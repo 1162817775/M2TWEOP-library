@@ -37,7 +37,6 @@ namespace console
 		consoleData.pressAmount = 0;
 	}
 
-
 	void handleMessageBoxResult(int result){
 		// Handle the return value
 		switch (result) {
@@ -124,9 +123,17 @@ namespace console
 			consoleData.input = luaPlugin::logCommands[consoleData.commandNum - 1 - consoleData.pressAmount];
 		}
 
-		// Script Editor
+		// Script Editor with support for Unicode input (e.g., Chinese)
 		if (ImGui::InputTextMultiline("##console", &consoleData.input, ImVec2(-FLT_MIN, -FLT_MIN),
-			ImGuiInputTextFlags_AllowTabInput | ImGuiInputTextFlags_EnterReturnsTrue))
+			ImGuiInputTextFlags_AllowTabInput | ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCharFilter,
+			[](ImGuiInputTextCallbackData* data) -> int {
+				// Allow all Unicode characters
+				if (data->EventFlag == ImGuiInputTextFlags_CallbackCharFilter)
+				{
+					return 0; // Accept all characters
+				}
+				return 0;
+			}))
 		{
 			if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
 			{

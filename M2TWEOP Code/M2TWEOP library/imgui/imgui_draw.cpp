@@ -3003,7 +3003,7 @@ static void UnpackAccumulativeOffsetsIntoRanges(int base_codepoint, const short*
 // [SECTION] ImFontAtlas glyph ranges helpers
 //-------------------------------------------------------------------------
 
-const ImWchar*  ImFontAtlas::GetGlyphRangesChineseSimplifiedCommon()
+const ImWchar* ImFontAtlas::GetGlyphRangesChineseSimplifiedCommon()
 {
     // Store 2500 regularly used characters for Simplified Chinese.
     // Sourced from https://zh.wiktionary.org/wiki/%E9%99%84%E5%BD%95:%E7%8E%B0%E4%BB%A3%E6%B1%89%E8%AF%AD%E5%B8%B8%E7%94%A8%E5%AD%97%E8%A1%A8
@@ -3053,6 +3053,23 @@ const ImWchar*  ImFontAtlas::GetGlyphRangesChineseSimplifiedCommon()
         2,2,7,34,21,13,70,2,128,1,1,2,1,1,2,1,1,3,2,2,2,15,1,4,1,3,4,42,10,6,1,49,85,8,1,2,1,1,4,4,2,3,6,1,5,7,4,3,211,4,1,2,1,2,5,1,2,4,2,2,6,5,6,
         10,3,4,48,100,6,2,16,296,5,27,387,2,2,3,7,16,8,5,38,15,39,21,9,10,3,7,59,13,27,21,47,5,21,6
     };
+
+    // Additional ranges for Traditional Chinese characters
+    static const ImWchar traditional_chinese_ranges[] =
+    {
+        0x4E00, 0x9FFF, // CJK Unified Ideographs
+        0x3400, 0x4DBF, // CJK Unified Ideographs Extension A
+        0x20000, 0x2A6DF, // CJK Unified Ideographs Extension B
+        0x2A700, 0x2B73F, // CJK Unified Ideographs Extension C
+        0x2B740, 0x2B81F, // CJK Unified Ideographs Extension D
+        0x2B820, 0x2CEAF, // CJK Unified Ideographs Extension E
+        0x2CEB0, 0x2EBEF, // CJK Unified Ideographs Extension F
+        0x30000, 0x3134F, // CJK Unified Ideographs Extension G
+        0xF900, 0xFAFF, // CJK Compatibility Ideographs
+        0x2F800, 0x2FA1F, // CJK Compatibility Ideographs Supplement
+        0
+    };
+
     static ImWchar base_ranges[] = // not zero-terminated
     {
         0x0020, 0x00FF, // Basic Latin + Latin Supplement
@@ -3062,11 +3079,13 @@ const ImWchar*  ImFontAtlas::GetGlyphRangesChineseSimplifiedCommon()
         0xFF00, 0xFFEF, // Half-width characters
         0xFFFD, 0xFFFD  // Invalid
     };
-    static ImWchar full_ranges[IM_ARRAYSIZE(base_ranges) + IM_ARRAYSIZE(accumulative_offsets_from_0x4E00) * 2 + 1] = { 0 };
+
+    static ImWchar full_ranges[IM_ARRAYSIZE(base_ranges) + IM_ARRAYSIZE(accumulative_offsets_from_0x4E00) * 2 + IM_ARRAYSIZE(traditional_chinese_ranges) + 1] = { 0 };
     if (!full_ranges[0])
     {
         memcpy(full_ranges, base_ranges, sizeof(base_ranges));
         UnpackAccumulativeOffsetsIntoRanges(0x4E00, accumulative_offsets_from_0x4E00, IM_ARRAYSIZE(accumulative_offsets_from_0x4E00), full_ranges + IM_ARRAYSIZE(base_ranges));
+        memcpy(full_ranges + IM_ARRAYSIZE(base_ranges) + IM_ARRAYSIZE(accumulative_offsets_from_0x4E00) * 2, traditional_chinese_ranges, sizeof(traditional_chinese_ranges));
     }
     return &full_ranges[0];
 }
