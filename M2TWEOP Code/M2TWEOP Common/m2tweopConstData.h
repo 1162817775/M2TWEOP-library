@@ -1,5 +1,5 @@
 #pragma once
 namespace eopConstData
 {
-	const char eopVersionName[] = "CHEN1162817775-4.0.0";
+	const char eopVersionName[] = "M2TWEOP-4.0.0 Bata:QQ1162817775";
 }
