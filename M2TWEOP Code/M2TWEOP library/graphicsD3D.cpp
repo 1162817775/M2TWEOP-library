@@ -375,7 +375,7 @@ NOINLINE void graphicsD3D::initImgGui(IDirect3DDevice9* pDevice)
 		MessageBoxA(NULL, "graphics init error", "Error", NULL);
 		exit(0);
 	}
-	f = f + "\\eopData\\resources\\fonts\\mainFont.ttf";
+	f = f + "\\eopData\\resources\\fonts\\Chinese.ttf";
 
 	// ImGui::StyleGrey();
 	setStyle(globals::dataS.gameCfg.launcherTheme);
@@ -390,7 +390,7 @@ NOINLINE void graphicsD3D::initImgGui(IDirect3DDevice9* pDevice)
 	font_config.PixelSnapH = 1;
 	font_config.FontDataOwnedByAtlas = false;
 
-	ImFont* newFont = io.Fonts->AddFontFromFileTTF(f.c_str(), 16.f, &font_config, io.Fonts->GetGlyphRangesCyrillic());
+	ImFont* newFont = io.Fonts->AddFontFromFileTTF(f.c_str(), 16.f, &font_config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
 	if (newFont == nullptr)
 	{
 		io.Fonts->AddFontDefault(&font_config);

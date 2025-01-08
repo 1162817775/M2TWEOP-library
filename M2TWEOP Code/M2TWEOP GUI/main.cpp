@@ -93,6 +93,8 @@ void initRender()
     SDL_GL_MakeCurrent(mainData.window, mainData.gl_context);
     SDL_GL_SetSwapInterval(1); // Enable vsync
     SDL_HideWindow(mainData.window);
+
+    SDL_StartTextInput();
     
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -101,6 +103,8 @@ void initRender()
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+    io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;     // 防止ImGui更改鼠标光标
+    io.ConfigInputTextCursorBlink = true;                       // 启用输入框光标闪烁
 
    // Setup Dear ImGui style
     setStyle(dataG::data.modData.themeName);
