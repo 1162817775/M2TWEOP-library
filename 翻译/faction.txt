@@ -1,4 +1,4 @@
-factionStruct = {
+faction = {
     factionID = int, -- 派系ID
     cultureID = int, -- 文化ID
     aiPersonalityType = int, -- AI个性类型
