@@ -1,4 +1,4 @@
-armyStruct = {
+army = {
     faction = factionStruct, -- 所属派系
     getUnit = getUnit, -- 获取单位
     numOfUnits = int, -- 单位数量
