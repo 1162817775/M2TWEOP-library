@@ -21,7 +21,7 @@ uint8_t m2tweopOptions::khakiTextRed = 0x80;
 uint8_t m2tweopOptions::khakiTextGreen = 0x77;
 uint8_t m2tweopOptions::khakiTextBlue = 0x61;
 
-scriptCommand::scriptCommand(const char* name) : className(name)
+scriptCommand::scriptCommand(const char *name) : className(name)
 {
 	this->vftable = dataOffsets::offsets.scriptCommandVFT;
 }
@@ -30,7 +30,7 @@ namespace gameHelpers
 {
 	using namespace std;
 
-	std::string callConsole(const std::string& cmdName, sol::variadic_args va)
+	std::string callConsole(const std::string &cmdName, sol::variadic_args va)
 	{
 		char buffer[100]{};
 		buffer[0] = '\0';
@@ -42,8 +42,8 @@ namespace gameHelpers
 			sprintf_s(buffer, "error");
 		return buffer;
 	}
-	
-	bool callGameConsoleCommand(const char* name, const char* arg, char* errorBuffer)
+
+	bool callGameConsoleCommand(const char *name, const char *arg, char *errorBuffer)
 	{
 		const auto cmd = dataOffsets::offsets.consoleCommands;
 		for (int i = 0; i < cmd->size; i++)
@@ -55,14 +55,14 @@ namespace gameHelpers
 		}
 		return false;
 	}
-	
-	int getScriptCounter(const char* counterName, bool& success)
+
+	int getScriptCounter(const char *counterName, bool &success)
 	{
-		auto eventsObject = reinterpret_cast<countersObjectS*>(dataOffsets::offsets.scriptCounters);
-		counterS* retS = nullptr;
+		auto eventsObject = reinterpret_cast<countersObjectS *>(dataOffsets::offsets.scriptCounters);
+		counterS *retS = nullptr;
 		int retValue = 0;
 		DWORD funcAdr = codes::offsets.getScriptCounter;
-		char** cryptS = gameStringHelpers::createHashedString(counterName);
+		char **cryptS = gameStringHelpers::createHashedString(counterName);
 		_asm {
 			push cryptS
 			mov ecx, eventsObject
@@ -87,8 +87,8 @@ namespace gameHelpers
 		}
 		return 0;
 	}
-	
-	void setScriptCounter(const char* counterName, int counterValue)
+
+	void setScriptCounter(const char *counterName, int counterValue)
 	{
 		if (!counterName)
 			return;
@@ -102,7 +102,7 @@ namespace gameHelpers
 		}
 		DWORD eventsObject = dataOffsets::offsets.scriptCountersSet;
 		DWORD funcAdr = codes::offsets.setScriptCounter;
-		char** cryptS = gameStringHelpers::createHashedString(counterName);
+		char **cryptS = gameStringHelpers::createHashedString(counterName);
 		_asm {
 			push counterValue
 			push cryptS
@@ -112,24 +112,24 @@ namespace gameHelpers
 		}
 		return;
 	}
-	
-	std::tuple<bool, int> getScriptCounterLua(const char* type)
+
+	std::tuple<bool, int> getScriptCounterLua(const char *type)
 	{
 		bool isExist = false;
 		int counterValue = getScriptCounter(type, isExist);
 		return std::make_tuple(isExist, counterValue);
 	}
-	
-	int getScriptCounterNoBool(const char* type)
+
+	int getScriptCounterNoBool(const char *type)
 	{
 		bool isExist = false;
 		const int counterValue = getScriptCounter(type, isExist);
 		return isExist ? counterValue : 0;
 	}
-	
-	bool conditionLua(const std::string& condition, const eventTrigger* eventData)
+
+	bool conditionLua(const std::string &condition, const eventTrigger *eventData)
 	{
-		const char* conditionC = condition.c_str();
+		const char *conditionC = condition.c_str();
 		return gameHelpers::condition(conditionC, eventData);
 	}
 
@@ -138,28 +138,28 @@ namespace gameHelpers
 		return globals::dataS.gameVersion;
 	}
 
-	void generateSprite(const std::string& model)
+	void generateSprite(const std::string &model)
 	{
-		void* unitSprites = nullptr;
-		return GAME_FUNC(void(__thiscall*)(void*, const char*), generateSprite)(unitSprites, model.c_str());
+		void *unitSprites = nullptr;
+		return GAME_FUNC(void(__thiscall *)(void *, const char *), generateSprite)(unitSprites, model.c_str());
 	}
 
-	void scriptCommandLua(const std::string& command, sol::variadic_args va)
+	void scriptCommandLua(const std::string &command, sol::variadic_args va)
 	{
-		const char* commandC = command.c_str();
+		const char *commandC = command.c_str();
 		if (va.size() == 0)
 			scriptCommand(commandC, "");
 		else
 			scriptCommand(commandC, va.begin()->as<std::string>().c_str());
 	}
-	
-	void saveGame(const char* path)
+
+	void saveGame(const char *path)
 	{
 		DWORD funcAddr = codes::offsets.saveGame;
 		DWORD offS = dataOffsets::offsets.saveGameHandler;
-		auto uni = new UNICODE_STRING*;
+		auto uni = new UNICODE_STRING *;
 		gameStringHelpers::createUniString(uni, path);
-		UNICODE_STRING*** ptrUni = &uni;
+		UNICODE_STRING ***ptrUni = &uni;
 		_asm
 		{
 			push 0
@@ -170,18 +170,20 @@ namespace gameHelpers
 		}
 	}
 
-	const char* getReligionName2(const int index)
+	const char *getReligionName2(const int index)
 	{
-		const auto* religionDb = *reinterpret_cast <religionDatabase**>(dataOffsets::offsets.religionDatabase);
-		const wchar_t* name = religionDb->religionNames[index]->string;
+		const auto *religionDb = *reinterpret_cast<religionDatabase **>(dataOffsets::offsets.religionDatabase);
+		const wchar_t *name = religionDb->religionNames[index]->string;
 		// Determine the size of the required buffer
 		const int size = WideCharToMultiByte(CP_UTF8, 0, name, -1, nullptr, 0, nullptr, nullptr);
-		if (size == 0) {
+		if (size == 0)
+		{
 			return nullptr;
 		}
 		// Allocate a buffer for the converted string
 		const auto buffer = new char[size];
-		if (buffer == nullptr) {
+		if (buffer == nullptr)
+		{
 			// Allocation failed
 			return nullptr;
 		}
@@ -191,18 +193,20 @@ namespace gameHelpers
 		return buffer;
 	}
 
-	const char* getClimateName2(const int index)
+	const char *getClimateName2(const int index)
 	{
-	    const auto stratMap = stratMapHelpers::getStratMap();
-		const wchar_t* name = stratMap->climates->climateArray[index].rcString->string;
+		const auto stratMap = stratMapHelpers::getStratMap();
+		const wchar_t *name = stratMap->climates->climateArray[index].rcString->string;
 		// Determine the size of the required buffer
 		const int size = WideCharToMultiByte(CP_UTF8, 0, name, -1, nullptr, 0, nullptr, nullptr);
-		if (size == 0) {
+		if (size == 0)
+		{
 			return nullptr;
 		}
 		// Allocate a buffer for the converted string
 		const auto buffer = new char[size];
-		if (buffer == nullptr) {
+		if (buffer == nullptr)
+		{
 			// Allocation failed
 			return nullptr;
 		}
@@ -212,78 +216,78 @@ namespace gameHelpers
 		return buffer;
 	}
 
-	const char* getReligionName(const int index)
+	const char *getReligionName(const int index)
 	{
 		if (!plugData::data.luaAll.hashLoaded || plugData::data.luaAll.religionNames.empty())
 			plugData::data.luaAll.fillHashMaps();
 		const auto religionName = plugData::data.luaAll.religionNames.find(index);
-		if (religionName == plugData::data.luaAll.religionNames.end()) 
+		if (religionName == plugData::data.luaAll.religionNames.end())
 			return nullptr;
 		return religionName->second;
 	}
 
-	const char* getClimateName(const int index)
+	const char *getClimateName(const int index)
 	{
 		if (!plugData::data.luaAll.hashLoaded || plugData::data.luaAll.climateNames.empty())
 			plugData::data.luaAll.fillHashMaps();
 		const auto name = plugData::data.luaAll.climateNames.find(index);
-		if (name == plugData::data.luaAll.climateNames.end()) 
+		if (name == plugData::data.luaAll.climateNames.end())
 			return nullptr;
 		return name->second;
 	}
 
-	const char* getCultureName(const int index)
+	const char *getCultureName(const int index)
 	{
 		if (!plugData::data.luaAll.hashNonCampaignLoaded || plugData::data.luaAll.cultureNames.empty())
 			plugData::data.luaAll.fillHashMapsNonCampaign();
 		const auto name = plugData::data.luaAll.cultureNames.find(index);
-		if (name == plugData::data.luaAll.cultureNames.end()) 
+		if (name == plugData::data.luaAll.cultureNames.end())
 			return nullptr;
 		return name->second;
 	}
 
-	religionDatabase* getReligionDatabase()
+	religionDatabase *getReligionDatabase()
 	{
-		return *reinterpret_cast <religionDatabase**>(dataOffsets::offsets.religionDatabase);
+		return *reinterpret_cast<religionDatabase **>(dataOffsets::offsets.religionDatabase);
 	}
 
 	int getReligionCount()
 	{
-		const auto* religionDb = getReligionDatabase();
+		const auto *religionDb = getReligionDatabase();
 		return religionDb->religionCount;
 	}
 
-	int getReligionN(const std::string& name)
+	int getReligionN(const std::string &name)
 	{
 		if (!plugData::data.luaAll.hashNonCampaignLoaded || plugData::data.luaAll.religionIndex.empty())
 			plugData::data.luaAll.fillHashMapsNonCampaign();
 		const auto religionIndex = plugData::data.luaAll.religionIndex.find(name);
-		if (religionIndex == plugData::data.luaAll.religionIndex.end()) 
+		if (religionIndex == plugData::data.luaAll.religionIndex.end())
 			return -1;
 		return religionIndex->second;
 	}
 
-	int getClimateN(const std::string& name)
+	int getClimateN(const std::string &name)
 	{
 		if (!plugData::data.luaAll.hashLoaded || plugData::data.luaAll.climateIndex.empty())
 			plugData::data.luaAll.fillHashMaps();
 		const auto index = plugData::data.luaAll.climateIndex.find(name);
-		if (index == plugData::data.luaAll.climateIndex.end()) 
+		if (index == plugData::data.luaAll.climateIndex.end())
 			return -1;
 		return index->second;
 	}
 
-	int getCultureN(const std::string& name)
+	int getCultureN(const std::string &name)
 	{
 		if (!plugData::data.luaAll.hashNonCampaignLoaded || plugData::data.luaAll.cultureIndex.empty())
 			plugData::data.luaAll.fillHashMapsNonCampaign();
 		const auto index = plugData::data.luaAll.cultureIndex.find(name);
-		if (index == plugData::data.luaAll.cultureIndex.end()) 
+		if (index == plugData::data.luaAll.cultureIndex.end())
 			return -1;
 		return index->second;
 	}
-	
-	DWORD getScriptCommandByName(const char* cmdName)
+
+	DWORD getScriptCommandByName(const char *cmdName)
 	{
 		DWORD func1 = codes::offsets.scriptCommandOne;
 		DWORD func2 = codes::offsets.scriptCommandTwo;
@@ -301,28 +305,27 @@ namespace gameHelpers
 		}
 		return result;
 	}
-	
-	bool condition(const char* condition, const eventTrigger* eventData)
+
+	bool condition(const char *condition, const eventTrigger *eventData)
 	{
 		auto fakeText = std::make_shared<fakeTextInput>(fakeTextInput(condition, 0));
 		auto rawText = fakeText.get();
-		const auto makeConditionFunc = reinterpret_cast<DWORD*>(codes::offsets.parseCondition);
-		void* result = nullptr;
+		const auto makeConditionFunc = reinterpret_cast<DWORD *>(codes::offsets.parseCondition);
+		void *result = nullptr;
 		_asm
-		{
+			{
 			push rawText
 			mov ecx, rawText
 			mov eax, makeConditionFunc
 			call eax
 			mov result, eax
 			add esp, 0x4
-		}
-		if (result == nullptr)
-			return false;
+			}
+		if (result == nullptr) return false;
 		return callVFunc<1, bool>(result, eventData);
 	}
 
-	void scriptCommand(const char* command, const char* args)
+	void scriptCommand(const char *command, const char *args)
 	{
 		DWORD scriptClass = getScriptCommandByName(command);
 		if (scriptClass == 0x0)
@@ -334,25 +337,24 @@ namespace gameHelpers
 		auto fakeText = std::make_shared<fakeTextInput>(fakeTextInput(fullCommand.c_str(), start));
 		DWORD classPointer = 0x0;
 		_asm
-		{
+			{
 			mov eax, scriptClass
 			mov eax, [eax]
 			mov classPointer, eax
-		}
+			}
 		fakeText->classPointer = classPointer;
 		DWORD funcAddr = scriptClass + static_cast<int8_t>(0x4);
 		DWORD scriptObject = 0x0;
 		_asm
-		{
+			{
 			push fakeText
 			mov eax, funcAddr
 			mov eax, [eax]
 			call eax
 			mov scriptObject, eax
 			add esp, 0x4
-		}
-		if (scriptObject == 0x0)
-			return;
+			}
+		if (scriptObject == 0x0) return;
 		_asm
 		{
 			mov ecx, scriptObject
@@ -361,10 +363,10 @@ namespace gameHelpers
 			call eax
 		}
 	}
-	
-	void fireGameScriptFunc(void* scriptStruct, DWORD offset)
+
+	void fireGameScriptFunc(void *scriptStruct, DWORD offset)
 	{
-		void* scriptStructPtr = scriptStruct;
+		void *scriptStructPtr = scriptStruct;
 		DWORD func = offset;
 		_asm
 		{
@@ -373,60 +375,58 @@ namespace gameHelpers
 			call eax
 		}
 	}
-	
-	void logStringGame(const std::string& msg)
+
+	void logStringGame(const std::string &msg)
 	{
-		const auto flushRate = reinterpret_cast<int*>(dataOffsets::offsets.logFlushRate);
+		const auto flushRate = reinterpret_cast<int *>(dataOffsets::offsets.logFlushRate);
 		const int oldRate = *flushRate;
 		*flushRate = 1;
 		const auto order = std::make_shared<gameLogCommand>(msg.c_str());
 		fireGameScriptFunc(order.get(), codes::offsets.gameLogCommand);
 		*flushRate = oldRate;
 	}
-	
-	void logFuncError(const std::string& funcName, const std::string& error)
+
+	void logFuncError(const std::string &funcName, const std::string &error)
 	{
 		logStringGame(funcName + " error: " + error);
 	}
-	
-	void loadSaveGame(const char* saveName)
+
+	void loadSaveGame(const char *saveName)
 	{
-		const auto nameMem = new UNICODE_STRING*;
-		const auto loadName = reinterpret_cast<UNICODE_STRING***>(dataOffsets::offsets.loadGameHandler + 0x4);
+		const auto nameMem = new UNICODE_STRING *;
+		const auto loadName = reinterpret_cast<UNICODE_STRING ***>(dataOffsets::offsets.loadGameHandler + 0x4);
 		*loadName = nameMem;
 		gameStringHelpers::createUniString(*loadName, saveName);
-		const auto currentHandler = reinterpret_cast<DWORD*>(dataOffsets::offsets.currentGameHandler);
+		const auto currentHandler = reinterpret_cast<DWORD *>(dataOffsets::offsets.currentGameHandler);
 		*currentHandler = dataOffsets::offsets.loadGameHandler;
 	}
 
-	stringWithHash* LOOKUP_EVENT = new stringWithHash();
-	
-	int incrementEventCounter(const std::string& name, const int value)
+	stringWithHash *LOOKUP_EVENT = new stringWithHash();
+
+	int incrementEventCounter(const std::string &name, const int value)
 	{
 		gameStringHelpers::setHashedString(&LOOKUP_EVENT->name, name.c_str());
 		const int newVal = value;
-		return GAME_FUNC(int(__thiscall*)(DWORD, stringWithHash*, int)
-			, incEventCounter)(dataOffsets::offsets.eventManager, LOOKUP_EVENT, newVal);
+		return GAME_FUNC(int(__thiscall *)(DWORD, stringWithHash *, int), incEventCounter)(dataOffsets::offsets.eventManager, LOOKUP_EVENT, newVal);
 	}
 
-	eventAcceptDecline* createEventAcceptDecline(const std::string& name)
+	eventAcceptDecline *createEventAcceptDecline(const std::string &name)
 	{
 		gameStringHelpers::setHashedString(&LOOKUP_EVENT->name, name.c_str());
 		const auto obj = techFuncs::createGameClass<eventAcceptDecline>();
-		GAME_FUNC(eventAcceptDecline*(__thiscall*)(eventAcceptDecline*, const char*, int)
-			, createEventAcceptObj)(obj, LOOKUP_EVENT->name, LOOKUP_EVENT->hash);
+		GAME_FUNC(eventAcceptDecline * (__thiscall *)(eventAcceptDecline *, const char *, int), createEventAcceptObj)(obj, LOOKUP_EVENT->name, LOOKUP_EVENT->hash);
 		return obj;
 	}
 
-	void historicEvent(const std::string& name, const std::string& title, const std::string& description, const bool isChoice, const int xCoord,
-					   const int yCoord, const sol::table& factions)
+	void historicEvent(const std::string &name, const std::string &title, const std::string &description, const bool isChoice, const int xCoord,
+					   const int yCoord, const sol::table &factions)
 	{
 		uint32_t facMask = 0;
 		if (const int facCount = factions.size(); facCount)
 		{
-			for (int i{ 1 }; i <= facCount; i++)
+			for (int i{1}; i <= facCount; i++)
 			{
-				const auto& fac = factions.get<sol::optional<std::string>>(i);
+				const auto &fac = factions.get<sol::optional<std::string>>(i);
 				if (!fac)
 					break;
 				auto faction = fac.value_or("");
@@ -442,29 +442,29 @@ namespace gameHelpers
 		}
 		historicEventRaw(name.c_str(), title.c_str(), description.c_str(), isChoice, facMask, xCoord, yCoord);
 	}
-	
-	void historicEventRaw(const char* name, const char* title, const char* description, bool isChoice, uint32_t factions, int xCoord, int yCoord)
+
+	void historicEventRaw(const char *name, const char *title, const char *description, bool isChoice, uint32_t factions, int xCoord, int yCoord)
 	{
 		DWORD funcAddr = codes::offsets.historicEventFunc;
 		incrementEventCounter(name, 1);
-		
-		UNICODE_STRING** titleUni = techFuncs::createGameClass<UNICODE_STRING*>();
+
+		UNICODE_STRING **titleUni = techFuncs::createGameClass<UNICODE_STRING *>();
 		gameStringHelpers::createUniString(titleUni, title);
 
-		UNICODE_STRING** bodyUni = techFuncs::createGameClass<UNICODE_STRING*>();
+		UNICODE_STRING **bodyUni = techFuncs::createGameClass<UNICODE_STRING *>();
 		gameStringHelpers::createUniString(bodyUni, description);
 
-		UNICODE_STRING*** titleUniP = &titleUni;
-		UNICODE_STRING*** bodyUniP = &bodyUni;
+		UNICODE_STRING ***titleUniP = &titleUni;
+		UNICODE_STRING ***bodyUniP = &bodyUni;
 
-		eventAcceptDecline* obj = nullptr;
+		eventAcceptDecline *obj = nullptr;
 		if (isChoice)
 			obj = createEventAcceptDecline(name);
 		int x = xCoord;
 		int y = yCoord;
 		uint32_t facMask = factions;
 		_asm
-		{
+			{
 			push facMask
 			push 0x0
 			push obj
@@ -476,52 +476,52 @@ namespace gameHelpers
 			mov eax, funcAddr
 			call eax
 			add esp, 0x20
-		}
+			}
 	}
 
 	bool isPlayingDlc()
 	{
 		if (getGameVersion() == 1)
 			return true;
-		return *reinterpret_cast<bool*>(dataOffsets::offsets.isDLC);
+		return *reinterpret_cast<bool *>(dataOffsets::offsets.isDLC);
 	}
 
 	void setPlayingDlc(const bool value)
 	{
 		if (getGameVersion() == 1)
 			return;
-		*reinterpret_cast<bool*>(dataOffsets::offsets.isDLC) = value;
+		*reinterpret_cast<bool *>(dataOffsets::offsets.isDLC) = value;
 	}
-	
-	void historicEvent(const std::string& name, const std::string& title, const std::string& description, const bool isChoice)
+
+	void historicEvent(const std::string &name, const std::string &title, const std::string &description, const bool isChoice)
 	{
 		historicEventRaw(name.c_str(), title.c_str(), description.c_str(), isChoice, 0x3FFFFFFF, -1, -1);
 	}
-	
-	void historicEvent(const std::string& name, const std::string& title, const std::string& description, const bool isChoice, const int xCoord,
+
+	void historicEvent(const std::string &name, const std::string &title, const std::string &description, const bool isChoice, const int xCoord,
 					   const int yCoord)
 	{
 		historicEventRaw(name.c_str(), title.c_str(), description.c_str(), isChoice, 0x3FFFFFFF, xCoord, yCoord);
 	}
-	
-	void historicEvent(const std::string& name, const std::string& title, const std::string& description)
+
+	void historicEvent(const std::string &name, const std::string &title, const std::string &description)
 	{
 		historicEventRaw(name.c_str(), title.c_str(), description.c_str(), false, 0x3FFFFFFF, -1, -1);
 	}
-	
+
 	std::string getModPath()
 	{
-		return  globals::dataS.modPath;
+		return globals::dataS.modPath;
 	}
 	std::string getLuaPath()
 	{
 		return plugData::data.luaAll.luaPath;
 	}
-	
-	std::string getModString(const std::string& path)
+
+	std::string getModString(const std::string &path)
 	{
 		std::string ret;
-		const size_t pos = path.find("/mods/", 0);
+		const size_t pos = path.find("/", 0);
 		for (UINT32 i = 0; i < path.size(); i++)
 		{
 			if (i > static_cast<UINT32>(pos))
@@ -531,7 +531,7 @@ namespace gameHelpers
 		}
 		return ret;
 	}
-	
+
 	std::string getModFolderName()
 	{
 		const std::string path = getModPath();
@@ -546,9 +546,9 @@ namespace gameHelpers
 		return path.substr(pos + 1, path.length() - pos);
 	}
 
-	void copyFileLua(const std::string& file, const std::string& to)
+	void copyFileLua(const std::string &file, const std::string &to)
 	{
-		//CopyFileA(file.c_str(), to.c_str(), FALSE);
+		// CopyFileA(file.c_str(), to.c_str(), FALSE);
 		if (!std::filesystem::exists(file))
 		{
 			logStringGame("M2TWEOP.copyFile: File not found: " + file);
@@ -557,18 +557,18 @@ namespace gameHelpers
 		std::filesystem::copy(file, to, std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive);
 	}
 
-	UNICODE_STRING*** getHashedUniString(void* stringTable, const std::string& key)
+	UNICODE_STRING ***getHashedUniString(void *stringTable, const std::string &key)
 	{
 		auto uniString = new UNICODE_STRING();
-		UNICODE_STRING** lookup = &uniString;
+		UNICODE_STRING **lookup = &uniString;
 		gameStringHelpers::createUniString(lookup, key.c_str());
-		const auto value =  callClassFunc<void*, UNICODE_STRING***, UNICODE_STRING***>(stringTable, 0x4, &lookup);
+		const auto value = callClassFunc<void *, UNICODE_STRING ***, UNICODE_STRING ***>(stringTable, 0x4, &lookup);
 		return value;
 	}
 
-	void setExpandedString(const std::string& key, const std::string& value)
+	void setExpandedString(const std::string &key, const std::string &value)
 	{
-		const auto stringTable = *reinterpret_cast<void**>(dataOffsets::offsets.expandedBinTable);
+		const auto stringTable = *reinterpret_cast<void **>(dataOffsets::offsets.expandedBinTable);
 		const auto uniString = getHashedUniString(stringTable, key);
 		if (!uniString)
 			return;
@@ -583,7 +583,7 @@ namespace gameHelpers
 			int ladder;
 			int siegeTower;
 		};
-		const auto costs = reinterpret_cast<equipmentCosts*>(dataOffsets::offsets.equipmentCosts);
+		const auto costs = reinterpret_cast<equipmentCosts *>(dataOffsets::offsets.equipmentCosts);
 		switch (equipType)
 		{
 		case 0:
@@ -600,19 +600,19 @@ namespace gameHelpers
 		}
 	}
 
-	options1* getOptions1()
+	options1 *getOptions1()
 	{
-		return reinterpret_cast<options1*>(dataOffsets::offsets.options1);
+		return reinterpret_cast<options1 *>(dataOffsets::offsets.options1);
 	}
 
-	options2* getOptions2()
+	options2 *getOptions2()
 	{
-		return reinterpret_cast<options2*>(dataOffsets::offsets.options2);
+		return reinterpret_cast<options2 *>(dataOffsets::offsets.options2);
 	}
 
-	void addToIntArray(int** array, int* value)
+	void addToIntArray(int **array, int *value)
 	{
-		GAME_FUNC(void(__thiscall*)(int**, int*), addToArrayInt)(array, value);
+		GAME_FUNC(void(__thiscall *)(int **, int *), addToArrayInt)(array, value);
 	}
 
 	void setAncLimit(uint8_t limit)
@@ -629,7 +629,7 @@ namespace gameHelpers
 		codeOffset += 6;
 		MemWork::WriteData(&max, codeOffset, 2);
 	}
-	
+
 	void setMaxBgSize(unsigned char size)
 	{
 		const DWORD cmpAdr = dataOffsets::offsets.maxBgSize1 + 2;
@@ -638,16 +638,16 @@ namespace gameHelpers
 		MemWork::WriteData(&size, retAdr, 1);
 	}
 
-	gameDataAllStruct* getGameDataAll()
+	gameDataAllStruct *getGameDataAll()
 	{
 		return dataOffsets::offsets.gameDataAllOffset;
 	}
-	
+
 	void unlockConsoleCommands()
 	{
-		uchar nops[2] = { 0x90,0x90 };
+		uchar nops[2] = {0x90, 0x90};
 		DWORD cmd = dataOffsets::offsets.unlockConsoleCommands1;
-		//check checking code and change all jmps to nops
+		// check checking code and change all jmps to nops
 		for (int i = 0; i < 53; i++, cmd++)
 		{
 			uchar ch;
@@ -655,12 +655,12 @@ namespace gameHelpers
 			if (ch == 0x74)
 				MemWork::WriteData(nops, cmd, 2);
 		}
-		//unlock change_faction
-		uchar nops1[6] = { 0x90,0x90,0x90,0x90,0x90,0x90 };
+		// unlock change_faction
+		uchar nops1[6] = {0x90, 0x90, 0x90, 0x90, 0x90, 0x90};
 		cmd = dataOffsets::offsets.unlockConsoleCommands2;
 		MemWork::WriteData(nops1, cmd, 6);
 	}
-	
+
 	bool HIGHLIGHT_ON = false;
 	void toggleUnitHighlight()
 	{
@@ -678,12 +678,12 @@ namespace gameHelpers
 			HIGHLIGHT_ON = false;
 		}
 	}
-	
+
 	void setReligionsLimit(unsigned char limit)
 	{
 		MemWork::WriteData(&limit, dataOffsets::offsets.religionLimit, 1);
 	}
-	
+
 	void setBuildingChainLimit(unsigned int limit)
 	{
 		limit++;
@@ -701,16 +701,16 @@ namespace gameHelpers
 	{
 		return *dataOffsets::offsets.gameUnit_size;
 	}
-	
-	void addToLua(sol::state& luaState)
+
+	void addToLua(sol::state &luaState)
 	{
 		struct
 		{
 			sol::usertype<options1> options1;
 			sol::usertype<options2> options2;
-		}typeAll;
-		
-		///Game Options
+		} typeAll;
+
+		/// Game Options
 		//@section options1
 
 		/***
@@ -811,10 +811,9 @@ namespace gameHelpers
 		typeAll.options1.set("disableVnVs", &options1::disableVnVs);
 		typeAll.options1.set("allUsers", &options1::allUsers);
 
-
 		/***
 		Basic options2 table
-		
+
 		@tfield int campaignResolutionX
 		@tfield int campaignResolutionY
 		@tfield int battleResolutionX
@@ -951,7 +950,7 @@ namespace gameHelpers
 		typeAll.options2.set("unitSizeMultiplierLow", &options2::unitSizeMultiplierLow);
 		typeAll.options2.set("unitSizeMultiplierMedium", &options2::unitSizeMultiplierMedium);
 		typeAll.options2.set("unitSizeMultiplierLarge", &options2::unitSizeMultiplierLarge);
-		
+
 		/***
 		Check if a faction was selected on faction select screen.
 		@function options2:isHotseatPlayer
@@ -961,7 +960,7 @@ namespace gameHelpers
 			local selected = options2:isHotseatPlayer(1)
 		*/
 		typeAll.options2.set_function("isHotseatPlayer", &options2::isHotseatPlayer);
-		
+
 		/***
 		Select a faction on faction select screen.
 		@function options2:setHotseatPlayer
@@ -971,7 +970,6 @@ namespace gameHelpers
 			options2:setHotseatPlayer(1, true)
 		*/
 		typeAll.options2.set_function("setHotseatPlayer", &options2::setHotseatPlayer);
-	
 	}
-	
+
 }

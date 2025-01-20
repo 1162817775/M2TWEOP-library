@@ -3,7 +3,7 @@
 #include "gameRunnerUI.h"
 bool gameStarter::startGame()
 {
-	//SetCurrentDirectoryA("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Medieval II Total War\\mods\\teutonic");
+	// SetCurrentDirectoryA("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Medieval II Total War\\mods\\teutonic");
 	string gameStartArgs;
 
 	if (dataG::data.gameData.gameMode == 0)
@@ -26,7 +26,7 @@ bool gameStarter::startGame()
 			return false;
 		}
 	}
-	//dlc
+	// dlc
 	else if (dataG::data.gameData.gameMode < 6)
 	{
 		helpers::addModPathArg(gameStartArgs, dataG::data.gameData.gameMode);
@@ -36,7 +36,7 @@ bool gameStarter::startGame()
 			return false;
 		}
 	}
-	//mod
+	// mod
 	else
 	{
 		if (initM2TWEOP() == false)
@@ -46,7 +46,7 @@ bool gameStarter::startGame()
 		}
 		if (dataG::data.modData.useVanillaConfig == true)
 		{
-			dataG::data.gameData.gameArgs += " --features.mod=mods/";
+			dataG::data.gameData.gameArgs += " --features.mod=/";
 			dataG::data.gameData.gameArgs += dataG::data.gameData.modFolder;
 			if (!runGameExe())
 			{
@@ -55,18 +55,16 @@ bool gameStarter::startGame()
 		}
 		else
 		{
-			dataG::data.gameData.gameArgs += " @mods\\";
+			dataG::data.gameData.gameArgs += " --io.file_first";
 			dataG::data.gameData.gameArgs += dataG::data.gameData.modFolder;
 			dataG::data.gameData.gameArgs += '\\';
 			dataG::data.gameData.gameArgs += dataG::data.modData.configName;
-
 
 			if (!runGameExe())
 			{
 				return false;
 			}
 		}
-
 	}
 	return true;
 }
@@ -87,12 +85,10 @@ bool gameStarter::runGameExe()
 			"eopModFolder:",
 			currentPath.c_str(),
 			"GameVer:",
-			to_string(dataG::data.gameData.gameVer).c_str()
-		);
-
+			to_string(dataG::data.gameData.gameVer).c_str());
 	}
 
-	//mod
+	// mod
 	if (dataG::data.gameData.gameMode == 7 && isEopNeeded)
 	{
 		gameRunnerUI::setRunParams(dataG::data.gameData.gamePath, dataG::data.gameData.gameArgs, eopArgs, isEopNeeded);
@@ -105,7 +101,7 @@ bool gameStarter::runGameExe()
 
 	return true;
 }
-void gameStarter::ensureFiles(std::vector<std::wstring>& newFiles, std::vector<std::wstring>& oldFiles)
+void gameStarter::ensureFiles(std::vector<std::wstring> &newFiles, std::vector<std::wstring> &oldFiles)
 {
 	using namespace boost::filesystem;
 	for (size_t i = 0; i < newFiles.size(); ++i)
@@ -141,18 +137,18 @@ bool gameStarter::initM2TWEOP()
 	}
 
 	std::vector<std::wstring> newFiles = {
-	L"d3d9_vk.dll",
-	L"d3d9.dll",
-	L"libfbxsdk.dll",
-	L"lua5.1.dll",
-	L"openal32.dll",
-	L"discord_game_sdk.dll",
-	L"avcodec-61.dll",
-	L"avfilter-10.dll",
-	L"avformat-61.dll",
-	L"avutil-59.dll",
-	L"swresample-5.dll",
-	L"swscale-8.dll",
+		L"d3d9_vk.dll",
+		L"d3d9.dll",
+		L"libfbxsdk.dll",
+		L"lua5.1.dll",
+		L"openal32.dll",
+		L"discord_game_sdk.dll",
+		L"avcodec-61.dll",
+		L"avfilter-10.dll",
+		L"avformat-61.dll",
+		L"avutil-59.dll",
+		L"swresample-5.dll",
+		L"swscale-8.dll",
 	};
 
 	std::vector<std::wstring> oldFiles = {
