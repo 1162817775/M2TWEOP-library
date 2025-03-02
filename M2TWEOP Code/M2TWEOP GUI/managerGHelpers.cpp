@@ -33,7 +33,7 @@ namespace managerG
 	void loadFonts()
 	{
 		float fontsSize = 22.f;
-		loadFont(&dataG::data.fonts.mainFont, "eopData/resources/fonts/mainFont.ttf", "mainFont", fontsSize);
+		loadFont(&dataG::data.fonts.mainFont, "eopData/resources/fonts/Chinese.ttf", "mainFont", fontsSize);
 
 		loadFont(&dataG::data.fonts.markdownH1Font, "eopData/resources/fonts/markdownH1Font.ttf", "markdownH1Font", 12.f);
 		loadFont(&dataG::data.fonts.markdownH2Font, "eopData/resources/fonts/markdownH2Font.ttf", "markdownH2Font", 18.f);

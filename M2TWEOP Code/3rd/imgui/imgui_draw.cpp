@@ -3054,14 +3054,69 @@ const ImWchar*  ImFontAtlas::GetGlyphRangesChineseSimplifiedCommon()
         10,3,4,48,100,6,2,16,296,5,27,387,2,2,3,7,16,8,5,38,15,39,21,9,10,3,7,59,13,27,21,47,5,21,6
     };
     static ImWchar base_ranges[] = // not zero-terminated
-    {
-        0x0020, 0x00FF, // Basic Latin + Latin Supplement
-        0x2000, 0x206F, // General Punctuation
-        0x3000, 0x30FF, // CJK Symbols and Punctuations, Hiragana, Katakana
-        0x31F0, 0x31FF, // Katakana Phonetic Extensions
-        0xFF00, 0xFFEF, // Half-width characters
-        0xFFFD, 0xFFFD  // Invalid
-    };
+        {
+            0x0020, 0x00FF,   // Basic Latin + Latin Supplement
+            0x2000, 0x206F,   // General Punctuation
+            0x3000, 0x30FF,   // CJK Symbols and Punctuations, Hiragana, Katakana
+            0x31F0, 0x31FF,   // Katakana Phonetic Extensions
+            0xFF00, 0xFFEF,   // Half-width characters
+            0xFFFD, 0xFFFD,   // Invalid
+            0x2100, 0x214F,   // Letterlike Symbols
+            0x2190, 0x21FF,   // Arrows
+            0x2200, 0x22FF,   // Mathematical Operators
+            0x2300, 0x23FF,   // Miscellaneous Technical
+            0x2400, 0x243F,   // Control Pictures
+            0x2440, 0x245F,   // Optical Character Recognition
+            0x2460, 0x24FF,   // Enclosed Alphanumerics
+            0x2500, 0x257F,   // Box Drawing
+            0x2580, 0x259F,   // Block Elements
+            0x25A0, 0x25FF,   // Geometric Shapes
+            0x2600, 0x26FF,   // Miscellaneous Symbols
+            0x2700, 0x27BF,   // Dingbats
+            0x27C0, 0x27EF,   // Miscellaneous Mathematical Symbols-A
+            0x27F0, 0x27FF,   // Supplemental Arrows-A
+            0x2800, 0x28FF,   // Braille Patterns
+            0x2900, 0x297F,   // Supplemental Arrows-B
+            0x2980, 0x29FF,   // Miscellaneous Mathematical Symbols-B
+            0x2A00, 0x2AFF,   // Supplemental Mathematical Operators
+            0x2B00, 0x2BFF,   // Miscellaneous Symbols and Arrows
+            0x2E80, 0x2EFF,   // CJK Radicals Supplement
+            0x2F00, 0x2FDF,   // Kangxi Radicals
+            0x2FF0, 0x2FFF,   // Ideographic Description Characters
+            0x3000, 0x303F,   // CJK Symbols and Punctuation
+            0x3040, 0x309F,   // Hiragana
+            0x30A0, 0x30FF,   // Katakana
+            0x3100, 0x312F,   // Bopomofo
+            0x3130, 0x318F,   // Hangul Compatibility Jamo
+            0x3190, 0x319F,   // Kanbun
+            0x31A0, 0x31BF,   // Bopomofo Extended
+            0x31C0, 0x31EF,   // CJK Strokes
+            0x31F0, 0x31FF,   // Katakana Phonetic Extensions
+            0x3200, 0x32FF,   // Enclosed CJK Letters and Months
+            0x3300, 0x33FF,   // CJK Compatibility
+            0x3400, 0x4DBF,   // CJK Unified Ideographs Extension A
+            0x4E00, 0x9FFF,   // CJK Unified Ideographs
+            0xA000, 0xA48F,   // Yi Syllables
+            0xA490, 0xA4CF,   // Yi Radicals
+            0xAC00, 0xD7AF,   // Hangul Syllables
+            0xF900, 0xFAFF,   // CJK Compatibility Ideographs
+            0xFE30, 0xFE4F,   // CJK Compatibility Forms
+            0xFF00, 0xFFEF,   // Halfwidth and Fullwidth Forms
+            0x1F300, 0x1F5FF, // Miscellaneous Symbols and Pictographs
+            0x1F600, 0x1F64F, // Emoticons
+            0x1F680, 0x1F6FF, // Transport and Map Symbols
+            0x1F700, 0x1F77F, // Alchemical Symbols
+            0x1F780, 0x1F7FF, // Geometric Shapes Extended
+            0x1F800, 0x1F8FF, // Supplemental Arrows-C
+            0x1F900, 0x1F9FF, // Supplemental Symbols and Pictographs
+            0x1FA00, 0x1FA6F, // Chess Symbols
+            0x1FA70, 0x1FAFF, // Symbols and Pictographs Extended-A
+            0x1FB00, 0x1FBFF, // Symbols and Pictographs Extended-B
+            0x1FC00, 0x1FCFF, // Symbols and Pictographs Extended-C
+            0x1FD00, 0x1FDFF, // Symbols and Pictographs Extended-D
+            0x1FE00, 0x1FEFF, // Symbols and Pictographs Extended-E
+            0x1FF00, 0x1FFFF, // Symbols and Pictographs Extended-F
+        };
     static ImWchar full_ranges[IM_ARRAYSIZE(base_ranges) + IM_ARRAYSIZE(accumulative_offsets_from_0x4E00) * 2 + 1] = { 0 };
     if (!full_ranges[0])
     {
