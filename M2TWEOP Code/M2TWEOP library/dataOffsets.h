@@ -30,6 +30,7 @@ public:
 		DWORD equipmentCosts = NULL;
 		DWORD saveGameHandler = NULL;
 		DWORD ancLimit = NULL;
+		DWORD religionTriggerBug = NULL;
 		DWORD maxUnitSize = NULL;
 		DWORD maxBgSize1 = NULL;
 		DWORD maxBgSize2 = NULL;
@@ -55,6 +56,8 @@ public:
 		DWORD getMovePath = NULL;
 		DWORD modelsDb = NULL;
 		DWORD eventManager = NULL;
+		DWORD currentCharacterActionType = NULL;
+		DWORD aStarTilesGlobal = NULL;
 
 		gameDataAllStruct* gameDataAllOffset = nullptr;
 		consoleCommands* consoleCommands = nullptr;

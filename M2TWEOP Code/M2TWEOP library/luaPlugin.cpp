@@ -278,7 +278,9 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield getFactionRecordNum getFactionRecordNum
 	@tfield hideUnknownUnitTooltips hideUnknownUnitTooltips
 	@tfield handleUnitCards handleUnitCards
+	@tfield setWatchTowerRange setWatchTowerRange
 	@tfield enableFamilyEventsWithoutTree enableFamilyEventsWithoutTree
+	@tfield useEopFrontiers useEopFrontiers
 	@tfield setKhakiTextColor setKhakiTextColor
 	@tfield getMinorSettlementBalance getMinorSettlementBalance
 	@tfield generateSprite generateSprite
@@ -421,7 +423,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tparam string from
 	@tparam string to
 	@usage
-	    M2TWEOP.copyFile(M2TWEOP.getModPath().."/saves/newsave.sav",  M2TWEOP.getModPath().."/backupSaves/newsave.sav");
+	    M2TWEOP.copyFile(M2TWEOP.getModPath().."/saves/newsave.sav",  M2TWEOP.getModPath().."/isSaveBackupEnabled/newsave.sav");
 	*/
 	tables.M2TWEOP.set_function("copyFile", &gameHelpers::copyFileLua);
 	
@@ -527,7 +529,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	M2TWEOP.setAncillariesLimit(15);
 	*/
 	tables.M2TWEOP.set_function("setAncillariesLimit", &gameHelpers::setAncLimit);
-	
+
 	/***
 	Unlocks all console commands, also allows the use of the 'control' command to change factions in singleplayer campaigns.
 	@function M2TWEOP.unlockGameConsoleCommands
@@ -968,6 +970,15 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	tables.M2TWEOP.set_function("hideUnknownUnitTooltips", &m2tweopOptions::setHideUnknownUnitTooltips);
 	
 	/***
+	Recalculates frontier tiles for the AI using EOP algorithms.
+	@function M2TWEOP.useEopFrontiers
+	@tparam bool set
+	@usage
+		M2TWEOP.useEopFrontiers(true)
+	*/
+	tables.M2TWEOP.set_function("useEopFrontiers", &m2tweopOptions::setUseEopFrontiers);
+	
+	/***
 	Faction specific unit cards are always chosen if found. Enabled by default.
 	@function M2TWEOP.handleUnitCards
 	@tparam bool set
@@ -975,6 +986,15 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 		M2TWEOP.handleUnitCards(true)
 	*/
 	tables.M2TWEOP.set_function("handleUnitCards", &m2tweopOptions::setHandleUnitCards);
+
+	/***
+	Set watchtower range. Default: 10.
+	@function M2TWEOP.setWatchTowerRange
+	@tparam int newRange
+	@usage
+		M2TWEOP.setWatchTowerRange(20)
+	*/
+	tables.M2TWEOP.set_function("setWatchTowerRange", &m2tweopOptions::setWatchTowerRange);
 	
 	/***
 	Factions without a family tree or a teutonic one still get marriage offers and produce children. Enabled by default.

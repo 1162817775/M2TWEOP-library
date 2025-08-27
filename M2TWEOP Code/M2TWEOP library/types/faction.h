@@ -319,8 +319,11 @@ struct factionStruct {
 	int32_t lastOpponentId; //0x0EEC
 public:
 	characterRecord* getCharacterByLabel(const std::string& label);
+	characterRecord* getFamilyHead();
+	characterRecord* newRecord();
 	void setLeader(characterRecord* newLeader, bool onlyLeader);
 	void updateNeighbours();
+	void setCapital(settlementStruct* newCapital);
 	void setFactionBanner(const std::string& newFac);
 	characterRecord* ancillaryExists(const std::string& ancName);
 	int getAliveCharacterNumOfType(characterTypeStrat charType);
@@ -519,7 +522,7 @@ namespace factionHelpers
 	float getFactionStanding(const factionStruct* fac1, const factionStruct* fac2);
 	watchTowerStruct* spawnWatchtower(const factionStruct* fac, int x, int y);
 	void setFactionStanding(const factionStruct* fac1, const factionStruct* fac2, float standing);
-	std::string getLocalizedFactionName(factionStruct* fac);
+	std::string getLocalizedFactionName(const factionStruct* fac);
 	void* disembark(armyStruct* army, int x, int y);
 	armyStruct* splitArmy(factionStruct *faction, const sol::table& units, int x, int y);
 	bool getTileVisibility(factionStruct* faction, int x, int y);

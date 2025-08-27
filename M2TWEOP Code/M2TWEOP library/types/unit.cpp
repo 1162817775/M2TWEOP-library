@@ -19,6 +19,7 @@
 #include "gameHelpers.h"
 #include "strategyMap.h"
 
+std::unique_ptr<eopMountedEngineDb> eopMountedEngineDb::m_MountedEngineDb = std::make_unique<eopMountedEngineDb>();
 
 std::unordered_map<int, const char*> actionTypes = {
 	{0,"idling"},
@@ -134,13 +135,91 @@ void unit::setWeapon(uint8_t wpn)
 	GAME_FUNC(void(__thiscall*)(unit*, uint8_t), setUnitWeaponFunc)(this, weapon);
 }
 
+bool unitDb::parse(descrParser* parser)
+{
+	while (parser->walker < parser->end)
+	{
+		eduEntry* newEntry;
+		bool isEop = false;
+		if (this->numberOfEntries < 500)
+		{
+			newEntry = &unitEntries[this->numberOfEntries];
+			this->numberOfEntries++;
+		}
+		else
+		{
+			newEntry = techFuncs::createGameClass<eduEntry>();
+			GAME_FUNC(void(__thiscall*)(eduEntry*), createEduEntry)(newEntry);
+			isEop = true;
+		}
+		if (!GAME_FUNC(bool(__thiscall*)(eduEntry*, descrParser*), readEDUEntryFunc)(newEntry, parser))
+		{
+			gameHelpers::logStringGame("DATABASE_TABLE error found : error reading record from file  " + std::string(parser->getFileName()));
+			return false;
+		}
+		if (!isEop)
+		{
+			char** name = &newEntry->eduType; 
+			if (GAME_FUNC(int(__thiscall*)(int*, char**), dbHashTableGet)(&this->maxEntryNum, name))
+			{
+				gameHelpers::logStringGame("DATABASE_TABLE error found : ids must be unique, non-unique entry " + std::string(*name) + " found in file " + parser->getFileName());
+				return false;
+			}
+			GAME_FUNC(void(__thiscall*)(int*, char**, unsigned long*), dbHashTableSet)(&this->maxEntryNum, name, &newEntry->index);
+		}
+		else
+		{
+			eopDu::addEopEduEntryFromEdu(newEntry);
+		}
+		
+	}
+	return true;
+}
+
+bool mountedEngineDb::parse(descrParser* parser)
+{
+	while (parser->walker < parser->end)
+	{
+		mountedEngine* newEngine;
+		if (this->mountedEngineNum < 4)
+		{
+			newEngine = &this->mountedEngines[this->mountedEngineNum];
+			this->mountedEngineNum++;
+		}
+		else
+		{
+			newEngine = techFuncs::createGameClass<mountedEngine>();
+			GAME_FUNC(void(__thiscall*)(mountedEngine*), createMountedEngineRecord)(newEngine);
+		}
+		if (!GAME_FUNC(bool(__thiscall*)(mountedEngine*, descrParser*), ParseDescrMountedEngineEntry)(newEngine, parser))
+		{
+			gameHelpers::logStringGame("DATABASE_TABLE error found: error reading record from file " + std::string(parser->getFileName()));
+			return false;
+		}
+		
+		if (eopMountedEngineDb::get()->getMountedEngine(newEngine->record.name.getString()))
+			gameHelpers::logStringGame("mountedEngineDb::parse: Added duplicate engine, overwriting");
+		
+		eopMountedEngineDb::get()->addMountedEngine(newEngine->record.name.getString(), newEngine);
+	}
+	return true;
+}
+
 namespace unitActions
 {
 	
     unit* getUnitByLabel(const char* label)
     {
-        const auto labelCrypt = gameStringHelpers::createHashedString(label);
-        return GAME_FUNC(unit*(__cdecl*)(char**), getUnitByLabel)(labelCrypt);
+    	if (!label)
+    		return nullptr;
+        const auto labelCrypt = gameStringHelpers::createHashedStringGame(label);
+        const auto un = GAME_FUNC(unit*(__cdecl*)(stringWithHash*), getUnitByLabel)(labelCrypt);
+    	gameStringHelpers::freeHashString(labelCrypt);
+    	if (!un)
+    	{
+    		gameHelpers::logStringGame("unitActions::getUnitByLabel: unit not found with label: " + std::string(label));
+    	}
+	    return un;
     }
     
     /*----------------------------------------------------------------------------------------------------------------*\
@@ -830,13 +909,33 @@ namespace unitHelpers
 
 	unit* createUnitN(const char* type, int regionID, int facNum, int exp, int arm, int weap)
 	{
+		if (!type)
+		{
+			gameHelpers::logStringGame("Can not create unit, type is null");
+			return nullptr;
+		}
 		const int unitIndex = getEduIndex(type);
+		if (unitIndex == -1)
+		{
+			gameHelpers::logStringGame("Can not create unit, type not found: " + std::string(type));
+			return nullptr;
+		}
 		return createUnitIdx2(unitIndex, regionID, facNum, exp, arm, weap, -1);
 	}
 	
 	unit* createUnitN(const char* type, int regionID, int facNum, int exp, int arm, int weap, int soldierCount)
 	{
+		if (!type)
+		{
+			gameHelpers::logStringGame("Can not create unit, type is null");
+			return nullptr;
+		}
 		const int unitIndex = getEduIndex(type);
+		if (unitIndex == -1)
+		{
+			gameHelpers::logStringGame("Can not create unit, type not found: " + std::string(type));
+			return nullptr;
+		}
 		return createUnitIdx2(unitIndex, regionID, facNum, exp, arm, weap, soldierCount);
 	}
 
@@ -873,7 +972,10 @@ namespace unitHelpers
 	unit* createUnitIdx2(const int index, const int regionId, const int facNum, const int exp, const uint8_t arm, const uint8_t weapon, const int soldiers)
 	{
 		if (!eopDu::getEduEntry(index))
+		{
+			gameHelpers::logStringGame("Can not create unit, index not found: " + std::to_string(index));
 			return nullptr;
+		}
 		
 		regionStruct* region = stratMapHelpers::getRegion(regionId);
 		const auto un = GAME_FUNC(unit*(__stdcall*)(regionStruct*, int, int, int, int), createUnitFunc2)(region, index, facNum, exp, soldiers);
@@ -966,7 +1068,7 @@ namespace unitHelpers
 
 	void setSoldiersCount(unit* un, int count)
 	{
-		if (count == 0)
+		if (count <= 0)
 		{
 			killUnit(un);
 			return;
@@ -1109,6 +1211,11 @@ namespace unitHelpers
 			mov group, eax
 		}
 		delete labelHash;
+		if (!group)
+		{
+			gameHelpers::logStringGame("Can not find group with label: " + std::string(label));
+			return nullptr;
+		}
 		return *group;
 	}
 	
@@ -1124,6 +1231,7 @@ namespace unitHelpers
 			if (allLabels->labels[i].group == group)
 				return allLabels->labels[i].name;
 		}
+		gameHelpers::logStringGame("getGroupLabel: Can not find group label");
 		return "";
 	}
 
@@ -1362,6 +1470,9 @@ namespace unitHelpers
 	
 	int getEduIndex(const char* type)
 	{
+		if (!type)
+			return -1;
+		
 		if (const auto data = eopDu::getEopEduEntryByName(type))
 			return data->index;
 		
@@ -1376,6 +1487,7 @@ namespace unitHelpers
 			}
 		}
 
+		gameHelpers::logStringGame("Edu index not found for type: " + std::string(type));
 		return -1;
 	}
 
@@ -1416,6 +1528,7 @@ namespace unitHelpers
 				gameHelpers::logStringGame("getEduEntryByName: No name for unit at index: " + std::to_string(i));
 			}
 		}
+		gameHelpers::logStringGame("getEduEntryByName: No unit found with name: " + std::string(type));
 		return nullptr;
 	}
 
@@ -1461,6 +1574,7 @@ void luaPlugin::initUnits()
 		sol::usertype<statArmour> defenseStats;
 		sol::usertype<unitStats> unitStats;
 		sol::usertype<unitAiGroupData> unitAiGroupData;
+		sol::usertype<vector3> vector3;
 	}types;
 	
 	///Unit
@@ -1520,6 +1634,8 @@ void luaPlugin::initUnits()
 	@tfield setParams setParams change soldierCountStratMap, exp, armourLVL, weaponLVL at one time.
 	@tfield hasAttribute hasAttribute Check if unit has edu attribute.
 	@tfield string alias
+	@tfield int crusadeState >0 means crusading, <0 means disbaning, 0 means no crusade
+	@tfield crusadeStruct crusade
 	@tfield hasBattleProperty hasBattleProperty
 	@tfield setBattleProperty setBattleProperty
 	@tfield getActionStatus getActionStatus
@@ -1575,6 +1691,8 @@ void luaPlugin::initUnits()
 	types.unit.set("flankRightThreat", &unit::flankRightThreat);
 	types.unit.set("flankLeftThreat", &unit::flankLeftThreat);
 	types.unit.set("flankRearThreat", &unit::flankRearThreat);
+	types.unit.set("crusadeState", &unit::crusadeState);
+	types.unit.set("crusade", &unit::crusade);
 	types.unit.set("soldiersFled", &unit::soldiersFled);
 	types.unit.set("aiGroupData", &unit::unitAiGroupData);
 	types.unit.set("isInfighting", &unit::isInfighting);
@@ -2325,22 +2443,70 @@ void luaPlugin::initUnits()
 	/***
 
 	@tfield string name
+	@tfield string modelName
 	@tfield int mountClass
 	@tfield float radius
+	@tfield float xRadius
+	@tfield float yRadius
+	@tfield float yOffset
+	@tfield float height
 	@tfield float mass
 	@tfield float elephantDeadRadius
 	@tfield float elephantTuskRadius
+	@tfield float elephantTuskZ
+	@tfield float elephantRootNodeHeight
+	@tfield int elephantNumberOfRiders
+	@tfield float riderOffSetX
+	@tfield float riderOffSetY
+	@tfield float riderOffsetZ
+	@tfield float rootNodeHeight
+	@tfield getElephantRiderOffset getElephantRiderOffset
 
 	@table mountStruct
 	*/
 	types.mountStruct = luaState.new_usertype<descrMountEntry>("mountStruct");
 	types.mountStruct.set("name", &descrMountEntry::name);
+	types.mountStruct.set("modelName", &descrMountEntry::modelName);
 	types.mountStruct.set("mountClass", &descrMountEntry::mountClass);
 	types.mountStruct.set("radius", &descrMountEntry::radius);
+	types.mountStruct.set("xRadius", &descrMountEntry::xRadius);
+	types.mountStruct.set("yRadius", &descrMountEntry::yRadius);
+	types.mountStruct.set("yOffset", &descrMountEntry::yOffset);
+	types.mountStruct.set("height", &descrMountEntry::height);
 	types.mountStruct.set("mass", &descrMountEntry::radius);
 	types.mountStruct.set("elephantDeadRadius", &descrMountEntry::elephantDeadRadius);
 	types.mountStruct.set("elephantTuskRadius", &descrMountEntry::elephantTuskRadius);
+	types.mountStruct.set("elephantTuskZ", &descrMountEntry::elephantTuskZ);
+	types.mountStruct.set("elephantRootNodeHeight", &descrMountEntry::elephantRootNodeHeight);
+	types.mountStruct.set("elephantNumberOfRiders", &descrMountEntry::elephantNumberOfRiders);
+	types.mountStruct.set("riderOffSetX", &descrMountEntry::riderOffSetX);
+	types.mountStruct.set("riderOffSetY", &descrMountEntry::riderOffSetY);
+	types.mountStruct.set("riderOffsetZ", &descrMountEntry::riderOffsetZ);
+	types.mountStruct.set("rootNodeHeight", &descrMountEntry::rootNodeHeight);
+	
+	/***
+	Get elephant rider offset.
+	@function mountStruct:getElephantRiderOffset
+	@tparam int index
+	@treturn vector3 offsets
+	@usage
+	local offsets = mount:getElephantRiderOffset(0);
+	*/
+	types.mountStruct.set_function("getElephantRiderOffset", &descrMountEntry::getElephantRiderOffset);
+	
+	/***
 
+	@tfield float xCoord
+	@tfield float yCoord
+	@tfield float zCoord
+
+	@table vector3
+	*/
+	types.vector3 = luaState.new_usertype<vector3>("vector3");
+	types.vector3.set("xCoord", &vector3::x);
+	types.vector3.set("yCoord", &vector3::y);
+	types.vector3.set("zCoord", &vector3::z);
+	
 	///Edu Entry
 	//@section Edu Entry
 

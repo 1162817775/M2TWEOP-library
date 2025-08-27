@@ -48,57 +48,25 @@ namespace gameUiHelpers
 
 	bool useButton(const char* buttonName)
 	{
-		DWORD foundButton = 0;
-		char** cryptS = gameStringHelpers::createHashedString(buttonName);
-		DWORD adrF = codes::offsets.getUiElementFunc;
-		_asm
-		{
-			push cryptS
-			mov eax, adrF
-			call eax
-			mov foundButton, eax
-			add esp, 0x4
-		}
-		
-		if (foundButton == 0)
+		uiElement* foundButton = getUiElement(buttonName);
+		if (!foundButton)
 			return false;
-
-		adrF = codes::offsets.useButtonFunc;
-		_asm
-		{
-			mov ecx, foundButton
-			mov eax, adrF
-			call eax
-		}
+		useUiElement(foundButton);
 		return true;
 	}
 	
 	uiElement* getUiElement(const char* elementName)
 	{
-		uiElement* resElement = nullptr;
-		char** cryptS = gameStringHelpers::createHashedString(elementName);
-		DWORD adrF = codes::offsets.getUiElementFunc;
-		_asm
-		{
-			push cryptS
-			mov eax, adrF
-			call eax
-			mov resElement, eax
-			add esp, 0x4
-		}
+		const auto hashedName = gameStringHelpers::createHashedStringGame(elementName);
+		uiElement* resElement = GAME_FUNC(uiElement*(__cdecl*)(stringWithHash*), getUiElementFunc)(hashedName);
+		gameStringHelpers::freeHashString(hashedName);
 
 		return resElement;
 	}
 	
 	void useUiElement(uiElement* element)
 	{
-		DWORD adrF = codes::offsets.useButtonFunc;
-		_asm
-		{
-			mov ecx, element
-			mov eax, adrF
-			call eax
-		}
+		GAME_FUNC(void(__thiscall*)(uiElement*), useButtonFunc)(element);
 	}
 
 	stratUIStruct* getStratUi()
@@ -436,28 +404,34 @@ namespace gameUiHelpers
 		/***
 		Basic unitInfoScroll table
 
-		@tfield unit unit If the scroll is about existing unit, this is set and eduEntry empty.
-		@tfield eduEntry eduEntry only for non-recruited units.
+		@tfield unit unit If the scroll is about existing unit
+		@tfield eduEntry eduEntry
+		@tfield unitInQueue recruitmentItem
+		@tfield mercPoolUnit mercenary
 
 		@table unitInfoScroll
 		*/
 		types.unitInfoScroll = luaState.new_usertype<unitInfoScroll>("unitInfoScroll");
 		types.unitInfoScroll.set("unit", &unitInfoScroll::unit);
-		types.unitInfoScroll.set("eduEntry", &unitInfoScroll::entry);
+		types.unitInfoScroll.set("eduEntry", sol::property(&unitInfoScroll::getEntry));
+		types.unitInfoScroll.set("recruitmentItem", &unitInfoScroll::recruitmentItem);
+		types.unitInfoScroll.set("mercenary", &unitInfoScroll::mercenary);
 
 		/***
 		Basic buildingInfoScroll table
 
 		@tfield settlementStruct settlement
-		@tfield building building If the scroll is about existing building, this is set and edbEntry empty.
-		@tfield edbEntry edbEntry only for non-constructed buildings.
+		@tfield building building
+		@tfield edbEntry edbEntry
+		@tfield buildingLevel level
 
 		@table buildingInfoScroll
 		*/
 		types.buildingInfoScroll = luaState.new_usertype<buildingInfoScroll>("buildingInfoScroll");
 		types.buildingInfoScroll.set("settlement", &buildingInfoScroll::settlement);
 		types.buildingInfoScroll.set("building", &buildingInfoScroll::building);
-		types.buildingInfoScroll.set("edbEntry", &buildingInfoScroll::entry);
+		types.buildingInfoScroll.set("edbEntry", sol::property(&buildingInfoScroll::getEdbEntry));
+		types.buildingInfoScroll.set("level", sol::property(&buildingInfoScroll::getLevel));
 
 		/***
 		Basic uiFamilyLeaf table
@@ -506,4 +480,73 @@ namespace gameUiHelpers
 		types.uiFamilyTree.set("selectedLeaf", &uiFamilyTree::selectedLeaf);
 		types.uiFamilyTree.set("canSelectAll", &uiFamilyTree::canSelectAll);
     }
+}
+
+buildingLevel* buildingInfoScroll::getLevel()
+{
+	if (level)
+		return level;
+	if (entry && settlement)
+	{
+		int8_t lvl = -1;
+		for (int i = 0; i < settlement->buildingsNum; i++)
+		{
+			if (settlement->getBuilding(i)->edbEntry == entry)
+			{
+				lvl = settlement->getBuilding(i)->level;
+				break;
+			}
+		}
+		if (lvl == -1)
+			return entry->getBuildingLevel(0);
+		if ((lvl + 1) < entry->buildingLevelCount)
+			return entry->getBuildingLevel(lvl + 1);
+		return entry->getBuildingLevel(lvl);
+	}
+	if (techTreeItem)
+	{
+		return techTreeItem->getLevel();
+	}
+	if (building)
+	{
+		return building->edbEntry->getBuildingLevel(building->level);
+	}
+	return nullptr;
+}
+
+edbEntry* buildingInfoScroll::getEdbEntry()
+{
+	if (entry)
+		return entry;
+	if (building)
+		return building->edbEntry;
+	if (techTreeItem)
+		return techTreeItem->entry;
+	if (level)
+	{
+		if (const auto id = buildingHelpers::getBuildingLevelId(level->name); id != -1)
+		{
+			return eopBuildings::getEdb()->getBuildingByID(id);
+		}
+	}
+	return nullptr;
+}
+
+struct eduEntry* unitInfoScroll::getEntry()
+{
+	if (entry)
+		return entry;
+	if (unit)
+		return unit->eduEntry;
+	if (recruitmentItem)
+		return recruitmentItem->entry;
+	if (mercenary)
+		return mercenary->eduEntry;
+	return nullptr;
+}
+
+
+buildingLevel* techTreeThreadItem::getLevel()
+{
+	return entry->getBuildingLevel(level);
 }

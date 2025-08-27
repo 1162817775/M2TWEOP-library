@@ -338,6 +338,36 @@ void codes::initCodes(int gameVer)
 		offsets.createUnitGroupDeployer = 0x6D6640;
 		offsets.buildingBattleGetFacing = 0x6EA3F0;
 		offsets.findDeployPosition = 0x6D6D20;
+		offsets.createSallyForthObjective = 0x51D3D0;
+		offsets.freeHashString = 0xD4B9E0;
+		offsets.getMovePath = 0x4D7DF0;
+		offsets.removeTrackedReference = 0xD6F200;
+		offsets.resetLtgd = 0x53C1A0;
+		offsets.setLtgdNavalTarget = 0x53F520;
+		offsets.getRegionGroup = 0x518E40;
+		offsets.getFactionRegionGroupNum = 0x518E90;
+		offsets.isLoneRegionGroup = 0x5190E0;
+		offsets.setCapital = 0x4FB500;
+		offsets.setSettlementTaxLevel = 0x52D070;
+		offsets.usePersonalityType = 0x530940;
+		offsets.usePersonalityName = 0x530DC0;
+		offsets.isMicroManageAll = 0x467730;
+		offsets.addSettlementPolicy = 0x5316E0;
+		offsets.createAiProductionController = 0x52E020;
+		offsets.prodSetPriorities = 0x52E3B0;
+		offsets.addToProductionControllers = 0x5315F0;
+		offsets.ParseDescrMountedEngineEntry = 0x8CD4E0;
+		offsets.formatStringAdd = 0xD386E0;
+		offsets.getParserFileName = 0xD4D270;
+		offsets.getDataInvalidLogger = 0xD388C0;
+		offsets.createEnabledLogger = 0x403D60;
+		offsets.destroyLogObject = 0x403DF0;
+		offsets.createMountedEngineRecord = 0x8CE1B0;
+		offsets.dbHashTableGet = 0x437DF0;
+		offsets.dbHashTableSet = 0x437890;
+		offsets.createCharacterRecord = 0x4F3F70;
+		offsets.birthLog = 0x832F70;
+		offsets.marryCharacters = 0x5A7CB0;
 	}
 
 
@@ -679,5 +709,35 @@ void codes::initCodes(int gameVer)
 		offsets.createUnitGroupDeployer = 0x6D6BF0;
 		offsets.buildingBattleGetFacing = 0x6EA9D0;
 		offsets.findDeployPosition = 0x6D72D0;
+		offsets.createSallyForthObjective = 0x51D9C0;
+		offsets.freeHashString = 0xD45D40;
+		offsets.getMovePath = 0x4D8390;
+		offsets.removeTrackedReference = 0xD69580;
+		offsets.resetLtgd = 0x53C5C0;
+		offsets.setLtgdNavalTarget = 0x53F940;
+		offsets.getRegionGroup = 0x519430;
+		offsets.getFactionRegionGroupNum = 0x519480;
+		offsets.isLoneRegionGroup = 0x5196D0;
+		offsets.setCapital = 0x4FBA60;//4FB500
+		offsets.setSettlementTaxLevel = 0x52D670;
+		offsets.usePersonalityType = 0x530F50;
+		offsets.usePersonalityName = 0x5313D0;
+		offsets.isMicroManageAll = 0x467AB0;
+		offsets.addSettlementPolicy = 0x531CF0;
+		offsets.createAiProductionController = 0x52E620;
+		offsets.prodSetPriorities = 0x0052E9B0;
+		offsets.addToProductionControllers = 0x531C00;
+		offsets.ParseDescrMountedEngineEntry = 0x8CDEF0;
+		offsets.formatStringAdd = 0xD32A60;
+		offsets.getParserFileName = 0xD475D0;
+		offsets.getDataInvalidLogger = 0xD32C40;
+		offsets.createEnabledLogger = 0x403E00;
+		offsets.destroyLogObject = 0x403E90;
+		offsets.createMountedEngineRecord = 0x8CEBC0;
+		offsets.dbHashTableGet = 0x438130;
+		offsets.dbHashTableSet = 0x437BD0;
+		offsets.createCharacterRecord = 0x4F4540;
+		offsets.birthLog = 0x8337E0;
+		offsets.marryCharacters = 0x5A8190;
 	}
 }

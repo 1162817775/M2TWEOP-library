@@ -7,6 +7,7 @@
 #include "characterRecord.h"
 
 #include "campaign.h"
+#include "campaignDb.h"
 #include "gameStringHelpers.h"
 #include "functionsOffsets.h"
 #include "character.h"
@@ -298,6 +299,7 @@ namespace characterRecordHelpers
 		const auto ancDb = getAncillaryDb();
 		if (const auto ancIndex = plugData::data.luaAll.ancillaries.find(ancName); ancIndex != plugData::data.luaAll.ancillaries.end()) 
 			return &ancDb->ancillaries[ancIndex->second];
+		gameHelpers::logStringGame("WARNING: findAncillary: Ancillary not found: " + ancName);
 		return nullptr;
 	}
 	
@@ -457,6 +459,7 @@ namespace characterRecordHelpers
 		const auto traitsDb = getTraitDb();
 		if (const auto traitIndex = plugData::data.luaAll.traits.find(name); traitIndex != plugData::data.luaAll.traits.end()) 
 			return &traitsDb->traits[traitIndex->second];
+		gameHelpers::logStringGame("WARNING: findTrait: Trait not found: " + name);
 		return nullptr;
 	}
 	
@@ -512,9 +515,9 @@ namespace characterRecordHelpers
 		@tfield string fullName Internal name including surname.
 		@tfield string localizedDisplayName Display name, resets upon reloading a save.
 		@tfield string label
-		@tfield string portrait Wives (who have never been princesses) and children do not have anything for this field. Path to 'young' portrait used starting from 'mods' folder. Resets upon reloading a save.
-		@tfield string portrait2 Wives (who have never been princesses) and children do not have anything for this field. Path to 'old' portrait used starting from 'mods' folder. Resets upon reloading a save.
-		@tfield string portrait_custom Wives (who have never been princesses) and children do not have anything for this field. Folder name in ui/custom_portraits folder.
+		@tfield string portrait Wives (who have never been princesses) and children do not have anything for this field. Path to 'young' portrait used starting from 'mods' folder. Resets upon reloading a save. Use setPortrait() to set a new persistent portrait.
+		@tfield string portrait2 Wives (who have never been princesses) and children do not have anything for this field. Path to 'old' portrait used starting from 'mods' folder. Resets upon reloading a save. Use setPortrait() to set a new persistent portrait.
+		@tfield string portrait_custom Wives (who have never been princesses) and children do not have anything for this field. Folder name in ui/custom_portraits folder. Use setPortrait() to set a new persistent portrait.
 		@tfield string modelName Battle model (needs battle_models.modeldb entry).
 		@tfield int status 5-leader,2 - heir, 0 - ordinary character, read only, do not set value
 		@tfield setAsHeir setAsHeir
@@ -579,7 +582,7 @@ namespace characterRecordHelpers
 		@tfield int gunpowderCommand
 		@tfield int health
 		@tfield int heresyImmunity
-		@tfield int hitpoints
+		@tfield int hitpoints Note: Generals have base 5 hitpoints and can gain up to 5 more from traits/ancillaries. Hitpoint values can exceed 10 but effective hitpoints are capped at 10.
 		@tfield int infantryCommand
 		@tfield int influence
 		@tfield int law
@@ -629,6 +632,8 @@ namespace characterRecordHelpers
 		@tfield giveRandomPortrait giveRandomPortrait
 		@tfield acquireAncillary acquireAncillary
 		@tfield hasAncType hasAncType
+		@tfield birthChild birthChild
+		@tfield marryWife marryWife
 
 		@table characterRecord
 		*/
@@ -647,7 +652,7 @@ namespace characterRecordHelpers
 		types.characterRecord.set("portrait", sol::property(&getStringPropertyGenChar<characterRecord_portrait>, &setStringPropertyGenChar<characterRecord_portrait>));
 		types.characterRecord.set("portrait2", sol::property(&getStringPropertyGenChar<characterRecord_portrait2>, &setStringPropertyGenChar<characterRecord_portrait2>));
 		types.characterRecord.set("portrait_custom", sol::property(&getStringPropertyGenChar<characterRecord_portrait_custom>, &setStringPropertyGenChar<characterRecord_portrait_custom>));
-		types.characterRecord.set("modelName", sol::property(&getStringPropertyGenChar<characterRecord_modelName>, &setStringPropertyGenChar<characterRecord_modelName>));
+		types.characterRecord.set("modelName", sol::property(&getStringPropertyGenChar<characterRecord_modelName>, &characterRecord::setBattleModel));
 		types.characterRecord.set("status", &characterRecord::status);
 		/***
 		Sets the named character as the faction heir.
@@ -705,7 +710,7 @@ namespace characterRecordHelpers
 		*/
 		types.characterRecord.set_function("getTraits", &characterRecord::getTraits);
 		/***
-		Add a trait to the character.
+		Add a trait to the character. Case sensitive.
 		@function characterRecord:addTrait
 		@tparam string traitName Trait's internal name per export\_descr\_character\_traits.txt
 		@tparam int traitLevel Trait's level.
@@ -714,7 +719,7 @@ namespace characterRecordHelpers
 		*/
 		types.characterRecord.set_function("addTrait", &addTrait);
 		/***
-		Remove a trait from the character.
+		Remove a trait from the character. Case sensitive.
 		@function characterRecord:removeTrait
 		@tparam string traitName Trait's internal name per export\_descr\_character\_traits.txt
 		@usage
@@ -811,7 +816,7 @@ namespace characterRecordHelpers
 		*/
 		types.characterRecord.set_function("getTrait", &characterRecord::getTrait);
 		/***
-		Get the level of a trait the character has (or 0 if the character does not have the trait).
+		Get the level of a trait the character has (or 0 if the character does not have the trait). Case sensitive.
 		@function characterRecord:getTraitLevel
 		@tparam string traitName
 		@treturn int level
@@ -820,7 +825,7 @@ namespace characterRecordHelpers
 		*/
 		types.characterRecord.set_function("getTraitLevel", &characterRecord::getTraitLevel);
 		/***
-		Add trait points to a trait, will upgrade/downgrade the level if it passes the thresholds.
+		Add trait points to a trait, will upgrade/downgrade the level if it passes the thresholds.  Case sensitive.
 		@function characterRecord:addTraitPoints
 		@tparam string traitName
 		@tparam int points
@@ -846,11 +851,14 @@ namespace characterRecordHelpers
 		*/
 		types.characterRecord.set_function("giveRandomName", &characterRecord::giveRandomName);
 		/***
-		Set a characters portrait. Use a relative path from the mod folder!
+		Set a characters portrait. Use a relative path from the mod folder! This is persistent and the recommended method for setting a portrait, including custom ones.
 		@function characterRecord:setPortrait
 		@tparam string portraitPath
 		@usage
+			  // Setting specific portrait from the generic folder    
 		      record:setPortrait("data/ui/mesoamerican/portraits/portraits/young/generals/028.tga")
+			  // Setting specific portrait from the custom folder    
+		      record:setPortrait("/data/ui/custom_portraits/saruman_manycolours/portrait_young.tga")
 		*/
 		types.characterRecord.set_function("setPortrait", &characterRecord::setPortrait);
 		/***
@@ -862,6 +870,29 @@ namespace characterRecordHelpers
 		      record:giveRandomPortrait(M2TWEOP.getCultureID("southern_european"), -1)
 		*/
 		types.characterRecord.set_function("giveRandomPortrait", &characterRecord::giveRandomPortrait);
+		/***
+		Create a new child for the character. You need to select the father for this.
+		@function characterRecord:birthChild
+		@tparam string name random_name for random
+		@tparam string lastName
+		@tparam int age
+		@tparam bool isMale
+		@tparam bool isAlive
+		@treturn characterRecord child
+		@usage
+		      local newKid = record:birthChild("random_name", "", 0, true, true)
+		*/
+		types.characterRecord.set_function("birthChild", &characterRecord::birthChild);
+		/***
+		Create and marry a wife.
+		@function characterRecord:marryWife
+		@tparam string name random_name for random
+		@tparam int age
+		@treturn characterRecord wife
+		@usage
+		      local wife = record:marryWife("random_name", 30)
+		*/
+		types.characterRecord.set_function("marryWife", &characterRecord::marryWife);
 			
 		types.characterRecord.set("level", &characterRecord::level);
 		types.characterRecord.set("authority", &characterRecord::authority);
@@ -1264,6 +1295,106 @@ void ancillary::setLocalizedEffectsDescr(const std::string& newDescr)
 	gameStringHelpers::createUniString(*effectsDescr, newDescr.c_str());
 }
 
+characterRecord* characterRecord::birthChild(const std::string& name, const std::string& childLastName, const int childAge,
+	const bool childMale, const bool childAlive)
+{
+	if (!this->isMale)
+	{
+		gameHelpers::logStringGame("characterRecord::birthChild: only fathers can birth children");
+		return nullptr;
+	}
+	if (!this->spouse)
+	{
+		gameHelpers::logStringGame("characterRecord::birthChild: character does not have a spouse");
+		return nullptr;
+	}
+	if (this->numberOfChildren > 3)
+	{
+		gameHelpers::logStringGame("characterRecord::birthChild: can only have 4 children");
+		return nullptr;
+	}
+	const auto campaignDb = campaignHelpers::getCampaignDb();
+	if ((age - childAge < campaignDb->campaignDbFamilyTree.ageOfManhood)
+		||(spouse->age - childAge < campaignDb->campaignDbFamilyTree.daughtersAgeOfConsent))
+	{
+		gameHelpers::logStringGame("characterRecord::birthChild: character is not old enough to birth this child");
+		return nullptr;
+	}
+	if (childMale && childAge >= campaignDb->campaignDbFamilyTree.ageOfManhood)
+	{
+		gameHelpers::logStringGame("characterRecord::birthChild: child is too old, create a general and adopt him");
+		return nullptr;
+	}
+	const auto newRecord = this->faction->newRecord();
+	newRecord->setAge(childAge);
+	newRecord->setWasLeader(false);
+	newRecord->isMale = childMale;
+	if (name == "random_name" || name.empty())
+		newRecord->giveRandomName(this->faction->factionID);
+	else
+	{
+		GAME_FUNC(void(__thiscall*)(characterRecord*, const char*, const char*, UNICODE_STRING***, int, bool)
+		          , setCharacterName)(newRecord, name.c_str(), childLastName.c_str(), localizedNicknameForSave, 7, false);
+	}
+	newRecord->yearOfBirth = campaignHelpers::getCampaignData()->currentDate - static_cast<float>(childAge);
+	newRecord->seasonOfBirth = childAge == 0 ? campaignHelpers::getCampaignData()->season : campaignHelpers::getCampaignData()->tickCount % 2;
+	newRecord->isAlive = childAlive;
+	if (!childAlive)
+	{
+		newRecord->deathYear = campaignHelpers::getCampaignData()->currentDate;
+		newRecord->deathSeason = campaignHelpers::getCampaignData()->season;
+	}
+	if (isMale || (childAge < campaignDb->campaignDbFamilyTree.daughtersAgeOfConsent))
+		newRecord->isChild = true;
+	newRecord->parent = this;
+	newRecord->isFamily = true;
+	this->childs[numberOfChildren++] = newRecord;
+	GAME_FUNC(void(__cdecl*)(characterRecord*), birthLog)(newRecord);
+	return newRecord;
+}
+
+characterRecord* characterRecord::marryWife(const std::string& name, int wifeAge)
+{
+	if (!isMale)
+	{
+		gameHelpers::logStringGame("characterRecord::marryWife: Character is not male");
+		return nullptr;
+	}
+	if (spouse)
+	{
+		gameHelpers::logStringGame("characterRecord::marryWife: Character already married");
+		return nullptr;
+	}
+	const auto campaignDb = campaignHelpers::getCampaignDb();
+	if (age < campaignDb->campaignDbFamilyTree.ageOfManhood)
+	{
+		gameHelpers::logStringGame("characterRecord::marryWife: Character is too young");
+		return nullptr;
+	}
+	if (wifeAge < campaignDb->campaignDbFamilyTree.daughtersAgeOfConsent)
+	{
+		gameHelpers::logStringGame("characterRecord::marryWife: Wife is too young");
+		return nullptr;
+	}
+	const auto newRecord = this->faction->newRecord();
+	newRecord->setAge(wifeAge);
+	newRecord->setWasLeader(false);
+	newRecord->isMale = false;
+	if (name == "random_name" || name.empty())
+		newRecord->giveRandomName(this->faction->factionID);
+	else
+	{
+		GAME_FUNC(void(__thiscall*)(characterRecord*, const char*, const char*, UNICODE_STRING***, int, bool)
+		, setCharacterName)(newRecord, name.c_str(), "", localizedNicknameForSave, 7, false);
+	}
+	newRecord->yearOfBirth = campaignHelpers::getCampaignData()->currentDate - static_cast<float>(wifeAge);
+	newRecord->seasonOfBirth = campaignHelpers::getCampaignData()->tickCount % 2;
+	newRecord->isAlive = true;
+	newRecord->isFamily = true;
+	GAME_FUNC(void(__thiscall*)(characterRecord*, characterRecord*), marryCharacters)(newRecord, this);
+	return newRecord;
+}
+
 std::string characterRecord::giveValidLabel()
 {
 	if (labelCrypt != 0 && label)
@@ -1325,7 +1456,7 @@ void characterRecord::applyName()
 
 void characterRecord::acquireAncillary(const std::string& name, const bool noDuplicate)
 {
-	if (!gen || gen->getTypeID() == characterTypeStrat::general)
+	if (gen && gen->getTypeID() == characterTypeStrat::general)
 		return;
 	const auto anc = characterRecordHelpers::findAncillary(name);
 	if (!anc)
@@ -1343,7 +1474,10 @@ void characterRecord::setPortrait(const std::string& portraitPath)
 	path.append("/");
 	path.append(portraitPath);
 	if (!std::filesystem::exists(path))
+	{
+		gameHelpers::logStringGame("characterRecord::setPortrait: file not found: " + path);
 		return;
+	}
 	if (const auto charData = eopCharacterDataDb::instance->getOrCreateData(giveValidLabel(), gen ? gen->getTypeID() : 7))
 	{
 		charData->portrait = portraitPath;
@@ -1395,7 +1529,13 @@ void characterRecord::giveRandomName(const int nameFactionId)
 void characterRecord::giveRandomPortrait(const int cultureId, const int religionId)
 {
 	const auto randomPortrait = cultures::getRandomPortrait(cultureId, religionId);
-	setPortrait(randomPortrait);
+	if (!randomPortrait.empty())
+		setPortrait(randomPortrait);
+	else
+	{
+		gameHelpers::logStringGame("characterRecord::giveRandomPortrait: no portrait found for cultureId: " + std::to_string(cultureId) + " religionId: " + std::to_string(religionId));
+		gameHelpers::logStringGame("Make sure the portraits start with 000.tga");
+	}
 }
 
 stringWithHash* LOOKUP_STRING_ANC = new stringWithHash();
@@ -1405,7 +1545,9 @@ bool characterRecord::hasAncillary(const std::string& ancName)
 	gameStringHelpers::setHashedString(&LOOKUP_STRING_ANC->name, ancName.c_str());
 	for (uint32_t i = 0; i < ancNum; i++)
 	{
-		if (const auto anc = ancillaries[i]; anc->dataAnc->ancNameHash == LOOKUP_STRING_ANC->hash)
+		if (const auto anc = ancillaries[i];
+			anc->dataAnc->ancNameHash == LOOKUP_STRING_ANC->hash
+			&& strcmp(anc->dataAnc->ancName, ancName.c_str()) == 0)
 			return true;
 	}
 	return false;
@@ -1416,7 +1558,9 @@ bool characterRecord::hasAncType(const std::string& ancType)
 	gameStringHelpers::setHashedString(&LOOKUP_STRING_ANC->name, ancType.c_str());
 	for (uint32_t i = 0; i < ancNum; i++)
 	{
-		if (const auto anc = ancillaries[i]; anc->dataAnc->typeHash == LOOKUP_STRING_ANC->hash)
+		if (const auto anc = ancillaries[i];
+			anc->dataAnc->typeHash == LOOKUP_STRING_ANC->hash
+			&& strcmp(anc->dataAnc->type, ancType.c_str()) == 0)
 			return true;
 	}
 	return false;
@@ -1438,10 +1582,22 @@ int characterRecord::getTraitLevel(const std::string& traitName)
 	const int traitCount = getTraitCount();
 	for (int i = 0; i < traitCount; i++)
 	{
-		if (const auto trait = &traitList[i]; trait->traitEntry->nameHash == LOOKUP_STRING->hash)
+		if (const auto trait = &traitList[i];
+			trait->traitEntry->nameHash == LOOKUP_STRING->hash
+			&& strcmp(trait->traitEntry->name, traitName.c_str()) == 0)
 			return trait->level->level;
 	}
 	return 0;
+}
+
+void characterRecord::setBattleModel(const std::string& model)
+{
+	if (const auto battleMod = unitHelpers::findBattleModel(model.c_str()); !battleMod)
+	{
+		gameHelpers::logStringGame("characterRecord::setBattleModel: model not found: " + model);
+		return;
+	}
+	gameStringHelpers::setHashedString(&this->modelName, model.c_str());
 }
 
 void characterRecord::addTraitPoints(const std::string& trait, const int points)

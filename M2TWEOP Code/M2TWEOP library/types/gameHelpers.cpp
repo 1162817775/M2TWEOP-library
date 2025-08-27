@@ -17,6 +17,8 @@
 bool m2tweopOptions::hideUnknownUnitTooltips = false;
 bool m2tweopOptions::eopHandleUnitCards = true;
 bool m2tweopOptions::enableFamilyEventsForTeutonic = true;
+bool m2tweopOptions::useEopFrontiers = true;
+int m2tweopOptions::watchTowerRange = 10;
 uint8_t m2tweopOptions::khakiTextRed = 0x80;
 uint8_t m2tweopOptions::khakiTextGreen = 0x77;
 uint8_t m2tweopOptions::khakiTextBlue = 0x61;
@@ -27,6 +29,11 @@ scriptCommand::scriptCommand(const char* name) : className(name)
 }
 
 eopLogging* eopLogging::m_Instance = new eopLogging();
+
+char* descrParser::getFileName()
+{
+	return GAME_FUNC(char*(__thiscall*)(descrParser*), getParserFileName)(this);
+}
 
 void eopLogging::createEopLoggers()
 {
@@ -60,6 +67,8 @@ namespace gameHelpers
 	
 	bool callGameConsoleCommand(const char* name, const char* arg, char* errorBuffer)
 	{
+		if (!name)
+			return false;
 		const auto cmd = dataOffsets::offsets.consoleCommands;
 		for (int i = 0; i < cmd->size; i++)
 		{
@@ -68,42 +77,38 @@ namespace gameHelpers
 				continue;
 			return (**currCom->function)(arg, errorBuffer);
 		}
+		logStringGame("Command not found: " + std::string(name));
 		return false;
 	}
 	
 	int getScriptCounter(const char* counterName, bool& success)
 	{
-		auto eventsObject = reinterpret_cast<countersObjectS*>(dataOffsets::offsets.scriptCounters);
-		counterS* retS = nullptr;
-		int retValue = 0;
-		DWORD funcAdr = codes::offsets.getScriptCounter;
-		char** cryptS = gameStringHelpers::createHashedString(counterName);
-		_asm {
-			push cryptS
-			mov ecx, eventsObject
-			mov eax, funcAdr
-			call eax
-			mov retS, eax
-		}
+		if (!counterName)
+			return 0;
+		const auto eventsObject = reinterpret_cast<countersObjectS*>(dataOffsets::offsets.scriptCounters);
+		stringWithHash* cryptS = gameStringHelpers::createHashedStringGame(counterName);
+		const auto retS = GAME_FUNC(counterS*(__thiscall*)(countersObjectS*, stringWithHash*), getScriptCounter)(eventsObject, cryptS);
+		gameStringHelpers::freeHashString(cryptS);
 		if (retS == eventsObject->testCounterSValue)
 			success = false;
 		else
 		{
 			if (retS != nullptr)
 			{
-				if (retS->nameCrypt == reinterpret_cast<int>(cryptS[1]))
+				if (retS->nameCrypt == cryptS->hash && retS->counterName && strcmp(retS->counterName, counterName) == 0)
 				{
 					success = true;
 					return retS->counterValue;
 				}
-				else
-					success = false;
+				success = false;
 			}
+			else
+				success = false;
 		}
 		return 0;
 	}
 	
-	void setScriptCounter(const char* counterName, int counterValue)
+	void setScriptCounter(const char* counterName, const int counterValue)
 	{
 		if (!counterName)
 			return;
@@ -115,17 +120,12 @@ namespace gameHelpers
 			scriptCommand("set_event_counter", commandArgs.c_str());
 			return;
 		}
-		DWORD eventsObject = dataOffsets::offsets.scriptCountersSet;
-		DWORD funcAdr = codes::offsets.setScriptCounter;
-		char** cryptS = gameStringHelpers::createHashedString(counterName);
-		_asm {
-			push counterValue
-			push cryptS
-			mov ecx, eventsObject
-			mov eax, funcAdr
-			call eax
-		}
-		return;
+		if (value == counterValue)
+			return;
+		const DWORD eventsObject = dataOffsets::offsets.scriptCountersSet;
+		const auto hashedName = gameStringHelpers::createHashedStringGame(counterName);
+		GAME_FUNC(void(__thiscall*)(DWORD, stringWithHash*, int), setScriptCounter)(eventsObject, hashedName, counterValue);
+		gameStringHelpers::freeHashString(hashedName);
 	}
 	
 	std::tuple<bool, int> getScriptCounterLua(const char* type)
@@ -232,8 +232,11 @@ namespace gameHelpers
 		if (!plugData::data.luaAll.hashLoaded || plugData::data.luaAll.religionNames.empty())
 			plugData::data.luaAll.fillHashMaps();
 		const auto religionName = plugData::data.luaAll.religionNames.find(index);
-		if (religionName == plugData::data.luaAll.religionNames.end()) 
+		if (religionName == plugData::data.luaAll.religionNames.end())
+		{
+			logStringGame("getReligionName: Could not find religion name for index " + std::to_string(index));
 			return nullptr;
+		}
 		return religionName->second;
 	}
 
@@ -242,8 +245,11 @@ namespace gameHelpers
 		if (!plugData::data.luaAll.hashLoaded || plugData::data.luaAll.climateNames.empty())
 			plugData::data.luaAll.fillHashMaps();
 		const auto name = plugData::data.luaAll.climateNames.find(index);
-		if (name == plugData::data.luaAll.climateNames.end()) 
+		if (name == plugData::data.luaAll.climateNames.end())
+		{
+			logStringGame("getClimateName: Could not find climate name for index " + std::to_string(index));
 			return nullptr;
+		}
 		return name->second;
 	}
 
@@ -252,8 +258,11 @@ namespace gameHelpers
 		if (!plugData::data.luaAll.hashNonCampaignLoaded || plugData::data.luaAll.cultureNames.empty())
 			plugData::data.luaAll.fillHashMapsNonCampaign();
 		const auto name = plugData::data.luaAll.cultureNames.find(index);
-		if (name == plugData::data.luaAll.cultureNames.end()) 
+		if (name == plugData::data.luaAll.cultureNames.end())
+		{
+			logStringGame("getCultureName: Could not find culture name for index " + std::to_string(index));
 			return nullptr;
+		}
 		return name->second;
 	}
 
@@ -273,8 +282,11 @@ namespace gameHelpers
 		if (!plugData::data.luaAll.hashNonCampaignLoaded || plugData::data.luaAll.religionIndex.empty())
 			plugData::data.luaAll.fillHashMapsNonCampaign();
 		const auto religionIndex = plugData::data.luaAll.religionIndex.find(name);
-		if (religionIndex == plugData::data.luaAll.religionIndex.end()) 
+		if (religionIndex == plugData::data.luaAll.religionIndex.end())
+		{
+			logStringGame("getReligionN: Could not find religion index for name " + name);
 			return -1;
+		}
 		return religionIndex->second;
 	}
 
@@ -283,8 +295,11 @@ namespace gameHelpers
 		if (!plugData::data.luaAll.hashLoaded || plugData::data.luaAll.climateIndex.empty())
 			plugData::data.luaAll.fillHashMaps();
 		const auto index = plugData::data.luaAll.climateIndex.find(name);
-		if (index == plugData::data.luaAll.climateIndex.end()) 
+		if (index == plugData::data.luaAll.climateIndex.end())
+		{
+			logStringGame("getClimateN: Could not find climate index for name " + name);
 			return -1;
+		}
 		return index->second;
 	}
 
@@ -293,8 +308,11 @@ namespace gameHelpers
 		if (!plugData::data.luaAll.hashNonCampaignLoaded || plugData::data.luaAll.cultureIndex.empty())
 			plugData::data.luaAll.fillHashMapsNonCampaign();
 		const auto index = plugData::data.luaAll.cultureIndex.find(name);
-		if (index == plugData::data.luaAll.cultureIndex.end()) 
+		if (index == plugData::data.luaAll.cultureIndex.end())
+		{
+			logStringGame("getCultureN: Could not find culture index for name " + name);
 			return -1;
+		}
 		return index->second;
 	}
 	
@@ -319,21 +337,14 @@ namespace gameHelpers
 	
 	bool condition(const char* condition, const eventTrigger* eventData)
 	{
-		auto fakeText = std::make_shared<fakeTextInput>(fakeTextInput(condition, 0));
-		auto rawText = fakeText.get();
-		const auto makeConditionFunc = reinterpret_cast<DWORD*>(codes::offsets.parseCondition);
-		void* result = nullptr;
-		_asm
-		{
-			push rawText
-			mov ecx, rawText
-			mov eax, makeConditionFunc
-			call eax
-			mov result, eax
-			add esp, 0x4
-		}
+		const auto fakeText = std::make_unique<fakeTextInput>(fakeTextInput(condition, 0));
+		const auto rawText = fakeText.get();
+		void* result = GAME_FUNC(void*(__cdecl*)(fakeTextInput*), parseCondition)(rawText);
 		if (result == nullptr)
+		{
+			logStringGame("Condition: Could not create condition for " + std::string(condition));
 			return false;
+		}
 		return callVFunc<1, bool>(result, eventData);
 	}
 
@@ -367,7 +378,10 @@ namespace gameHelpers
 			add esp, 0x4
 		}
 		if (scriptObject == 0x0)
+		{
+			logStringGame("ScriptCommand: Could not create script object for " + std::string(command));
 			return;
+		}
 		_asm
 		{
 			mov ecx, scriptObject
@@ -639,6 +653,7 @@ namespace gameHelpers
 			costs->siegeTower = cost;
 			break;
 		default:
+			logStringGame("setEquipmentCosts: Invalid equipment type " + std::to_string(equipType));
 			break;
 		}
 	}
@@ -656,6 +671,42 @@ namespace gameHelpers
 	void addToIntArray(int** array, int* value)
 	{
 		GAME_FUNC(void(__thiscall*)(int**, int*), addToArrayInt)(array, value);
+	}
+	
+	struct intArray
+	{
+		int* elements;
+		int capacity;
+		int count;
+	};
+
+	bool intArrayContains(int** array, const int value)
+	{
+		const auto arr = reinterpret_cast<intArray*>(array);
+		for (int i = 0; i < arr->count; i++)
+		{
+			if (arr->elements[i] == value)
+				return true;
+		}
+		return false;
+	}
+
+	void removeFromIntArray(int** array, const int index)
+	{
+		const auto arr = reinterpret_cast<intArray*>(array);
+		if (!arr || index < 0 || index >= arr->count)
+		{
+			logStringGame("removeFromIntArray: Invalid index " + std::to_string(index));
+			return;
+		}
+		arr->count--;
+		int next;
+		int *curr;
+		for (int i = index; i < arr->count; *curr = next)
+		{
+			next = arr->elements[i + 1];
+			curr = &arr->elements[i++];
+		}
 	}
 
 	void setAncLimit(uint8_t limit)
@@ -679,6 +730,12 @@ namespace gameHelpers
 		const DWORD retAdr = dataOffsets::offsets.maxBgSize2 + 1;
 		MemWork::WriteData(&size, cmpAdr, 1);
 		MemWork::WriteData(&size, retAdr, 1);
+	}
+
+	void fixReligionTrigger()
+	{
+		int8_t fixValue = -3;
+		MemWork::WriteData(&fixValue, dataOffsets::offsets.religionTriggerBug, 1);
 	}
 
 	gameDataAllStruct* getGameDataAll()

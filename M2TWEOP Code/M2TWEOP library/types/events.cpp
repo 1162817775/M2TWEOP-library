@@ -824,6 +824,22 @@ void onBattleTick()
 	}
 }
 
+void onCalculateLTGD(aiLongTermGoalDirector* ltgd)
+{
+	if (plugData::data.luaAll.onCalculateLTGD != nullptr)
+	{
+		tryLua((*plugData::data.luaAll.onCalculateLTGD)(ltgd))
+	}
+}
+
+void onSetProductionControllers(aiPersonalityValues* personality)
+{
+	if (plugData::data.luaAll.onSetProductionControllers != nullptr)
+	{
+		tryLua((*plugData::data.luaAll.onSetProductionControllers)(personality))
+	}
+}
+
 std::string* onSelectWorldpkgdesc(const char* selectedRec, const char* selectedGroup)
 {
 	std::string tmpS;
@@ -1366,6 +1382,8 @@ void luaPlugin::onPluginLoadF()
 	@tfield onGameInit onGameInit
 	@tfield onUnloadCampaign onUnloadCampaign
 	@tfield onAiTurn onAiTurn
+	@tfield onCalculateLTGD onCalculateLTGD
+	@tfield onSetProductionControllers onSetProductionControllers
 	@tfield onClickAtTile onClickAtTile
 	@tfield onCharacterClicked onCharacterClicked
 	@tfield onCampaignTick onCampaignTick
@@ -4118,7 +4136,7 @@ void luaPlugin::onPluginLoadF()
 	checkLuaFunc(&initDXFunc);
 
 	/***
-	Called when a new campaign is started from the menu.
+	Called when a new campaign is started from the menu (when you click the start campaign button, nothing loaded yet).
 
 	@function onNewGameStart
 
@@ -4160,7 +4178,7 @@ void luaPlugin::onPluginLoadF()
 	checkLuaFunc(&onGameInit);
 
 	/***
-	Called after a new campaign has been loaded first time.
+	Called after a new campaign's data has been loaded first time. (M2TW.stratMap and M2TW.campaign)
 	@function onNewGameLoaded
 	@usage
 	function onNewGameLoaded()
@@ -4197,6 +4215,36 @@ void luaPlugin::onPluginLoadF()
 
 	onAiTurn = new sol::function(luaState["onAiTurn"]);
 	checkLuaFunc(&onAiTurn);
+
+	/***
+	Called just after LTGD reads xml every turn.
+
+	@function onCalculateLTGD
+	@tparam aiLongTermGoalDirector ltgd
+
+	@usage
+	function onCalculateLTGD(ltgd)
+	--something here
+	end
+	*/
+
+	onCalculateLTGD = new sol::function(luaState["onCalculateLTGD"]);
+	checkLuaFunc(&onCalculateLTGD);
+
+	/***
+	Called just before the personality production values are propogated to the production controllers.
+
+	@function onSetProductionControllers
+	@tparam aiPersonality personality
+
+	@usage
+	function onSetProductionControllers(personality)
+	--something here
+	end
+	*/
+
+	onSetProductionControllers = new sol::function(luaState["onSetProductionControllers"]);
+	checkLuaFunc(&onSetProductionControllers);
 
 	/***
 	Called on clicking the stratmap.
@@ -4270,7 +4318,7 @@ void luaPlugin::onPluginLoadF()
 	checkLuaFunc(&onBattleTick);
 
 	/***
-	Called after loading the campaign map
+	Called after loading the campaign map, including cas models and textures. Best used for model related stuff. This fires every time including post-battle and save loading.
 
 	@function onCampaignMapLoaded
 

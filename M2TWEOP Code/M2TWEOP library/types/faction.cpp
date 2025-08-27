@@ -57,8 +57,10 @@ void factionStruct::revealTile(const int x, const int y)
 {
 	if (stratMapHelpers::isStratMap() == false)
 		return;
+	if (!stratMapHelpers::getStratMap()->isInBounds(x, y))
+		gameHelpers::logStringGame("factionStruct.revealTile: tile out of bounds. x: " + std::to_string(x) + " y: " + std::to_string(y));
 	int coords[2] = {x, y};
-	GAME_FUNC(int*(__thiscall*)(void*, int*, int, float), revealTile)(tilesFac, coords, 1, -1.0);
+	GAME_FUNC(int*(__thiscall*)(void*, int*, int, float), revealTile)(tilesFac, coords, 2, -1.0);
 }
 
 bool factionStruct::canSeeCharacter(character* candidate)
@@ -100,7 +102,7 @@ void factionRecord::setFactionStratModel(const std::string& model, const int cha
 {
 	if (characterType < 0 || characterType >= characterTypeStrat::invalid || level < 0 || level > 10)
 		return;
-	stratModelArrayEntry* entry = stratModelsChange::findCharacterStratModel(model.c_str());
+	stratModelArrayEntry* entry = stratModelsChange::findCharacterStratModel(model);
 	if (!entry)
 	{
 		gameHelpers::logStringGame("factionRecord.setFactionStratModel: model not found: " + model);
@@ -116,7 +118,7 @@ void factionRecord::setFactionStratModel(const std::string& model, const int cha
 	}
 	const auto levelEntry = &factionEntry->stratInfo->stratModelsArray[level];
 	levelEntry->stratModelEntry = entry;
-	gameStringHelpers::setHashedString(&levelEntry->modelName, model.c_str());
+	gameStringHelpers::setHashedStringGame(&levelEntry->modelName, model.c_str());
 }
 
 void factionRecord::setFactionBattleModel(const std::string& model, const int characterType)
@@ -156,10 +158,26 @@ characterRecord* factionStruct::getCharacterByLabel(const std::string& label)
 	const UINT32 hash = static_cast<UINT32>(LOOKUP_STRING_LABEL->hash);
 	for (int i = 0; i < recordCount; i++)
 	{
-		if (const auto rec = characterRecords[i]; rec->labelCrypt == hash)
+		if (const auto rec = characterRecords[i]; rec->labelCrypt == hash && rec->label && strcmp(rec->label, label.c_str()) == 0)
 			return rec;
 	}
 	return nullptr;
+}
+
+characterRecord* factionStruct::getFamilyHead()
+{
+	for (int i = 0; i < characterRecordNum; i++)
+	{
+		if (const auto record = characterRecords[i]; record->isFamilyHead)
+			return record;
+	}
+
+	return nullptr;
+}
+
+characterRecord* factionStruct::newRecord()
+{
+	return GAME_FUNC(characterRecord*(__thiscall*)(factionStruct*), createCharacterRecord)(this);
 }
 
 void factionStruct::setLeader(characterRecord* newLeader, const bool onlyLeader)
@@ -229,6 +247,11 @@ void factionStruct::updateNeighbours()
 			}
 		}
 	}
+}
+
+void factionStruct::setCapital(settlementStruct* newCapital)
+{
+	GAME_FUNC(void(__thiscall*)(factionStruct*, settlementStruct*), setCapital)(this, newCapital);
 }
 
 void factionStruct::setFactionBanner(const std::string& newFac)
@@ -458,7 +481,7 @@ namespace factionHelpers
 		campaign->diplomaticStandings[fac1->factionID][fac2->factionID].factionStanding = standing;
 	}
 	
-	std::string getLocalizedFactionName(factionStruct* fac)
+	std::string getLocalizedFactionName(const factionStruct* fac)
 	{
 		UNICODE_STRING** localizedName = fac->localizedName;
 		if (const UNICODE_STRING* name = *localizedName; name->Length == 0)
@@ -503,7 +526,7 @@ namespace factionHelpers
 		const int y
 		)
 	{
-		return characterHelpers::createCharacter(type.c_str(), fac, age, name.c_str(), lastName.c_str(), subFaction, portrait.c_str(), x, y);
+		return characterHelpers::createCharacter(type, fac, age, name, lastName, subFaction, portrait, x, y);
 	}
 
 	armyStruct* splitArmy(factionStruct *faction, const sol::table& units, int x, int y)
@@ -701,6 +724,7 @@ namespace factionHelpers
 		@tfield ancillaryExists ancillaryExists
 		@tfield setFactionBanner setFactionBanner
 		@tfield setLeader setLeader
+		@tfield setCapital setCapital
 
 		@table factionStruct
 		*/
@@ -1214,8 +1238,8 @@ namespace factionHelpers
 					int,
 					int,
 					int,
-					int,
-					int)>(&armyHelpers::spawnArmy),
+					uint8_t,
+					uint8_t)>(&armyHelpers::spawnArmy),
 					sol::resolve<armyStruct*(
 						factionStruct*,
 						const char*,
@@ -1230,8 +1254,8 @@ namespace factionHelpers
 						int,
 						int,
 						int,
-						int,
-						int,
+						uint8_t,
+						uint8_t,
 						int)>(&armyHelpers::spawnArmy)
 			));
 		
@@ -1308,6 +1332,15 @@ namespace factionHelpers
 			fac:setLeader(myChar, true)
 		*/
 		types.factionStruct.set_function("setLeader", &factionStruct::setLeader);
+		
+		/***
+		Set new faction capital.
+		@function factionStruct:setCapital
+		@tparam settlementStruct newCapital
+		@usage
+			fac:setCapital(mySett)
+		*/
+		types.factionStruct.set_function("setCapital", &factionStruct::setCapital);
 
 		/***
 		Basic battleFactionCounter table
@@ -1474,6 +1507,7 @@ namespace factionHelpers
 		@tfield regionsBordersOnlyTrusted regionsBordersOnlyTrusted
 		@tfield getInvasionTargetPriority getInvasionTargetPriority
 		@tfield getInvasionTargetNum getInvasionTargetNum
+		@tfield reset reset
 
 		@table aiLongTermGoalDirector
 		*/
@@ -1502,7 +1536,7 @@ namespace factionHelpers
 		/***
 		Check if another faction is an enemy of one the faction's trusted allies.
 		@function aiLongTermGoalDirector:isTrustedAllyEnemy
-		@tparam int targetFactionID
+		@tparam factionStruct targetFaction
 		@treturn bool isAllyEnemy
 		@usage
 		local isAllyEnemy = LTGD:isTrustedAllyEnemy(2)
@@ -1548,6 +1582,14 @@ namespace factionHelpers
 		local result = LTGD:getInvasionTargetPriority(2)
 		*/
 		types.aiLongTermGoalDirector.set_function("getInvasionTargetPriority", &aiLongTermGoalDirector::getInvasionTargetPriority);
+
+		/***
+		Reset decision values.
+		@function aiLongTermGoalDirector:reset
+		@usage
+			LTGD:reset()
+		*/
+		types.aiLongTermGoalDirector.set_function("reset", &aiLongTermGoalDirector::reset);
 		
 		/***
 		Basic decisionValuesLTGD table
@@ -1556,18 +1598,18 @@ namespace factionHelpers
 		@tfield int defendPriority
 		@tfield int invasionType
 		@tfield int invadePriority
-		@tfield int atWar
-		@tfield int wantPeace
-		@tfield int wantAlly
-		@tfield int forceInvade
-		@tfield int wantBeProtect
-		@tfield int wantOfferProtect
-		@tfield int allianceAgainst
+		@tfield bool atWar
+		@tfield bool wantPeace
+		@tfield bool wantAlly
+		@tfield bool forceInvade
+		@tfield bool wantBeProtect
+		@tfield bool wantOfferProtect
+		@tfield bool allianceAgainst
 		@tfield int ptsDesire
 		@tfield int ptsAlliance
 		@tfield int pointsInvasion
 		@tfield int pointsDefense
-		@tfield int canForceInvade
+		@tfield bool canForceInvade
 
 		@table decisionValuesLTGD
 		*/

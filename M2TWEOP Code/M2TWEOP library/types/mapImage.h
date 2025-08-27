@@ -13,10 +13,10 @@ struct color
 
 struct tileColor
 {
-	tileColor() : color(0), coords({ 0,0 }) {}
-	tileColor(const uint32_t colorA, const int x, const int y) : color(colorA), coords({ x,y }) {}
-	uint32_t color;
-	coordPair coords;
+	tileColor() : color(0) {}
+	tileColor(const uint32_t colorA, const int x, const int y) : color(colorA), coords(x, y) {}
+	uint32_t color{};
+	coordPair coords{};
 };
 
 struct mapImage
@@ -32,6 +32,7 @@ namespace mapImageManager
 	std::shared_ptr<mapImage> makeMapImage();
 	void addToLua(sol::state& luaState);
 	void clearMapImage(mapImage* img);
+	void exportImage(const mapImage* img, const std::string& name);
 	std::tuple<int, int, void*> loadMapTexture(const mapImage* mapImage, const std::string& path);
 	void fillRegionColor(mapImage* img, int id, int r, int g, int b, int a);
 	void addRegionColor(mapImage* img, int id, int r, int g, int b, int a);

@@ -14,6 +14,7 @@
 - Allow users to specify a website and discord link which can be clicked in the launcher - *Medik*
 - Launcher no longer continues to play music if Discord Rich Presence is enabled and background music is enabled - *Medik*
 - Renamed "M2TWEOP GUI.exe" to "M2TWEOP_GUI.exe" - *Medik*
+- Allow users to disable the "backup saves" feature so they don't get spammed with multiple saves - *Medik*
 
 ### **Library**
 - Reduced amount of EOP "branding" displayed on startup - *Medik*
@@ -32,6 +33,7 @@
 - Updated default scrollbar theming - *Medik*
 - `reloadLua()` and `restartLua()` no long require opening the console - *Medik*
 - A toast popup appears when `reloadLua()` and `restartLua()` is called to provide feedback that the restart/reload was successful - *Medik*
+- Added `Copy to clipboard` button for console output
 
 ### **Documentation**
 - Updated Erken's ImGUI PDF tutorial to V5 (Thanks Erken!) - *Medik*

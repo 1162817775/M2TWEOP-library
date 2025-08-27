@@ -95,6 +95,10 @@ namespace managerG
 			{
 				getJson(dataG::data.gameData.isBlockLaunchWithoutEop, "isBlockLaunchWithoutEop");
 			}
+			if (json.contains("isSaveBackupEnabled"))
+			{
+				getJson(dataG::data.gameData.isSaveBackupEnabled, "isSaveBackupEnabled");
+			}
 			if (json.contains("IsOverrideBattleCamera"))
 			{
 				getJson(dataG::data.gameData.IsOverrideBattleCamera, "IsOverrideBattleCamera");
@@ -106,6 +110,10 @@ namespace managerG
 			if (json.contains("isFreecamIntegrationEnabled"))
 			{
 				getJson(dataG::data.gameData.freecamIntegration, "isFreecamIntegrationEnabled");
+			}
+			if (json.contains("isOpenTelemetryCollectorIntegrationEnabled"))
+			{
+				getJson(dataG::data.gameData.otelCollectorIntegration, "isOpenTelemetryCollectorIntegrationEnabled");
 			}
 		}
 		catch (jsn::json::type_error& e)
@@ -238,10 +246,12 @@ namespace managerG
 		setJson("isContextMenuNeeded", dataG::data.modulesData.isContextMenuNeeded);
 		setJson("isTacticalMapViewerNeeded", dataG::data.modulesData.isTacticalMapViewerNeeded);
 		setJson("isDeveloperModeNeeded", dataG::data.modulesData.isDeveloperModeNeeded);
+		setJson("isSaveBackupEnabled", dataG::data.gameData.isSaveBackupEnabled);
 		setJson("isBlockLaunchWithoutEop", dataG::data.gameData.isBlockLaunchWithoutEop);
 		setJson("IsOverrideBattleCamera", dataG::data.gameData.IsOverrideBattleCamera);
 		setJson("isDiscordRichPresenceEnabled", dataG::data.gameData.isDiscordRichPresenceEnabled);
 		setJson("isFreecamIntegrationEnabled", dataG::data.gameData.freecamIntegration);
+		setJson("isOpenTelemetryCollectorIntegrationEnabled", dataG::data.gameData.otelCollectorIntegration);
 		writeJsonToFile(fPath, json);
 		json.clear();
 

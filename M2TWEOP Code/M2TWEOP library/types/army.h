@@ -189,6 +189,7 @@ public:
 	void nullifyMovePoints();
 	coordPair* getCoordPair();
 	void siegeSettlement(settlementStruct* sett, bool isAttack);
+	void siegeFort(fortStruct* fort, bool isAttack);
 	bool isBorderingSettlement(const settlementStruct* sett);
 	int calculatePositionPower();
 	bool canStartSiege(settlementStruct* sett);
@@ -270,8 +271,8 @@ namespace armyHelpers
 		int subFaction,
 		int unitIndex,
 		int exp,
-		int wpn,
-		int armour
+		uint8_t wpn,
+		uint8_t armour
 		);
 	armyStruct* spawnArmy(
 		factionStruct* faction,
@@ -287,8 +288,8 @@ namespace armyHelpers
 		int subFaction,
 		int unitIndex,
 		int exp,
-		int wpn,
-		int armour,
+		uint8_t wpn,
+		uint8_t armour,
 		int soldierCount
 		);
 	

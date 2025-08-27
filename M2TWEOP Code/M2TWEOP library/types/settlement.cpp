@@ -27,6 +27,131 @@
 
 std::shared_ptr<eopSettlementDataDb> eopSettlementDataDb::instance = std::make_shared<eopSettlementDataDb>();
 
+unitRQ::unitRQ()
+{
+	settlement = nullptr;
+	frozen = 0;
+	experience = 0;
+	armourUpg = 0;
+	weaponUpgrade = 0;
+	weaponUpgradeSec = 0;
+	turnsTrainedAlready = 0;
+	percentFinished = 0;
+	turnsToTrain = 0;
+	cost = 0;
+	soldierCount = 0;
+	turnNumber = 0;
+	isValid = 0;
+	purchased = 0;
+	availability = 0;
+	isMercenary = 0;
+}
+
+eduEntry* unitRQ::getUnitEntry()
+{
+	if (recruitType < 2)
+		return this->entry;
+	if (recruitType > 2)
+		return reinterpret_cast<unit*>(this)->eduEntry;
+	return nullptr;
+}
+
+void aiProductionController::setBuildPoliciesAndTaxLevel(const int policy, const int recruitPolicy)
+{
+	if (this == nullptr)  // NOLINT(clang-diagnostic-tautological-undefined-compare)
+		return;
+	if (this->autoManagePolicy != settlementPolicy::none)
+		--*(&this->aiFaction->aiProductionControllers->balancedPolicyNum + policy);
+	this->autoManagePolicy = policy;
+	this->secondaryPolicy = recruitPolicy;
+	this->aiFaction->aiProductionControllers->updatePolicies(this->settlement, policy);
+	if (this->autoManagePolicy != settlementPolicy::none)
+	{
+		this->isAutoManagedTaxes = true;
+		this->isAutoManaged = true;
+		setSettlementTaxLevel();
+	}
+	else
+	{
+		this->isAutoManagedTaxes = false;
+		this->isAutoManaged = false;
+	}
+}
+
+void aiProductionController::setSettlementTaxLevel()
+{
+	GAME_FUNC(void(__thiscall*)(aiProductionController*), setSettlementTaxLevel)(this);
+}
+
+void aiProductionController::setPriorities()
+{
+	GAME_FUNC(void(__thiscall*)(aiProductionController*, int*, int*), prodSetPriorities)(this, this->aiFaction->aiProductionControllers->buildingValues, this->aiFaction->aiProductionControllers->agentRecruitValues);
+	const auto sett = this->settlement;
+	if (!sett)
+		return;
+	if (sett->isMinorSettlement)
+	{
+		setConstructionValueEnum(buildingCapabilities::trade_fleet, 0);
+		setConstructionValueEnum(buildingCapabilities::road_level, 0);
+		setConstructionValueEnum(buildingCapabilities::mine_resource, 0);
+		setConstructionValueEnum(buildingCapabilities::farming_level, 0);
+		setConstructionValueEnum(buildingCapabilities::religion_level, 0);
+		setConstructionValueEnum(buildingCapabilities::amplify_religion_level, 0);
+	}
+	if (!sett->army || sett->army->numOfUnits == 0)
+	{
+		for (int i = 1; i < 8; i++)
+		{
+			incConstructionUnitValue(i, 100);
+			incRecruitmentValue(i, 200);
+		}
+	}
+	else
+	{
+		if (sett->getSettlementStats()->PublicOrder < 70)
+		{
+			incConstructionValueEnum(buildingCapabilities::law_bonus, 50);
+			incConstructionValueEnum(buildingCapabilities::happiness_bonus, 50);
+			incConstructionValueEnum(buildingCapabilities::population_health_bonus, 25);
+			if (!sett->isMinorSettlement)
+				incConstructionValueEnum(buildingCapabilities::religion_level, 25);
+			for (int i = 1; i < 8; i++)
+				incRecruitmentValue(i, 25);
+		}
+		if (sett->getSettlementStats()->population - sett->lastPopulation <= 0)
+		{
+			incConstructionValueEnum(buildingCapabilities::population_growth_bonus, 50);
+			incConstructionValueEnum(buildingCapabilities::population_health_bonus, 50);
+			if (!sett->isMinorSettlement)
+				incConstructionValueEnum(buildingCapabilities::farming_level, 25);
+		}
+		if (sett->isMinorSettlement)
+			return;
+		if (const auto relPercent = sett->getSettlementStats()->religionPercentages[this->aiFaction->faction->religion]; relPercent < 50)
+		{
+			incConstructionValueEnum(buildingCapabilities::religion_level, (50 - relPercent) * 2);
+		}
+	}
+}
+
+void aiProductionController::underControlCheck(const factionStruct* faction)
+{
+	if (this->settlement->faction == faction)
+	{
+		settlement->aiProductionController = this;
+		this->isAutoManaged = this->autoManagePolicy != settlementPolicy::none;
+		this->notControlledDuration = 0;
+	}
+	else
+	{
+		if (settlement->aiProductionController == this)
+			settlement->aiProductionController = nullptr;
+		this->isAutoManaged = false;
+		this->notControlledDuration++;
+	}
+	
+}
+
 void settlementStatsManager::recalculate(const bool recalculateFacEconomy)
 {
 	GAME_FUNC(void(__thiscall*)(settlementStatsManager*, bool), recalculateSettlement)(this, recalculateFacEconomy);
@@ -51,8 +176,7 @@ int settlementStruct::getSettlementValue()
 	const int settlementLevelValues[] = {5, 30, 60, 80, 100, 120};
 	int value = settlementLevelValues[level];
 	int popVal = stats.settlementStats.population / 50;
-	if (popVal > 40)
-		popVal = 40;
+	popVal = min(popVal, 40);
 	value += popVal;
 	if (isCapital)
 		value += 50;
@@ -360,7 +484,7 @@ namespace settlementHelpers
 	    gameStringHelpers::setHashedString(&settlement->name, name.c_str());
 	    coordPair coords { xCoord, yCoord };
 	    GAME_FUNC(void(__thiscall*)(stratPathFinding*, void*, coordPair*),
-	    	spawnCreatedObject)(campaignHelpers::getStratPathFinding(), settlement, &coords);
+	              spawnCreatedObject)(campaignHelpers::getStratPathFinding(), settlement, &coords);
 		
 	    changeSettlementName(settlement, name.c_str());
 	    GAME_FUNC(void(__thiscall*)(settlementStruct*, factionStruct*), settAttachFaction)(settlement, faction);
@@ -695,24 +819,11 @@ namespace settlementHelpers
 		return build;
 	}
 	
-	void destroyBuilding(settlementStruct* sett, const char* typeName, bool isReturnMoney)
+	void destroyBuilding(settlementStruct* sett, const char* typeName, const bool isReturnMoney)
 	{
-
-		DWORD adr = codes::offsets.destroyBuildingFunc;
-		char** buildTypeS = gameStringHelpers::createHashedString(typeName);
-		if (buildTypeS == nullptr)return;
-		char* buildType = buildTypeS[0];
-		char* hash = buildTypeS[1];
-		int returnMoney = isReturnMoney ? 1 : 0;
-		_asm {
-			push returnMoney
-			push hash
-			push buildType
-			mov ecx, [sett]
-			mov eax, [adr]
-			call eax
-		}
-		return;
+		const auto hashString = gameStringHelpers::createHashedStringGame(typeName);
+		GAME_FUNC(void(__thiscall*)(settlementStruct*, const char*, int, bool), destroyBuildingFunc)(sett, hashString->name, hashString->hash, isReturnMoney);
+		gameStringHelpers::freeHashString(hashString);
 	}
 	
 #pragma endregion
@@ -814,13 +925,14 @@ namespace settlementHelpers
 		const int turnNum = campaignHelpers::getCampaignData()->turnNumber;
 		const int hash = makeBuildOptionsHash(sett);
 		auto options = buildingOptionsDbPtr->settOptions[index];
-		if (options && options->hash == hash && options->turn == turnNum)
+		if (options && options->hash == hash && options->turn == turnNum && options->settIndex == sett->minorSettlementIndex)
 			return options.get();
 		
 		buildingOptionsDbPtr->settOptions[index] = std::make_shared<settlementBuildingOptions>();
 		options = buildingOptionsDbPtr->settOptions[index];
 		options->hash = hash;
 		options->turn = turnNum;
+		options->settIndex = sett->minorSettlementIndex;
 		const auto available = getAvailableBuildings(sett);
 		options->count = getAvailableBuildingsCount(available);
 		for (int i = 0; i < options->count; i++)
@@ -930,13 +1042,14 @@ namespace settlementHelpers
 		const int turnNum = campaignHelpers::getCampaignData()->turnNumber;
 		const int hash = makeRecruitOptionsHash(sett);
 		auto options = recruitOptionsDbPtr->settRecruitOptions[index];
-		if (options && options->hash == hash && options->turn == turnNum)
+		if (options && options->hash == hash && options->settIndex == sett->minorSettlementIndex && options->turn == turnNum)
 			return options.get();
 		
 		recruitOptionsDbPtr->settRecruitOptions[index] = std::make_shared<settlementRecruitmentOptions>();
 		options = recruitOptionsDbPtr->settRecruitOptions[index];
 		options->hash = hash;
 		options->turn = turnNum;
+		options->settIndex = sett->minorSettlementIndex;
 		auto available = getAvailableUnits(sett);
 		const int trainCount = (available->lastUnit - reinterpret_cast<DWORD>(available->units)) / sizeof(unitRQ);
 		options->count = trainCount;
@@ -954,6 +1067,7 @@ namespace settlementHelpers
 		{
 			options->recruitOptions.push_back(std::make_shared<unitRQ>());
 			*options->recruitOptions[i] = available->units[i];
+			options->recruitOptions[i]->recruitType = 3;
 			options->totalCost += options->recruitOptions[i]->cost;
 			options->totalTime += options->recruitOptions[i]->turnsToTrain;
 		}
@@ -1018,9 +1132,9 @@ namespace settlementHelpers
 		@tfield int creatorFactionID
 		@tfield int regionID
 		@tfield int level
-		@tfield int salliedOut
+		@tfield bool salliedOut
 		@tfield int previousOwner
-		@tfield int readyToSurrender
+		@tfield bool readyToSurrender
 		@tfield int lastHordeFaction
 		@tfield int moneySpentConstruction
 		@tfield int moneySpentTraining
@@ -1029,20 +1143,21 @@ namespace settlementHelpers
 		@tfield crusadeStruct takenByCrusade
 		@tfield int isCastle
 		@tfield int plagueDuration
-		@tfield int scriptRebel
+		@tfield bool scriptRebel
 		@tfield int factionTradedFrom
 		@tfield int maxHoldoutTurns
 		@tfield int siegeCasualties
 		@tfield int siegeDuration
 		@tfield int subFactionID
 		@tfield int yearFounded
-		@tfield int isCapital
-		@tfield int isTradeBlocked
+		@tfield bool isCapital
+		@tfield bool isMinorSettlement
+		@tfield bool isTradeBlocked
 		@tfield int harvestSuccess
 		@tfield int baseFertility
 		@tfield int loyaltyLastTurn
 		@tfield int rebelFactionChance
-		@tfield int plagued
+		@tfield bool plagued
 		@tfield int plagueDeaths
 		@tfield int turnsOwned start at 10 for settlements owned at game start without specification in descr_strat
 		@tfield int populationSiegeStart
@@ -1066,7 +1181,7 @@ namespace settlementHelpers
 		@tfield int isProvokedRebellion
 		@tfield int publicHealth
 		@tfield int populationSize
-		@tfield int gatesAreOpened
+		@tfield bool gatesAreOpened
 		@tfield int characterCount
 		@tfield table savedData
 		@tfield getReligion getReligion
@@ -1169,6 +1284,7 @@ namespace settlementHelpers
 		types.settlementStruct.set("subFactionID", &settlementStruct::subFactionID);
 		types.settlementStruct.set("yearFounded", &settlementStruct::yearFounded);
 		types.settlementStruct.set("isCapital", &settlementStruct::isCapital);
+		types.settlementStruct.set("isMinorSettlement", &settlementStruct::isMinorSettlement);
 		types.settlementStruct.set("aiProductionController", &settlementStruct::aiProductionController);
 		types.settlementStruct.set("harvestSuccess", &settlementStruct::harvestSuccess);
 		types.settlementStruct.set("baseFertility", sol::property(&settlementStruct::getBaseFertility, &settlementStruct::setBaseFertility));
@@ -1727,6 +1843,7 @@ namespace settlementHelpers
 		@tfield int armourUpg
 		@tfield int weaponUpg
 		@tfield eduEntry eduEntry
+		@tfield unit retrainingUnit
 		@tfield int agentType
 		@tfield int soldierCount
 		@tfield int cost
@@ -1746,6 +1863,7 @@ namespace settlementHelpers
 		types.unitInQueue.set("weaponUpg", &unitRQ::weaponUpgrade);
 		types.unitInQueue.set("eduEntry", sol::property(&unitRQ::getUnitEntry, &unitRQ::setUnitEntry));
 		types.unitInQueue.set("agentType", sol::property(&unitRQ::getAgentType, &unitRQ::setAgentType));
+		types.unitInQueue.set("retrainingUnit", sol::property(&unitRQ::getUnit, &unitRQ::setUnit));
 		types.unitInQueue.set("soldierCount", &unitRQ::soldierCount);
 		types.unitInQueue.set("cost", &unitRQ::cost);
 		types.unitInQueue.set("recruitTime", &unitRQ::turnsToTrain);

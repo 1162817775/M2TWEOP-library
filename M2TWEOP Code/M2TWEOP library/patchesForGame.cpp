@@ -89,7 +89,7 @@ void __fastcall patchesForGame::onLoadSettlementWorldpkgdesc(worldRecord* select
 
 	const string selectRecordS = battleMapWorker.getRecordName(selectedRecord);
 	const string selectRecordG = battleMapWorker.getRecordGroup(selectedRecord);
-	battleCreator::OnLoadSettlementWorldpkgdesc(selectRecordS, selectRecordG);
+	battleCreator::onLoadSettlementWorldpkgdesc(selectRecordS, selectRecordG);
 }
 
 float __fastcall patchesForGame::onCalculateUnitValue(eduEntry* entry, const DWORD value)
@@ -146,10 +146,19 @@ DWORD __fastcall patchesForGame::onCustomBattleUnitCards(const DWORD cardArrayTh
 	return cardArrayThing;
 }
 
-aiProductionController* __fastcall patchesForGame::onCreateProductionController(aiProductionController* controller, settlementStruct* sett)
+void __fastcall patchesForGame::onSetBuildPolicies(aiProductionController* controller, int policy, int secondaryPolicy)
 {
-	controller->settlement = sett;
-	return controller;
+	controller->setBuildPoliciesAndTaxLevel(policy, secondaryPolicy);
+}
+
+void patchesForGame::onUpdateProdControllers(aiPersonalityValues* personality)
+{
+	personality->updateControllers();
+}
+
+void patchesForGame::onSetProdPriorities(aiProductionController* controller)
+{
+	controller->setPriorities();
 }
 
 void __fastcall patchesForGame::onDecideNeighbours(factionStruct* faction)
@@ -849,6 +858,11 @@ int patchesForGame::onCheckHiddenResource(const int id, const int region)
 	return eopHiddenResources::hasHiddenResource(region, id);
 }
 
+int patchesForGame::onGetWatchTowerRange()
+{
+	return m2tweopOptions::getWatchTowerRange();
+}
+
 void patchesForGame::onSetSettlementModel(settlementStruct* settlement)
 {
 	bool changed = false;
@@ -869,6 +883,31 @@ void patchesForGame::onSetSettlementModel(settlementStruct* settlement)
 		const auto cultSett = cultures::getCultureSettlement(settlement->level, settlement->fac_creatorModNum);
 		settlement->model = cultSett;
 	}
+}
+
+void patchesForGame::onGeneralAssaultAction(generalAssault* assault)
+{
+	if (!assault || !assault->settlement)
+		return;
+	if (!assault->settlement->army)
+		gameHelpers::logStringGame("GeneralAssaultAction: No army in settlement: " + std::string(assault->settlement->name));
+}
+
+mountedEngine* patchesForGame::onGetMountedEngine(const stringWithHash* name)
+{
+	if (!name || !name->name)
+		return nullptr;
+	return eopMountedEngineDb::get()->getMountedEngine(std::string(name->name));
+}
+
+bool patchesForGame::onParseMountedEngines(mountedEngineDb* db, descrParser* parser)
+{
+	return db->parse(parser);
+}
+
+bool patchesForGame::onParseEdu(unitDb* db, descrParser* parser)
+{
+	return db->parse(parser);
 }
 
 int patchesForGame::onAddSettlementToDiplomacyScroll(const settlementStruct* settlement)
@@ -1071,6 +1110,17 @@ void patchesForGame::onAttachRegionSettlement(settlementStruct* sett, int region
 	}
 }
 
+int patchesForGame::onGetTrueBuildingCapabilities(const int counter, const stackCapabilities* cap)
+{
+	if (counter < 32)
+		return 0;
+	if (cap->settlement && cap->settlement->name)
+		gameHelpers::logStringGame("Settlement: " + std::string(cap->settlement->name) + " has too many true building capabilities!");
+	else
+		gameHelpers::logStringGame("A settlement has too many true building capabilities!");
+	return 1;
+}
+
 void patchesForGame::onCalculateSettlement(settlementStruct* sett)
 {
 	if(!sett->isMinorSettlement)
@@ -1207,6 +1257,26 @@ int patchesForGame::onEvalAttObjective(const aiCampaignController* controller)
 	if (factionId == controller->regionData->factionID && controller->attacking)
 		factionId = campaignHelpers::getCampaignData()->slaveFactionID;
 	return factionId;
+}
+
+void patchesForGame::onCalculateLTGD(aiLongTermGoalDirector* ltgd)
+{
+	ltgd->update();
+}
+
+void patchesForGame::onStartProductionTurn(aiPersonalityValues* personality)
+{
+	personality->init();
+}
+
+factionStruct* patchesForGame::onCheckGarrison(const aiRegionController* controller)
+{
+	return controller->settlement->faction;
+}
+
+int patchesForGame::onValidateGarrison(const aiRegionController* controller, const armyStruct* army)
+{
+	return army->settlement == controller->settlement ? 1 : 0;
 }
 
 void patchesForGame::onUpdateControllerAlloc(aiCampaignController* controller)
@@ -1746,6 +1816,8 @@ void patchesForGame::onBattleTick()
 	gameEvents::onBattleTick();
 }
 
+bool NEED_BUILD_FRONTIERS = true;
+
 void __stdcall patchesForGame::afterCampaignMapLoaded()
 {
 	discordManager::onCampaignMapLoaded();
@@ -1753,6 +1825,11 @@ void __stdcall patchesForGame::afterCampaignMapLoaded()
 	plugData::data.luaAll.fillHashMaps();
 	gameEvents::onCampaignMapLoaded();
 	eopCharacterDataDb::get()->onGameLoaded();
+	if (NEED_BUILD_FRONTIERS && m2tweopOptions::getUseEopFrontiers())
+	{
+		stratMapHelpers::rebuildFrontiers();
+		NEED_BUILD_FRONTIERS = false;
+	}
 }
 
 void __stdcall patchesForGame::onNewGameStart()
@@ -1766,6 +1843,7 @@ void __stdcall patchesForGame::onNewGameStart()
 //#define TESTPATCHES
 void __stdcall patchesForGame::onEduParsed()
 {
+	gameHelpers::fixReligionTrigger();
 	*reinterpret_cast<bool*>(dataOffsets::offsets.bugReport) = true;
 	unitHelpers::initBaseUnitsLookup();
 	gameEvents::onReadGameDbsAtStart();
@@ -1805,6 +1883,7 @@ void __stdcall patchesForGame::onNewGameLoaded()
 	eopRebelFactionDb::loadData();
 	plugData::data.luaAll.fillHashMaps();
 	gameEvents::onNewGameLoaded();
+	NEED_BUILD_FRONTIERS = true;
 }
 
 bool AI_ACTIVE = false;
@@ -1936,11 +2015,12 @@ void __stdcall patchesForGame::onBattleStratScreen()
 
 void deployGateAttackers(const aiTacticAssault* aiTactic)
 {
-	if (const auto unit = aiTactic->attackUnit; unit && distance(unit->positionX, unit->positionY, aiTactic->advanceX, aiTactic->advanceY) > 200)
+	if (const auto unit = aiTactic->attackUnit; unit && distance(unit->positionX, unit->positionY, aiTactic->advanceX, aiTactic->advanceY) > 500)
 		unitActions::placeUnit(unit, aiTactic->advanceX, aiTactic->advanceY, aiTactic->angle, 0);
 }
 
 bool FIRST_END = true;
+bool NEED_BUILD_FRONTIER = true;
 
 void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 {
@@ -1965,6 +2045,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 	const DWORD characterTurnEnd = gameVersion == 1 ? 0x0136C0B4 : 0x0132708C;
 	const DWORD characterTurnStart = gameVersion == 1 ? 0x0136BFE4 : 0x01326FBC;
 	const DWORD postBattle = gameVersion == 1 ? 0x01367ADC : 0x01322AB4; 
+	const DWORD preBattleWithdrawal = gameVersion == 1 ? 0x01366D54 : 0x01321D2C; 
 	if (eventCode == scrollOpenedCode)
 	{
 		char* str = reinterpret_cast<char*>(vTab[1]);
@@ -2121,7 +2202,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 			sett->aiProductionController->isAutoManagedTaxes = false;
 		}
 	}
-	else if (eventCode == postBattle)
+	else if (eventCode == postBattle || eventCode == preBattleWithdrawal)
 	{
 		campaignHelpers::getCampaignData()->ignoreSpeedUp = false;
 	}
@@ -2166,6 +2247,7 @@ void __fastcall patchesForGame::onLoadSaveFile(UNICODE_STRING**& savePath)
 	gameEvents::onLoadGamePl(&files);
 	plannedRetreatRoute::onGameLoad(files);
 	techFuncs::deleteFiles(files);
+	NEED_BUILD_FRONTIERS = true;
 }
 
 void __fastcall patchesForGame::onSaveGame(UNICODE_STRING**& savePath)
@@ -2346,13 +2428,13 @@ void __fastcall patchesForGame::onLoadDescrBattleCharacter(armyStruct* army, cha
 {
 	characterHelpers::setBodyguard(goalGen, army->units[0]);//we replace game function what set army leader character.
 
+	
 	std::string relativePath = techFuncs::uniToAnsi(campaignHelpers::getCampaignData()->currentDescrFile);
 
 	if (relativePath.find("battle") != std::string::npos)
 	{
 		battleCreator::addCharactersToCustomBattleArmy(army, relativePath);
 	}
-	//general*newGen=fastFuncts::createCharacter("named character",army->faction,25,"testGen", "testGen",0,nullptr, 0,0);
 }
 
 void __stdcall patchesForGame::onBattleStateChange()

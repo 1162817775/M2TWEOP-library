@@ -670,9 +670,81 @@ void managerF::execPatches()
 	f1 << "Done" << '\n';
 	
 	f1 << "Start applying onCreateProductionController patch" << '\n';
-	onCreateProductionController* toCreateProductionController = new onCreateProductionController(mem, (LPVOID)patchesForGame::onCreateProductionController, globals::dataS.gameVersion);
+	onCreateProductionController* toCreateProductionController = new onCreateProductionController(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
 	toCreateProductionController->SetNewCode();
 	toCreateProductionController->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onSetBuildPolicies patch" << '\n';
+	onSetBuildPolicies* toSetBuildPolicies = new onSetBuildPolicies(mem, (LPVOID)patchesForGame::onSetBuildPolicies, globals::dataS.gameVersion);
+	toSetBuildPolicies->SetNewCode();
+	toSetBuildPolicies->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onUpdateProdControllers patch" << '\n';
+	onUpdateProdControllers* toUpdateProdControllers = new onUpdateProdControllers(mem, (LPVOID)patchesForGame::onUpdateProdControllers, globals::dataS.gameVersion);
+	toUpdateProdControllers->SetNewCode();
+	toUpdateProdControllers->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onSetProdPriorities patch" << '\n';
+	onSetProdPriorities* toSetProdPriorities = new onSetProdPriorities(mem, (LPVOID)patchesForGame::onSetProdPriorities, globals::dataS.gameVersion);
+	toSetProdPriorities->SetNewCode();
+	toSetProdPriorities->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onGetTrueBuildingCapabilities patch" << '\n';
+	onGetTrueBuildingCapabilities* toGetTrueBuildingCapabilities = new onGetTrueBuildingCapabilities(mem, (LPVOID)patchesForGame::onGetTrueBuildingCapabilities, globals::dataS.gameVersion);
+	toGetTrueBuildingCapabilities->SetNewCode();
+	toGetTrueBuildingCapabilities->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onCheckMountedEngineValid patch" << '\n';
+	onCheckMountedEngineValid* toCheckMountedEngineValid = new onCheckMountedEngineValid(mem, (LPVOID)patchesForGame::onGetMountedEngine, globals::dataS.gameVersion);
+	toCheckMountedEngineValid->SetNewCode();
+	toCheckMountedEngineValid->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onGetMountedEngine patch" << '\n';
+	onGetMountedEngine* toGetMountedEngine = new onGetMountedEngine(mem, (LPVOID)patchesForGame::onGetMountedEngine, globals::dataS.gameVersion);
+	toGetMountedEngine->SetNewCode();
+	toGetMountedEngine->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onParseMountedEngines patch" << '\n';
+	onParseMountedEngines* toParseMountedEngines = new onParseMountedEngines(mem, (LPVOID)patchesForGame::onParseMountedEngines, globals::dataS.gameVersion);
+	toParseMountedEngines->SetNewCode();
+	toParseMountedEngines->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onParseEdu patch" << '\n';
+	onParseEdu* toParseEdu = new onParseEdu(mem, (LPVOID)patchesForGame::onParseEdu, globals::dataS.gameVersion);
+	toParseEdu->SetNewCode();
+	toParseEdu->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onApplyKillChance patch" << '\n';
+	onApplyKillChance* toApplyKillChance = new onApplyKillChance(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
+	toApplyKillChance->SetNewCode();
+	toApplyKillChance->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onRemoveKillChance patch" << '\n';
+	onRemoveKillChance* toRemoveKillChance = new onRemoveKillChance(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
+	toRemoveKillChance->SetNewCode();
+	toRemoveKillChance->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onInitUnitBattle patch" << '\n';
+	onInitUnitBattle* toInitUnitBattle = new onInitUnitBattle(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
+	toInitUnitBattle->SetNewCode();
+	toInitUnitBattle->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onCreateUnitKillChance patch" << '\n';
+	onCreateUnitKillChance* toCreateUnitKillChance = new onCreateUnitKillChance(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
+	toCreateUnitKillChance->SetNewCode();
+	toCreateUnitKillChance->Enable();
 	f1 << "Done" << '\n';
 	
 	f1 << "Start applying onDecideNeighbours patch" << '\n';
@@ -778,6 +850,12 @@ void managerF::execPatches()
 	toDamageCoreBuilding3->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onGetWatchTowerRange patch" << '\n';
+	onGetWatchTowerRange* toGetWatchTowerRange = new onGetWatchTowerRange(mem, (LPVOID)patchesForGame::onGetWatchTowerRange, globals::dataS.gameVersion);
+	toGetWatchTowerRange->SetNewCode();
+	toGetWatchTowerRange->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying onGetDefensesBuilding patch" << '\n';
 	onGetDefensesBuilding* toGetDefensesBuilding = new onGetDefensesBuilding(mem, (LPVOID)patchesForGame::onGetBuildingById, globals::dataS.gameVersion);
 	toGetDefensesBuilding->SetNewCode();
@@ -838,10 +916,40 @@ void managerF::execPatches()
 	toSetCqFlags2->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onRemoveCqFlags patch" << '\n';
+	onRemoveCqFlags* toRemoveCqFlags = new onRemoveCqFlags(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
+	toRemoveCqFlags->SetNewCode();
+	toRemoveCqFlags->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onRemoveCqFlags2 patch" << '\n';
+	onRemoveCqFlags2* toRemoveCqFlags2 = new onRemoveCqFlags2(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
+	toRemoveCqFlags2->SetNewCode();
+	toRemoveCqFlags2->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying onAddBuildingCapsAfterConstruction patch" << '\n';
 	onAddBuildingCapsAfterConstruction* toAddBuildingCapsAfterConstruction = new onAddBuildingCapsAfterConstruction(mem, (LPVOID)patchesForGame::onAddBuildingCapsAfterConstruction, globals::dataS.gameVersion);
 	toAddBuildingCapsAfterConstruction->SetNewCode();
 	toAddBuildingCapsAfterConstruction->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onCheckGarrison patch" << '\n';
+	onCheckGarrison* toCheckGarrison = new onCheckGarrison(mem, (LPVOID)patchesForGame::onCheckGarrison, globals::dataS.gameVersion);
+	toCheckGarrison->SetNewCode();
+	toCheckGarrison->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onValidateGarrison patch" << '\n';
+	onValidateGarrison* toValidateGarrison = new onValidateGarrison(mem, (LPVOID)patchesForGame::onValidateGarrison, globals::dataS.gameVersion);
+	toValidateGarrison->SetNewCode();
+	toValidateGarrison->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onGeneralAssaultAction patch" << '\n';
+	onGeneralAssaultAction* toGeneralAssaultAction = new onGeneralAssaultAction(mem, (LPVOID)patchesForGame::onGeneralAssaultAction, globals::dataS.gameVersion);
+	toGeneralAssaultAction->SetNewCode();
+	toGeneralAssaultAction->Enable();
 	f1 << "Done" << '\n';
 	
 	f1 << "Start applying onAddBuildingCapsAfterConstruction2 patch" << '\n';
@@ -872,6 +980,18 @@ void managerF::execPatches()
 	onCanWithdrawPreBattle* toCanWithdrawPreBattle = new onCanWithdrawPreBattle(mem, (LPVOID)patchesForGame::onCanWithdrawPreBattle, globals::dataS.gameVersion);
 	toCanWithdrawPreBattle->SetNewCode();
 	toCanWithdrawPreBattle->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onCalculateLTGD patch" << '\n';
+	onCalculateLTGD* toCalculateLTGD = new onCalculateLTGD(mem, (LPVOID)patchesForGame::onCalculateLTGD, globals::dataS.gameVersion);
+	toCalculateLTGD->SetNewCode();
+	toCalculateLTGD->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onStartProductionTurn patch" << '\n';
+	onStartProductionTurn* toStartProductionTurn = new onStartProductionTurn(mem, (LPVOID)patchesForGame::onStartProductionTurn, globals::dataS.gameVersion);
+	toStartProductionTurn->SetNewCode();
+	toStartProductionTurn->Enable();
 	f1 << "Done" << '\n';
 	
 	f1 << "Start applying onDecideMissionTarget patch" << '\n';
@@ -1295,19 +1415,19 @@ void managerF::execPatches()
 	toCreateMercUnitCheck->Enable();
 	f1 << "Done" << '\n';
 
-	f1 << "Start applying OnQuickSave patch" << '\n';
-	OnQuickSave* onQuickSave = new OnQuickSave(mem, (LPVOID)patchesForGame::onQuickSave, globals::dataS.gameVersion);
-	onQuickSave->SetNewCode();
-	onQuickSave->Enable();
-	f1 << "Done" << '\n';
+	if (globals::dataS.gameCfg.isSaveBackupEnabled == true) {
+		f1 << "Start applying OnQuickSave patch" << '\n';
+		OnQuickSave* onQuickSave = new OnQuickSave(mem, (LPVOID)patchesForGame::onQuickSave, globals::dataS.gameVersion);
+		onQuickSave->SetNewCode();
+		onQuickSave->Enable();
+		f1 << "Done" << '\n';
 
-
-	f1 << "Start applying OnAutoSave patch" << '\n';
-	OnAutoSave* onAutoSave = new OnAutoSave(mem, (LPVOID)patchesForGame::onAutoSave, globals::dataS.gameVersion);
-	onAutoSave->SetNewCode();
-	onAutoSave->Enable();
-	f1 << "Done" << '\n';
-
+		f1 << "Start applying OnAutoSave patch" << '\n';
+		OnAutoSave* onAutoSave = new OnAutoSave(mem, (LPVOID)patchesForGame::onAutoSave, globals::dataS.gameVersion);
+		onAutoSave->SetNewCode();
+		onAutoSave->Enable();
+		f1 << "Done" << '\n';
+	}
 
 	OnPathCasheCrashPlace* onPathCasheCrashPlace = new OnPathCasheCrashPlace(mem, (LPVOID)&tacticalMapViewer::getPathCache, globals::dataS.gameVersion, (LPVOID)&globals::dataS.Modules.tacticalMapViewer);
 	onPathCasheCrashPlace->SetNewCode();
@@ -1322,7 +1442,7 @@ void managerF::execPatches()
 	//onStartOfDrawFunction->Enable();
 
 
-	if (battleCreator::IsRetreatsOverhaulEnabled())
+	if (battleCreator::isRetreatsOverhaulEnabled())
 	{
 		toRetreat* onRetreat = new toRetreat(mem, (LPVOID)patchesForGame::onRetreat, globals::dataS.gameVersion);
 		onRetreat->SetNewCode();
@@ -1377,6 +1497,11 @@ void managerF::loadJsonSettings()
 		{
 			getJson(jsonBoolValue, "isDiscordRichPresenceEnabled")
 			globals::dataS.gameCfg.isDiscordRichPresenceEnabled = jsonBoolValue;
+		}
+		if (json.contains("isSaveBackupEnabled"))
+		{
+			getJson(jsonBoolValue, "isSaveBackupEnabled")
+			globals::dataS.gameCfg.isSaveBackupEnabled = jsonBoolValue;
 		}
 	}
 	catch (jsn::json::type_error &e)

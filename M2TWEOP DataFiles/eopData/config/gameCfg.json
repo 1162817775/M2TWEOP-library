@@ -2,8 +2,10 @@
   "isBlockLaunchWithoutEop": false,
   "isDiscordRichPresenceEnabled": false,
   "isFreecamIntegrationEnabled": false,
+  "isOpenTelemetryCollectorIntegrationEnabled": false,
   "isDeveloperModeNeeded": true,
   "isTacticalMapViewerNeeded": true,
   "isContextMenuNeeded": true,
-  "isDXVKEnabled": false
+  "isDXVKEnabled": false,
+  "isSaveBackupEnabled": true
 }

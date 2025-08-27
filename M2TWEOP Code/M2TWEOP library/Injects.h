@@ -1949,6 +1949,54 @@ private:
 	LPVOID funcAddress;
 };
 
+class onGetWatchTowerRange
+	:public AATemplate
+{
+public:
+	onGetWatchTowerRange(MemWork* mem, LPVOID addr, int ver);
+	~onGetWatchTowerRange() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onCheckGarrison
+	:public AATemplate
+{
+public:
+	onCheckGarrison(MemWork* mem, LPVOID addr, int ver);
+	~onCheckGarrison() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onValidateGarrison
+	:public AATemplate
+{
+public:
+	onValidateGarrison(MemWork* mem, LPVOID addr, int ver);
+	~onValidateGarrison() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onGeneralAssaultAction
+	:public AATemplate
+{
+public:
+	onGeneralAssaultAction(MemWork* mem, LPVOID addr, int ver);
+	~onGeneralAssaultAction() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 class onAddBuildingCapsAfterConstruction
 	:public AATemplate
 {
@@ -2171,6 +2219,174 @@ class onBattleTick
 public:
 	onBattleTick(MemWork* mem, LPVOID addr, int ver);
 	~onBattleTick() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onCalculateLTGD
+	:public AATemplate
+{
+public:
+	onCalculateLTGD(MemWork* mem, LPVOID addr, int ver);
+	~onCalculateLTGD() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onStartProductionTurn
+	:public AATemplate
+{
+public:
+	onStartProductionTurn(MemWork* mem, LPVOID addr, int ver);
+	~onStartProductionTurn() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onSetBuildPolicies
+	:public AATemplate
+{
+public:
+	onSetBuildPolicies(MemWork* mem, LPVOID addr, int ver);
+	~onSetBuildPolicies() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onUpdateProdControllers
+	:public AATemplate
+{
+public:
+	onUpdateProdControllers(MemWork* mem, LPVOID addr, int ver);
+	~onUpdateProdControllers() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onSetProdPriorities
+	:public AATemplate
+{
+public:
+	onSetProdPriorities(MemWork* mem, LPVOID addr, int ver);
+	~onSetProdPriorities() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onGetTrueBuildingCapabilities
+	:public AATemplate
+{
+public:
+	onGetTrueBuildingCapabilities(MemWork* mem, LPVOID addr, int ver);
+	~onGetTrueBuildingCapabilities() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onCheckMountedEngineValid
+	:public AATemplate
+{
+public:
+	onCheckMountedEngineValid(MemWork* mem, LPVOID addr, int ver);
+	~onCheckMountedEngineValid() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onGetMountedEngine
+	:public AATemplate
+{
+public:
+	onGetMountedEngine(MemWork* mem, LPVOID addr, int ver);
+	~onGetMountedEngine() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onParseMountedEngines
+	:public AATemplate
+{
+public:
+	onParseMountedEngines(MemWork* mem, LPVOID addr, int ver);
+	~onParseMountedEngines() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onParseEdu
+	:public AATemplate
+{
+public:
+	onParseEdu(MemWork* mem, LPVOID addr, int ver);
+	~onParseEdu() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onApplyKillChance
+	:public AATemplate
+{
+public:
+	onApplyKillChance(MemWork* mem, LPVOID addr, int ver);
+	~onApplyKillChance() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onRemoveKillChance
+	:public AATemplate
+{
+public:
+	onRemoveKillChance(MemWork* mem, LPVOID addr, int ver);
+	~onRemoveKillChance() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onInitUnitBattle
+	:public AATemplate
+{
+public:
+	onInitUnitBattle(MemWork* mem, LPVOID addr, int ver);
+	~onInitUnitBattle() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onCreateUnitKillChance
+	:public AATemplate
+{
+public:
+	onCreateUnitKillChance(MemWork* mem, LPVOID addr, int ver);
+	~onCreateUnitKillChance() = default;
 	
 	void SetNewCode();
 private:

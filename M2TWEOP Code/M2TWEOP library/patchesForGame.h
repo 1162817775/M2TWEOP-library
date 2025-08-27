@@ -3,8 +3,11 @@
 #include "graphicsD3D.h"
 #include "cultures.h"
 #include "faction.h"
+#include "gameHelpers.h"
 #include "unit.h"
 
+struct aiPersonalityValues;
+struct aiLongTermGoalDirector;
 struct unitRQ;
 struct bannerData;
 struct aiRegionData;
@@ -29,6 +32,23 @@ struct trackedArmy
 	armyStruct* army;
 };
 
+struct generalAssault
+{
+	DWORD vtbl;
+	int8_t finished : 1;
+	int8_t started : 1;
+	int8_t init : 1;
+	int8_t stop : 1;
+	character* character;
+	int xCoordStart;
+	int yCoordStart;
+	int xCoordTarget;
+	int yCoordTarget;
+	settlementStruct* settlement;
+	bool nightBattle;
+	char pad[3];
+};
+
 class patchesForGame
 {
 public:
@@ -49,7 +69,12 @@ public:
 	static int __fastcall onReadHiddenResources(int hiddenResourceId, void* textBuffer);
 	static int __fastcall onGetHiddenResource(const stringWithHash* name);
 	static int __fastcall onCheckHiddenResource(int id, int region);
+	static int __cdecl onGetWatchTowerRange();
 	static void __fastcall onSetSettlementModel(settlementStruct* settlement);
+	static void __fastcall onGeneralAssaultAction(generalAssault* assault);
+	static mountedEngine* __fastcall onGetMountedEngine(const stringWithHash* name);
+	static bool __fastcall onParseMountedEngines(mountedEngineDb* db, descrParser* parser);
+	static bool __fastcall onParseEdu(unitDb* db, descrParser* parser);
 	static int __fastcall onAddSettlementToDiplomacyScroll(const settlementStruct* settlement);
 	static settlementStruct* __fastcall onDecideMissionTarget(settlementStruct* settlement, factionStruct* faction);
 	static int __fastcall onCanWithdrawPreBattle(const settlementStruct* settlement);
@@ -66,6 +91,7 @@ public:
 	static int __fastcall onAddBuildingCapsAfterConstruction(const settlementStruct* sett, int index);
 	static building* __fastcall onCheckBuildUpgrade(const settlementStruct* sett, int buildingId);
 	static void __fastcall onAttachRegionSettlement(settlementStruct* sett, int regionId);
+	static int __fastcall onGetTrueBuildingCapabilities(int counter, const stackCapabilities* cap);
 	static void __fastcall onCalculateSettlement(settlementStruct* sett);
 	static eduEntry* __fastcall onCustomBattleCost(int eduIndexOffset);
 	static int __fastcall onMarriageOption(const factionRecord* facRecord);
@@ -74,6 +100,10 @@ public:
 	static bannerData* __fastcall onGetRebelSymbol(const trackedArmy* army, bannerData* oldData);
 	static void __fastcall onPredictedStats(settlementStats* statsManager);
 	static int __fastcall onEvalAttObjective(const aiCampaignController* controller);
+	static void __fastcall onCalculateLTGD(aiLongTermGoalDirector* ltgd);
+	static void __fastcall onStartProductionTurn(aiPersonalityValues* personality);
+	static factionStruct* __fastcall onCheckGarrison(const aiRegionController* controller);
+	static int __fastcall onValidateGarrison(const aiRegionController* controller, const armyStruct* army);
 	static void __fastcall onUpdateControllerAlloc(aiCampaignController* controller);
 	static int __fastcall onScoreBestCapital(const settlementStruct* sett);
 	static int __fastcall onGetUnitCard(const eduEntry* entry, int factionId, stringWithHash* newPath);
@@ -98,7 +128,9 @@ public:
 	static void __fastcall onDecideNeighbours(factionStruct* faction);
 	static void __fastcall onInitGsd(aiGlobalStrategyDirector* director);
 	static void __fastcall onInitGsd2(aiGlobalStrategyDirector* director);
-	static aiProductionController* __fastcall onCreateProductionController(aiProductionController* controller, settlementStruct* sett);
+	static void __fastcall onSetBuildPolicies(aiProductionController* controller, int policy, int secondaryPolicy);
+	static void __fastcall onUpdateProdControllers(aiPersonalityValues* personality);
+	static void __fastcall onSetProdPriorities(aiProductionController* controller);
 	static DWORD __fastcall onUnitInfo(DWORD entryAddress);
 	static void __fastcall onTransferSettlement(const settlementStruct* settlement, int reason, factionStruct* faction);
 	static portBuildingStruct* __fastcall onTransferSettlementPort(const settlementStruct* settlement);

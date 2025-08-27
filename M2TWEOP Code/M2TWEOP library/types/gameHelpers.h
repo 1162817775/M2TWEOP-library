@@ -346,20 +346,27 @@ struct countersObjectS
 class m2tweopOptions
 {
 public:
-	static void setHideUnknownUnitTooltips(bool value) { hideUnknownUnitTooltips = value; }
+	static void setHideUnknownUnitTooltips(const bool value) { hideUnknownUnitTooltips = value; }
 	static bool getHideUnknownUnitTooltips() { return hideUnknownUnitTooltips; }
-	static void setEnableFamilyEventsForTeutonic(bool value) { enableFamilyEventsForTeutonic = value; }
+	static void setEnableFamilyEventsForTeutonic(const bool value) { enableFamilyEventsForTeutonic = value; }
 	static bool getEnableFamilyEventsForTeutonic() { return enableFamilyEventsForTeutonic; }
-	static void setHandleUnitCards(bool value) { eopHandleUnitCards = value; }
+	static void setHandleUnitCards(const bool value) { eopHandleUnitCards = value; }
 	static bool getHandleUnitCards() { return eopHandleUnitCards; }
-	static DWORD getColor() { return (0xFF << 24) | (khakiTextRed << 16) | (khakiTextGreen << 8) | khakiTextBlue; }
+	static void setWatchTowerRange(const int value) { watchTowerRange = value; }
+	static int getWatchTowerRange() { return watchTowerRange; }
+	static void setUseEopFrontiers(const bool value) { useEopFrontiers = value; }
+	static int getUseEopFrontiers() { return useEopFrontiers; }
+	static DWORD getColor() { return (static_cast<uint32_t>(0xFF) << 24) | (khakiTextRed << 16) | (khakiTextGreen << 8) | khakiTextBlue; }
 	static void setKhakiTextColor(const uint8_t red, const uint8_t green, const uint8_t blue) { khakiTextRed = red; khakiTextGreen = green; khakiTextBlue = blue; }
 	static bool hideUnknownUnitTooltips;
 	static bool eopHandleUnitCards;
 	static bool enableFamilyEventsForTeutonic;
+	static bool useEopFrontiers;
+	static bool fixHeroAbilityKillChance;
 	static uint8_t khakiTextRed;
 	static uint8_t khakiTextGreen;
 	static uint8_t khakiTextBlue;
+	static int watchTowerRange;
 };
 
 struct boostLightMutex
@@ -396,6 +403,35 @@ struct boostLogger
 	boostSharedPtr impl;
 	bool destroyed;
 	char pad[0x3];
+};
+
+struct loggerAndLevel
+{
+	boostLogger* logger;
+	int level;
+	loggerAndLevel(boostLogger* logger, const int level)
+		: logger(logger), level(level) {}
+};
+
+struct enabledLogger
+{
+	std::ostringstream* stream;
+	boostLogger* logger;
+	int level;
+};
+
+struct descrParser
+{
+	char *buffer;
+	int size;
+	char *end;
+	UNICODE_STRING **filename;
+	char *walker;
+	char *lineStart;
+	int lineNumber;
+	bool ownBuffer;
+	char pad[3];
+	char* getFileName();
 };
 
 class eopLogging
@@ -454,6 +490,8 @@ namespace gameHelpers
 	options2* getOptions2();
 	
 	void addToIntArray(int** array, int* value);
+	bool intArrayContains(int** array, int value);
+	void removeFromIntArray(int** array, int index);
 	
 	void saveGame(const char* path);
 	void loadSaveGame(const char* saveName);
@@ -472,6 +510,7 @@ namespace gameHelpers
 	void setAncLimit(uint8_t limit);
 	void setMaxUnitSize(signed short min, signed short max);
 	void setMaxBgSize(unsigned char size);
+	void fixReligionTrigger();
 	void unlockConsoleCommands();
 	void toggleUnitHighlight();
 	void setReligionsLimit(unsigned char limit);

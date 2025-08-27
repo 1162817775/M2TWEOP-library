@@ -32,6 +32,11 @@ public:
 			string gamePath;
 			string modFolder;
 
+			// OpenTelemetry Collector Integration
+			string otelCollectorExeName = "otelcol.exe";
+			bool otelCollectorIntegration = false;
+			bool otelCollectorStarted = false;
+
 			// Freecam Integration
 			string freecamExeName = "Freecam.exe";
 			bool freecamIntegration = false;
@@ -70,6 +75,7 @@ public:
 
 			int gameVer = 0;
 
+			bool isSaveBackupEnabled = false;
 			bool isBlockLaunchWithoutEop = false;
 			bool IsOverrideBattleCamera = false;
 		}gameData;

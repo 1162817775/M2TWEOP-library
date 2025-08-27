@@ -41,14 +41,10 @@ characterMoveData::characterMoveData(character* charPtr, const int searchType, c
 				tiles.emplace_back(tileEx);
 			else
 				continue;
-			if (x < actualMinX)
-				actualMinX = x;
-			if (x > actualMaxX)
-				actualMaxX = x;
-			if (y < actualMinY)
-				actualMinY = y;
-			if (y > actualMaxY)
-				actualMaxY = y;
+			actualMinX = min(x, actualMinX);
+			actualMaxX = max(x, actualMaxX);
+			actualMinY = min(y, actualMinY);
+			actualMaxY = max(y, actualMaxY);
 		}
 	}
 	for (int x = actualMinX; x <= actualMaxX; x++)
@@ -235,8 +231,12 @@ characterRecord* campaign::getCharacterByLabel(const std::string& label)
 	for (int i = 0; i < factionCount; i++)
 	{
 		const auto fac = getFactionByOrder(i);
+		if (fac->deadStatus > 0)
+			continue;
 		if (const auto rec = fac->getCharacterByLabel(label); rec)
+		{
 			return rec;
+		}
 	}
 	return nullptr;
 }
@@ -247,6 +247,8 @@ characterRecord* campaign::worldwideAncillaryExists(const std::string& ancName)
 	{
 		if (const auto fac = getFactionByOrder(i); fac)
 		{
+			if (fac->deadStatus > 0)
+				continue;
 			if (const auto rec = fac->ancillaryExists(ancName); rec)
 				return rec;
 		}
@@ -254,43 +256,43 @@ characterRecord* campaign::worldwideAncillaryExists(const std::string& ancName)
 	return nullptr;
 }
 
-void campaign::setDipStance(campaignEnums::dipRelEnum dipType, factionStruct* fac1, factionStruct* fac2)
+void campaign::setDipStance(const campaignEnums::DipRelEnum dipType, const factionStruct* fac1, const factionStruct* fac2)
 {
 	using namespace campaignEnums;
 	if (!fac1 || !fac2 || !fac1->factionRecord || !fac2->factionRecord)
 		return;
-	if (dipType == suzerain)
+	if (dipType == Suzerain)
 		return setFactionProtectorate(fac1, fac2);
-	if (dipType == trade)
+	if (dipType == Trade)
 		return setFactionTrade(fac1, fac2);
 	const auto facOneName = std::string(fac1->factionRecord->facName);
 	const auto facTwoName = std::string(fac2->factionRecord->facName);
 	const std::string command = "diplomatic_stance " + facOneName + " " + facTwoName + " ";
-	if (dipType == war)
+	if (dipType == War)
 		gameHelpers::scriptCommand("console_command", (command + "war").c_str());
-	else if (dipType == peace)
+	else if (dipType == Peace)
 		gameHelpers::scriptCommand("console_command", (command + "neutral").c_str());
-	else if (dipType == alliance)
+	else if (dipType == Alliance)
 		gameHelpers::scriptCommand("console_command", (command + "allied").c_str());
 }
 
 	
-bool campaign::checkDipStance(const campaignEnums::dipRelEnum dipType, const factionStruct* fac1, const factionStruct* fac2)
+bool campaign::checkDipStance(const campaignEnums::DipRelEnum dipType, const factionStruct* fac1, const factionStruct* fac2)
 {
 	using namespace campaignEnums;
 	if (!fac1 || !fac2)
 		return false;
 	const auto facDiplomacy = diplomaticStandings[fac1->factionID][fac2->factionID];
-	if (dipType == trade)
+	if (dipType == Trade)
 		return facDiplomacy.hasTradeRights;
 	const auto state = facDiplomacy.state;
-	if (dipType == war)
-		return state == warState;
-	if (dipType == peace)
-		return state == peaceState;
-	if (dipType == alliance)
-		return state == allianceState;
-	if (dipType == suzerain)
+	if (dipType == War)
+		return state == WarState;
+	if (dipType == Peace)
+		return state == PeaceState;
+	if (dipType == Alliance)
+		return state == AllianceState;
+	if (dipType == Suzerain)
 		return facDiplomacy.isProtectorate;
 	return false;
 }
@@ -305,6 +307,11 @@ void campaign::setFactionTrade(const factionStruct* factionOne, const factionStr
 std::string campaign::getCampaignPath()
 {
 	return gameStringHelpers::uniStringToStr(currentDescrFile);
+}
+
+bool campaign::isMicroManageAll()
+{
+	return GAME_FUNC(bool(__thiscall*)(campaign*), isMicroManageAll)(this);
 }
 
 settlementStruct* campaign::getSettlementByName(const char* name)
@@ -380,7 +387,7 @@ void jihad::stop(const int result)
 mercPoolUnit* mercPool::addMercUnit(const int idx, const int exp, const int cost, const float repMin, const float repMax,
                                     const int maxUnits, const float startPool, const float startYear, const float endYear, const int crusading)
 {
-	int16_t mercPoolUnitIndex = mercenaryUnits.currentCount;
+	int16_t mercPoolUnitIndex = static_cast<int16_t>(mercenaryUnits.currentCount);
 	int16_t poolIndex = 0;
 	if (const auto unit = &mercenaryUnits.elements[0]; !unit)
 	{
@@ -396,7 +403,7 @@ mercPoolUnit* mercPool::addMercUnit(const int idx, const int exp, const int cost
 	else
 		poolIndex = unit->poolIndex;
 	if (const auto nextUnitsPtr = mercenaryUnits.next; nextUnitsPtr && nextUnitsPtr->currentCount )
-		mercPoolUnitIndex = mercenaryUnits.currentCount + campaignHelpers::getPoolIndex(nextUnitsPtr);
+		mercPoolUnitIndex = static_cast<int16_t>(mercenaryUnits.currentCount + campaignHelpers::getPoolIndex(nextUnitsPtr));
 	const auto newMerc = campaignHelpers::getNewMercUnit(&mercenaryUnits);
 	newMerc->mercPoolUnitIndex = mercPoolUnitIndex;
 	newMerc->poolIndex = poolIndex;
@@ -415,7 +422,6 @@ mercPoolUnit* mercPool::addMercUnit(const int idx, const int exp, const int cost
 	return newMerc;
 }
 
-#define resource_dataStruct_type 1
 namespace campaignHelpers
 {
 	
@@ -426,31 +432,6 @@ namespace campaignHelpers
 		if (event->eventController)
 			callClassFunc<DWORD*, void, scriptEvent*>(event->eventController, 0x0, event);
 		GAME_FUNC(void(__thiscall*)(scriptEvent*), deleteScriptEvent)(event);
-	}
-	
-	//stratResMod
-	template <char fieldIndex>
-	std::string getStringPropertyBD(const stratResMod* stratMod)
-	{
-		char* retS = nullptr;
-		if (fieldIndex == resource_dataStruct_type)
-		{
-			retS = stratMod->tga;
-		}
-		if (retS != nullptr)
-		{
-			return std::string(retS);
-		}
-		else
-		{
-			return std::string("");
-		}
-	}
-	template <char fieldIndex>
-	void setStringPropertyBD(stratResMod* stratMod, std::string newS)
-	{
-		if (fieldIndex == resource_dataStruct_type)
-			gameStringHelpers::setHashedString(&stratMod->tga, newS.c_str());
 	}
 	
 	int getPoolIndex(const gameList<mercPoolUnit> *unitPtr)
@@ -530,8 +511,10 @@ namespace campaignHelpers
 
 	int modifyWithSettMechanics(const std::string& mechanic, const float raw, const bool isCastle)
 	{
-		const auto hashed = reinterpret_cast<stringWithHash*>(gameStringHelpers::createHashedString(mechanic.c_str()));
-		return GAME_FUNC(int(__cdecl*)(const char*, int, float, bool), modifyWithSettMechanics)(hashed->name, hashed->hash, raw, isCastle);
+		const auto hashed = gameStringHelpers::createHashedStringGame(mechanic.c_str());
+		const auto returnValue = GAME_FUNC(int(__cdecl*)(const char*, int, float, bool), modifyWithSettMechanics)(hashed->name, hashed->hash, raw, isCastle);
+		gameStringHelpers::freeHashString(hashed);
+		return returnValue;
 	}
 
 	factionStruct* getFaction(const int index)
@@ -1030,7 +1013,7 @@ namespace campaignHelpers
 		*/
 		typeAll.campaignTable.set_function("worldwideAncillaryExists", &campaign::worldwideAncillaryExists);
         /***
-		Fire an event such as a disaster.
+		Fire an event such as a disaster. You need vision of the event or the event must be in your lands to get a notification event message.
 		@function campaignStruct.execScriptEvent
 		@tparam string name Needs entry in historic_events.txt! Empty string to disable (no message).
 		@tparam string eventType earthquake, flood, horde, storm, volcano, dustbowl, locusts, famine, plague, riot, fire, historic

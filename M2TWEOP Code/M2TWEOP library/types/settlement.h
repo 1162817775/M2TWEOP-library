@@ -102,12 +102,16 @@ public:
 	int16_t availability{}; //0x001E
 	int8_t isMercenary{}; //0x0020
 	char pad_0021[3]{}; //0x0021
+
 public:
+	unitRQ();
 	
-	eduEntry* getUnitEntry()
+	eduEntry* getUnitEntry();
+	
+	unit* getUnit()
 	{
-		if (recruitType != 2)
-			return this->entry;
+		if (recruitType >= 3)
+			return reinterpret_cast<unit*>(this->entry);
 		return nullptr;
 	}
 
@@ -120,14 +124,20 @@ public:
 
 	void setUnitEntry(eduEntry* newEntry)
 	{
-		if (recruitType != 2)
+		if (recruitType < 2)
 			entry = newEntry;
 	}
 
-	void setAgentType(int type)
+	void setAgentType(const int type)
 	{
 		if (recruitType == 2)
 			entry = reinterpret_cast<eduEntry*>(type);
+	}
+	
+	void setUnit(unit* unit)
+	{
+		if (recruitType >= 3)
+			entry = reinterpret_cast<eduEntry*>(unit);
 	}
 }; //Size: 0x0024
 
@@ -242,6 +252,7 @@ struct settlementBuildingOptions
 	int totalTime;
 	int turn;
 	int hash;
+	int settIndex;
 };
 
 struct settlementRecruitmentOptions
@@ -252,6 +263,7 @@ struct settlementRecruitmentOptions
 	int totalTime;
 	int turn;
 	int hash;
+	int settIndex{};
 };
 
 struct settlementPolicies
@@ -261,7 +273,8 @@ struct settlementPolicies
 	int32_t secondaryPolicy;
 	int8_t autoManagedConstruction;
 	int8_t autoManagedRecruitment;
-	char pad_000E[2];
+	uint8_t settlementIndex;
+	uint8_t pad_000E;
 };
 
 struct aiProductionItem
@@ -318,9 +331,25 @@ struct aiProductionController
 	{
 		buildingBias[type] = value;
 	}
+	void incConstructionValueEnum(buildingCapabilities type, int value)
+	{
+		buildingBias[static_cast<int>(type)] += value;
+	}
+	void setConstructionValueEnum(buildingCapabilities type, int value)
+	{
+		buildingBias[static_cast<int>(type)] = value;
+	}
 	void setRecruitmentValueSett(int type, int value)
 	{
 		recruitBias[type] = value;
+	}
+	void incRecruitmentValue(int type, int value)
+	{
+		recruitBias[type] += value;
+	}
+	void incConstructionUnitValue(int type, int value)
+	{
+		unitBias[type] += value;
 	}
 	void setExtraBias(int type, int value)
 	{
@@ -337,6 +366,17 @@ struct aiProductionController
 	int getRecruitmentValueSett(int type)
 	{
 		return recruitBias[type];
+	}
+	void setBuildPoliciesAndTaxLevel(int policy, int recruitPolicy);
+	void setSettlementTaxLevel();
+	void setPriorities();
+	void underControlCheck(const factionStruct* faction);
+	void resetExtraBias()
+	{
+		for (int& bias : extraBias)
+			bias = 0;
+		extraX = 0;
+		extraY = 0;
 	}
 };
 
@@ -452,6 +492,16 @@ struct settlementBuildings
 	struct building *guildList;
 };
 
+struct stackCapabilities
+{
+	struct settlementStruct* settlement;
+	struct factionStruct* faction;
+	int factionId;
+	int factionId2;
+	int factionId3;
+	struct capabilityStruct* capabilities;
+};
+
 //settlement
 struct settlementStruct {
 	DWORD* Vtable;
@@ -481,10 +531,10 @@ struct settlementStruct {
 	int32_t preSiegePopulation;
 	int32_t factionTradedFrom;
 	int32_t plagueDuration;
-	int8_t plagued;
-	int8_t salliedOut; //0x00A5
-	int8_t gatesAreOpened;
-	int8_t readyToSurrender;
+	bool plagued;
+	bool salliedOut; //0x00A5
+	bool gatesAreOpened;
+	bool readyToSurrender;
 	struct crusade* takenByCrusade;
 	struct descrRebelEntry* descrRebel; //0x00AC
 	int32_t subFactionID; //0x00B0
@@ -556,13 +606,13 @@ struct settlementStruct {
 	struct aiProductionController* aiProductionController; //0x0DFC
 	int32_t plagueDeaths; //0x0E00
 	int8_t scriptRebel; //0x0E04
-	uchar isProvokedRebellion;//0x0E05
+	bool isProvokedRebellion;//0x0E05
 	bool isMinorSettlement;
 	int8_t pad3[1];
 	int timeSinceLastRebellion;
 	int entertainmentType;
-	int8_t isCapital; //0x0E10
-	int8_t isTradeBlocked;
+	bool isCapital; //0x0E10
+	bool isTradeBlocked;
 	int8_t gamesMessage;
 	int8_t racesMessage; 
 	int8_t governorLeft; 

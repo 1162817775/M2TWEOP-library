@@ -7,6 +7,7 @@ public:
 	static struct offsetsT
 	{
 		DWORD stringCryptFunc = NULL;
+		DWORD freeHashString = NULL;
 		DWORD loadStratCasModelFunc = NULL;
 		DWORD getRelativePath = NULL;
 		DWORD parseCas = NULL;
@@ -30,6 +31,8 @@ public:
 		DWORD getUnitFullMovePoints = NULL;
 		DWORD createMoveExtents = NULL;
 		DWORD setCharacterName = NULL;
+		DWORD birthLog = NULL;
+		DWORD marryCharacters = NULL;
 
 		DWORD createIdleActionFunc = NULL;
 		DWORD makeCadDiplomacyFunc = NULL;
@@ -147,6 +150,8 @@ public:
 
 		DWORD readEDUEntryFunc = NULL;
 		DWORD deleteFortFuncOne = NULL;
+		DWORD dbHashTableGet = NULL;
+		DWORD dbHashTableSet = NULL;
 		DWORD deleteFortFuncTwo = NULL;
 		DWORD createFortFunc = NULL;
 		DWORD createsFort = NULL;
@@ -169,6 +174,7 @@ public:
 		DWORD setArmyRegionEntriesFunc = NULL;
 		DWORD factionResurrectStuffFunc = NULL;
 		DWORD modifyWithSettMechanics = NULL;
+		DWORD getMovePath = NULL;
 
 		DWORD unitMove = NULL;
 		DWORD unitOrderMove = NULL;
@@ -220,6 +226,7 @@ public:
 		DWORD getResidenceCharacterAtIndex = NULL;
 		DWORD removeSieges = NULL;
 		DWORD doHordeStuff = NULL;
+		DWORD createCharacterRecord = NULL;
 		DWORD getTileCharactersFunc = NULL;
 		DWORD getValidRegionTile = NULL;
 		DWORD isTileValidForCharacter = NULL;
@@ -255,6 +262,7 @@ public:
 		DWORD upgradeBuildInSett = NULL;
 		DWORD upgradeSett = NULL;
 		DWORD createSettlement = NULL;
+		DWORD createSallyForthObjective = NULL;
 		DWORD createRallyPointSundry = NULL;
 		DWORD initRallyPoint = NULL;
 		DWORD getRecruitmentOptions = NULL;
@@ -289,7 +297,14 @@ public:
 		DWORD isTileFree = NULL;
 		DWORD hideRevealedTile = NULL;
 		DWORD findBattleModel = NULL;
+		DWORD setCapital = NULL;
+		DWORD resetLtgd = NULL;
+		DWORD setLtgdNavalTarget = NULL;
+		DWORD getRegionGroup = NULL;
+		DWORD getFactionRegionGroupNum = NULL;
+		DWORD isLoneRegionGroup = NULL;
 		DWORD isZoneValid = NULL;
+		DWORD removeTrackedReference = NULL;
 		DWORD getZonePerimeter = NULL;
 		DWORD getZoneID = NULL;
 		DWORD settAttachFaction = NULL;
@@ -308,6 +323,11 @@ public:
 		DWORD calculateBackupRegionStrengths = NULL;
 		DWORD isTrustedAlly = NULL;
 		DWORD resetRegionGroupControllers = NULL;
+		DWORD setSettlementTaxLevel = NULL;
+		DWORD usePersonalityType = NULL;
+		DWORD isMicroManageAll = NULL;
+		DWORD usePersonalityName = NULL;
+		DWORD addSettlementPolicy = NULL;
 		DWORD addNavalTargetRegion = NULL;
 		DWORD removeNavalTargetRegion = NULL;
 		DWORD createSettCondContext = NULL;
@@ -332,9 +352,12 @@ public:
 		DWORD destroyFaction = NULL;
 		DWORD reduceUnitProduction = NULL;
 		DWORD reduceEconomicProduction = NULL;
+		DWORD prodSetPriorities = NULL;
+		DWORD addToProductionControllers = NULL;
 		DWORD attachResourceSett = NULL;
 		DWORD updateFowTableObject = NULL;
 		DWORD updateFowTable = NULL;
+		DWORD ParseDescrMountedEngineEntry = NULL;
 		DWORD updateTerrain = NULL;
 		DWORD updateRadar = NULL;
 		DWORD canMerge = NULL;
@@ -342,6 +365,13 @@ public:
 		DWORD generalLeaveCrusade = NULL;
 		DWORD incEventCounter = NULL;
 		DWORD createEventAcceptObj = NULL;
+		DWORD formatStringAdd = NULL;
+		DWORD getParserFileName = NULL;
+		DWORD getDataInvalidLogger = NULL;
+		DWORD createEnabledLogger = NULL;
+		DWORD destroyLogObject = NULL;
+		DWORD createMountedEngineRecord = NULL;
+		DWORD createAiProductionController = NULL;
 	}offsets;
 
 	static void initCodes(int gameVer);
