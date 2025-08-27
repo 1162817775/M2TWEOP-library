@@ -4,7 +4,7 @@
 
 #### Note: Remember that JSON does not allow comments so do not copy these examples directly
 
-#### ```eopData/config/uiCfg.json```
+#### ```eopData/uiCfg.json```
 
 ```
 {
@@ -22,7 +22,7 @@
 
 ### Configure the Battles
 
-#### ```eopData/config/battlesCfg.json```
+#### ```eopBattles/battlesCfg.json```
 
 ```
 {
