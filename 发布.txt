@@ -1,1 +1,1 @@
-.\buildEOP.ps1 -modFolder "E:\EOP\"
+.\buildEOP.ps1 -modFolder "Z:\EOP\"
