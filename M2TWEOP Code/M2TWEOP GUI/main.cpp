@@ -133,6 +133,12 @@ void runApp(appTickFunc drawTick)
         while (SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
+            switch (event.type)
+            {
+            case SDL_TEXTINPUT:
+                // ImGui已经处理了这个事件
+                break;
+            }
             if (event.type == SDL_QUIT)
                 done = true;
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(mainData.window))
@@ -180,6 +186,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
         while (SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
+            switch (event.type)
+            {
+            case SDL_TEXTINPUT:
+                // ImGui已经处理了这个事件
+                break;
+            }
             if (event.type == SDL_QUIT)
                 done = true;
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(mainData.window))
