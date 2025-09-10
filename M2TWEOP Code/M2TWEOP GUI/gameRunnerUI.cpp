@@ -227,11 +227,7 @@ namespace gameRunnerUI
 			{
 				helpers::closeProcess(dataG::data.gameData.exeName);
 			}
-
-			// If all of these features are disabled, we can just close the GUI
-			if (dataG::data.gameData.isDiscordRichPresenceEnabled == false 
-				&& dataG::data.gameData.freecamIntegration == false 
-				&& dataG::data.gameData.otelCollectorIntegration == false)
+			if (dataG::data.gameData.isDiscordRichPresenceEnabled == false && dataG::data.gameData.freecamIntegration == false && dataG::data.gameData.otelCollectorIntegration)
 			{
 				exit(0);
 			}
