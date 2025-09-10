@@ -1,3 +1,1 @@
-.\buildEOP.ps1 -modFolder "D:\M2TWEOP\"
-
-.\buildEOPDev_release.ps1 -modFolder "D:\M2TWEOP\"
+.\buildEOP.ps1 -modFolder "Z:\EOP\"
