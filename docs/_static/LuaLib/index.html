@@ -70,6 +70,7 @@
     <li><a href="#M2TWEOP.unlockGameConsoleCommands">M2TWEOP.unlockGameConsoleCommands ()</a></li>
     <li><a href="#M2TWEOP.setMaxBgSize">M2TWEOP.setMaxBgSize (newSize)</a></li>
     <li><a href="#M2TWEOP.setEDUUnitsSize">M2TWEOP.setEDUUnitsSize (minSize, maxSize)</a></li>
+    <li><a href="#M2TWEOP.setBigMapRegionsSize">M2TWEOP.setBigMapRegionsSize ()</a></li>
     <li><a href="#M2TWEOP.getSettlementInfoScroll">M2TWEOP.getSettlementInfoScroll ()</a></li>
     <li><a href="#M2TWEOP.setBuildingChainLimit">M2TWEOP.setBuildingChainLimit (limit)</a></li>
     <li><a href="#M2TWEOP.setConversionLvlFromCastle">M2TWEOP.setConversionLvlFromCastle (castleLvl, convertToLvl)</a></li>
@@ -1455,7 +1456,7 @@
         <h3 class="welcomeMessage">Welcome to the EOP Lua Plugin Documentation!</h3>
         <br>
         <h3 class="disclaimerMessage">Please note that many of the examples require additional checks and not all functions are fully documented. If you need additional help, we welcome you to join the Discord!</h3>
-        <p class="lastUpdatedMessage">Last updated: 2025-09-07 11:45:51</p>
+        <p class="lastUpdatedMessage">Last updated: 2025-09-10 17:41:22</p>
         <a target="_blank" href="https://discord.gg/Epqjm8u2WK">
             <img class="discordImage" src="https://img.shields.io/discord/713369537948549191?color=282828&label=DISCORD&style=for-the-badge"/>
         </a>
@@ -1595,6 +1596,10 @@
 	<tr>
 	<td class="name" nowrap><a href="#M2TWEOP.setEDUUnitsSize">M2TWEOP.setEDUUnitsSize (minSize, maxSize)</a></td>
 	<td class="summary">Sets the new maximum soldier count.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#M2TWEOP.setBigMapRegionsSize">M2TWEOP.setBigMapRegionsSize ()</a></td>
+	<td class="summary">Set a size limit for map_regions.tga.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#M2TWEOP.getSettlementInfoScroll">M2TWEOP.getSettlementInfoScroll ()</a></td>
@@ -7220,6 +7225,27 @@ M2TWEOP.unloadTexture(testImage.img);</code></pre>
     <h3>Usage:</h3>
     <ul>
         <pre class="example"><code class="language-lua" >M2TWEOP.setEDUUnitsSize(<span class="number">1</span>,<span class="number">300</span>);</code></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "M2TWEOP.setBigMapRegionsSize"></a>
+    <a id="linkto" rel="noopener" href="#M2TWEOP.setBigMapRegionsSize">
+        M2TWEOP.setBigMapRegionsSize ()
+    </a>
+    </dt>
+    <dd>
+    <div class="functionDescription">
+    Set a size limit for map_regions.tga.  The new maximum size is 2048 x 2048. Don't use regions that are too gigantic!
+    </div>
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><code class="language-lua" >M2TWEOP.setBigMapRegionsSize();</code></pre>
     </ul>
 
 </dd>
@@ -42151,7 +42177,7 @@ fac:splitArmy(units, <span class="number">154</span>, <span class="number">84</s
 
         </li>
         <li><span class="parameter">getConstructionValue</span>
-            <span class="types"><a class="type" href="index.html#aiPersonality:getConstructionValue">getConstructionValue</a></span>
+            <span class="types"><a class="type" href="index.html#aiProductionController:getConstructionValue">getConstructionValue</a></span>
 
 
 
@@ -48907,7 +48933,7 @@ currSet:changeOwner(fac1, <span class="keyword">true</span>)</code></pre>
 
         </li>
         <li><span class="parameter">getConstructionValue</span>
-            <span class="types"><a class="type" href="index.html#aiPersonality:getConstructionValue">getConstructionValue</a></span>
+            <span class="types"><a class="type" href="index.html#aiProductionController:getConstructionValue">getConstructionValue</a></span>
 
 
 
