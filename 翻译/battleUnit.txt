@@ -1,0 +1,20 @@
+battleUnit = {
+    unit = unit,                    -- 战斗单位对象 
+    valuePerSoldier = float,        -- 每个士兵的价值 
+    soldiersLost = int,             -- 损失的士兵数量 
+    soldiersStart = int,            -- 初始士兵数量 
+    soldiersRouted = int,           -- 溃逃的士兵数量 
+    soldiersKilled = int,           -- 被击杀的士兵数量 
+    takenPrisoner = int,            -- 被俘虏的士兵数量 
+    prisonersCaught = int,          -- 捕获的俘虏数量 
+    soldiersHealed = int,           -- 被治疗的士兵数量 
+    soldiersRallied = int,          -- 重新集结的士兵数量 
+    soldiersEnd = int,              -- 战斗结束时的士兵数量 
+    friendlyFireCasualties = int,   -- 友军误伤造成的伤亡 
+    expStart = int,                 -- 初始经验值 
+    expGained = int,                -- 获得的经验值 
+    shipsSunk = int,                -- 击沉的船只数量 
+    shipDamage = int,               -- 对船只造成的伤害 
+    isGeneral = int,                -- 是否为将军(1=是,0=否) 
+    hasWithdrawn = int              -- 是否已撤退(1=是,0=否)
+}
