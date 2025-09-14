@@ -1,0 +1,11 @@
+battleArmy = {
+    army = armyStruct,               -- 军队数据结构 
+    character = character,           -- 所属角色对象 
+    generalNumKillsBattle = int,     -- 将军本场战斗击杀数
+    initialStrength = float,         -- 初始兵力强度值 
+    battleOdds = float,              -- 战斗胜负概率 
+    generalHPRatioLost = float,      -- 将军生命值损失比例 
+    numKilledGenerals = int,         -- 击杀的敌方将军数量(仅手动战斗有效)
+    unitCount = int,                 -- 军队中单位数量 
+    getBattleUnit = getBattleUnit,   -- 获取指定战斗单位的函数 
+} 

@@ -1,0 +1,107 @@
+M2TW = {
+    battle = battleStruct, -- 战斗结构
+    campaign = campaignStruct, -- 战役结构
+    uiCardManager = uiCardManager, -- UI卡片管理器
+    stratMap = stratMap, -- 战略地图
+    selectionInfo = selectionInfo -- 选择信息
+}
+
+battleStruct = {
+    battleState = int, -- 战斗状态
+    battleType = int, -- 战斗类型
+    isNightBattle = bool, -- 是否为夜战
+    battleAiEnabled = bool, -- 是否启用战斗AI
+    defenderWithdrawn = bool, -- 防御者是否撤退
+    xCoord = int, -- X坐标
+    yCoord = int, -- Y坐标
+    attackingSide = int, -- 攻击方
+    defendingSide = int, -- 防御方
+    residenceOwnerFacId = int, -- 驻地拥有者派系ID
+    attackerXCoord = int, -- 攻击者X坐标
+    attackerYCoord = int, -- 攻击者Y坐标
+    defenderXCoord = int, -- 防御者X坐标
+    defenderYCoord = int, -- 防御者Y坐标
+    paused = bool, -- 是否暂停
+    isAutoResolve = bool, -- 是否为自动解决
+    isFortBattle = bool, -- 是否为堡垒战斗
+    inBattle = bool, -- 是否在战斗中
+    finishTimer = int, -- 结束计时器
+    battleSpeed = float, -- 战斗速度
+    secondsPassed = float, -- 经过的秒数
+    tickCount = int, -- 滴答计数
+    ticksSinceBattleStart = int, -- 自战斗开始以来的滴答数
+    hidingEnabledSet = int, -- 是否启用隐藏
+    fortInfo = fortBattleInfo, -- 堡垒战斗信息
+    mapWidth = float, -- 地图宽度
+    mapHeight = float, -- 地图高度
+    terrainFeatures = terrainFeatures, -- 地形特征
+    sidesNum = int, -- 方数
+    unitSize = int, -- 单位大小
+    tideOfBattle = int, -- 战斗趋势
+    playerArmyNum = int, -- 玩家军队数量
+    timeWinningAlliance = int, -- 胜利联盟时间
+    sides = battleSide[8], -- 返回一个battleSide[8]。最大：8。
+    factionSide = int[31], -- 派系联盟数组，-1表示不在战斗中，从1开始，因此派系ID + 1。最大31。
+    getPlayerArmy = getPlayerArmy, -- 获取玩家军队
+    getBattleResidence = getBattleResidence, -- 获取战斗驻地
+    getUnitByLabel = getUnitByLabel, -- 通过标签获取单位
+    getGroupByLabel = getGroupByLabel, -- 通过标签获取组
+    getBattleMapHeight = getBattleMapHeight, -- 获取战斗地图高度
+    getBattlefieldEngines = getBattlefieldEngines, -- 获取战场引擎
+    getBattleTile = getBattleTile, -- 获取战斗地块
+    getZoneID = getZoneID, -- 获取区域ID
+    getPosPerimeter = getPosPerimeter, -- 获取位置周长
+    isZoneValid = isZoneValid -- 检查区域是否有效
+}
+
+uiCardManager = {
+    selectedUnitCardsCount = int, -- 选中的单位卡片数量
+    unitCardsCount = int, -- 单位卡片数量
+    selectedSettlement = settlementStruct, -- 选中的定居点
+    selectedCharacter = character, -- 选中的角色
+    selectedFort = fortStruct, -- 选中的堡垒
+    getSelectedUnitCard = getSelectedUnitCard, -- 获取选中的单位卡片
+    getUnitCard = getUnitCard, -- 获取单位卡片
+    getBuildingInfoScroll = getBuildingInfoScroll, -- 获取建筑信息滚动
+    getUnitInfoScroll = getUnitInfoScroll, -- 获取单位信息滚动
+    getFamilyTree = getFamilyTree -- 获取家族树
+}
+
+stratMap = {
+    isLoaded = bool, -- 是否已加载
+    mapWidth = int, -- 地图宽度
+    mapHeight = int, -- 地图高度
+    regionsNum = int, -- 区域数量
+    volcanoesNum = int, -- 火山数量
+    landConnectionsNum = int, -- 陆地连接数量
+    landMassNum = int, -- 陆地数量
+    getRegion = getRegion, -- 获取区域
+    getTile = getTile, -- 获取地块
+    getVolcanoCoords = getVolcanoCoords, -- 获取火山坐标
+    getLandConnection = getLandConnection, -- 获取陆地连接
+    getLandMass = getLandMass, -- 获取陆地
+    getSettlement = getSettlement, -- 获取定居点
+    getRegionByName = getRegionByName, -- 按名称获取区域
+    moveCamera = moveCamera, -- 移动摄像机
+    jumpCamera = jumpCamera, -- 跳转摄像机
+    zoomCamera = zoomCamera, -- 缩放摄像机
+    startDrawModelAt = startDrawModelAt, -- 开始在地点绘制模型
+    stopDrawModel = stopDrawModel, -- 停止绘制模型
+    replaceTile = replaceTile, -- 替换地块
+    setOwnExtentsColor = setOwnExtentsColor, -- 设置自己的范围颜色
+    setEnemyExtentsColor = setEnemyExtentsColor, -- 设置敌人的范围颜色
+    setZocColor = setZocColor, -- 设置控制区颜色
+    findValidTileNearTile = findValidTileNearTile -- 在地块附近查找有效地块
+}
+
+selectionInfo = {
+    selectedCharacter = character, -- 选中的角色（只读）
+    hoveredCharacter = character, -- 悬停的角色（只读）
+    selectedEnemyCharacter = character, -- 选中的敌方角色，只能通过定位按钮选择非玩家角色（只读）
+    selectedSettlement = settlementStruct, -- 选中的定居点（只读）
+    hoveredSettlement = settlementStruct, -- 悬停的定居点（只读）
+    selectedEnemySettlement = settlementStruct, -- 选中的敌方定居点，只能通过定位按钮选择非玩家定居点（只读）
+    selectedFort = fortStruct, -- 选中的堡垒（只读）
+    hoveredFort = fortStruct, -- 悬停的堡垒（只读）
+    selectedEnemyFort = fortStruct -- 选中的敌方堡垒，只能通过定位按钮选择非玩家堡垒（只读）
+}

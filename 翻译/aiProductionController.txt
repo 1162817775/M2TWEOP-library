@@ -1,0 +1,22 @@
+aiProductionController = {
+    aiFaction = nil,                       -- AI派系对象 
+    regionID = 0,                          -- 区域ID 
+    settlement = nil,                      -- 定居点结构体 
+    autoManagePolicy = 0,                  -- 自动管理策略 
+    isAutoManaged = false,                 -- 是否自动管理 
+    isAutoManagedRecruitment = false,      -- 是否自动管理招募 
+    isAutoManagedConstruction = false,     -- 是否自动管理建筑 
+    isAutoManagedTaxes = false,            -- 是否自动管理税收 
+    spyBias = 0,                           -- 间谍倾向（权重）
+    assassinBias = 0,                      -- 刺客倾向（权重）
+    diplomatBias = 0,                      -- 外交官倾向（权重）
+    admiralBias = 0,                       -- 海军将领倾向（权重）
+    priestBias = 0,                        -- 牧师倾向（权重）
+    merchantBias = 0,                      -- 商人倾向（权重） 
+    setConstructionValue = nil,            -- 设置建筑优先级的方法 
+    setRecruitmentValue = nil,             -- 设置招募优先级的方法 
+    getConstructionValue = nil,            -- 获取建筑优先级的方法 
+    getRecruitmentValue = nil,             -- 获取招募优先级的方法 
+    setExtraBias = nil,                    -- 设置额外倾向的方法 
+    getExtraBias = nil                     -- 获取额外倾向的方法 
+}

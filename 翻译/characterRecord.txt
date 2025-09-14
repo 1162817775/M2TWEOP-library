@@ -1,0 +1,140 @@
+characterRecord = {
+    index = int, -- 角色索引ID 
+    character = character, -- 关联的角色对象
+    shortName = string, -- 内部短名称
+    lastName = string, -- 内部姓氏
+    fullName = string, -- 包含姓氏的完整内部名称
+    localizedDisplayName = string, -- 显示名称(重载存档会重置)
+    label = string, -- 标签 
+    portrait = string, -- 年轻肖像路径(从未是公主的妻子和孩子无此字段)
+    portrait2 = string, -- 年老肖像路径(从未是公主的妻子和孩子无此字段)
+    portrait_custom = string, -- 自定义肖像文件夹名(从未是公主的妻子和孩子无此字段)
+    modelName = string, -- 战斗模型(需要battle_models.modeldb 条目)
+    status = int, -- 状态(5=领袖,2=继承人,0=普通角色,只读)
+    setAsHeir = setAsHeir, -- 设为继承人方法 
+    isAlive = bool, -- 是否存活 
+    isFamily = bool, -- 是否是家族成员 
+    isMale = bool, -- 是否是男性
+    wasLeader = bool, -- 是否曾是领袖
+    isOffMap = isOffMap, -- 是否在地图外
+    isChild = bool, -- 是否是儿童 
+    age = int, -- 年龄
+    traitCount = int, -- 特质数量 
+    yearOfBirth = float, -- 出生年份(小数部分表示季度)
+    seasonOfBirth = int, -- 出生季节 
+    yearOfDeath = float, -- 死亡年份 
+    seasonOfDeath = int, -- 死亡季节 
+    numberOfChildren = int, -- 子女数量
+    faction = factionStruct, -- 所属派系
+    originalFaction = int, -- 原始派系ID
+    nameFaction = int, -- 命名派系ID
+    deathType = int, -- 死亡类型 
+    wasMarriageAlliance = bool, -- 是否通过联姻加入 
+    isFamilyHead = bool, -- 是否是家族首领
+    kills = int, -- 击杀数
+    parent = characterRecord, -- 父母角色记录
+    spouse = characterRecord, -- 配偶角色记录
+    children = characterRecord[4], -- 子女角色记录(最多4个)
+    
+    -- 特质方法 
+    getTraits = getTraits, -- 获取所有特质
+    addTrait = addTrait, -- 添加特质
+    removeTrait = removeTrait, -- 移除特质
+    
+    -- 随从方法 
+    ancNum = int, -- 随从数量 
+    getAncillary = getAncillary, -- 获取随从
+    addAncillary = addAncillary, -- 添加随从 
+    removeAncillary = removeAncillary, -- 移除随从
+    
+    -- 属性字段 
+    level = int, -- 等级
+    authority = int, -- 权威 
+    command = int, -- 统御 
+    chivalryAndDread = int, -- 正数=侠义,负数=恐怖
+    loyalty = int, -- 忠诚 
+    piety = int, -- 虔诚 
+    ambush = int, -- 伏击
+    artilleryCommand = int, -- 炮兵指挥 
+    assassination = int, -- 刺杀
+    attack = int, -- 进攻 
+    battleSurgery = int, -- 战场医术 
+    bodyguardSize = int, -- 卫队规模
+    bodyguardValour = int, -- 卫队勇气
+    boldness = int, -- 胆识 
+    bribeResistance = int, -- 抗贿赂 
+    bribery = int, -- 贿赂能力 
+    cavalryCommand = int, -- 骑兵指挥
+    charm = int, -- 魅力 
+    construction = int, -- 建筑 
+    defence = int, -- 防御
+    disposition = int, -- 性格 
+    electability = int, -- 当选可能性 
+    eligibility = int, -- 资格
+    farming = int, -- 农耕 
+    fertility = int, -- 生育能力 
+    finance = int, -- 财政
+    footInTheDoor = int, -- 入门技巧 
+    generosity = int, -- 慷慨
+    gunpowderCommand = int, -- 火药指挥 
+    health = int, -- 健康
+    heresyImmunity = int, -- 异端免疫
+    hitpoints = int, -- 生命值(基础5点,上限10点)
+    infantryCommand = int, -- 步兵指挥
+    influence = int, -- 影响力 
+    law = int, -- 法律
+    lineOfSight = int, -- 视线范围 
+    localPopularity = int, -- 当地声望 
+    looting = int, -- 掠夺 
+    magic = int, -- 魔法
+    management = int, -- 管理 
+    mining = int, -- 采矿
+    movementPointsBonus = int, -- 移动点数加成 
+    navalCommand = int, -- 海军指挥
+    nightBattle = int, -- 夜战 
+    personalSecurity = int, -- 个人安全
+    publicSecurity = int, -- 公共安全 
+    purity = int, -- 纯洁
+    sabotage = int, -- 破坏 
+    siegeAttack = int, -- 攻城攻击
+    siegeDefense = int, -- 守城防御 
+    siegeEngineering = int, -- 围城工程 
+    squalor = int, -- 肮脏 
+    subterfuge = int, -- 诡计 
+    taxCollection = int, -- 征税 
+    trading = int, -- 贸易
+    trainingAgents = int, -- 训练特工 
+    trainingAnimalUnits = int, -- 训练动物单位
+    trainingUnits = int, -- 训练单位 
+    troopMorale = int, -- 部队士气 
+    unorthodoxy = int, -- 非正统 
+    unrest = int, -- 动荡
+    violence = int, -- 暴力 
+    
+    -- 显示相关 
+    portraitIndex = int, -- 肖像索引
+    savedDisplayName = string, -- 保存的显示名 
+    savedDisplayLastName = string, -- 保存的显示姓氏 
+    savedDisplayEpithet = string, -- 保存的显示称号 
+    
+    -- 特殊战斗加成 
+    combatVsReligion = int[10], -- 对抗宗教加成(最多10种)
+    combatVsFaction = int[31], -- 对抗派系加成(最多31个)
+    
+    -- 方法 
+    getEopSetModel = getEopSetModel, -- 获取EOP设置模型
+    giveValidLabel = giveValidLabel, -- 分配有效标签 
+    isLeader = isLeader, -- 是否是领袖 
+    isHeir = isHeir, -- 是否是继承人 
+    hasAncillary = hasAncillary, -- 是否拥有随从
+    getTrait = getTrait, -- 获取特质 
+    addTraitPoints = addTraitPoints, -- 添加特质点数
+    getTraitLevel = getTraitLevel, -- 获取特质等级 
+    giveRandomName = giveRandomName, -- 分配随机名称
+    setPortrait = setPortrait, -- 设置肖像 
+    giveRandomPortrait = giveRandomPortrait, -- 分配随机肖像
+    acquireAncillary = acquireAncillary, -- 获得随从 
+    hasAncType = hasAncType, -- 是否有指定类型随从 
+    birthChild = birthChild, -- 生育孩子 
+    marryWife = marryWife -- 娶妻
+}

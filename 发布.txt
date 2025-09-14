@@ -1,0 +1,1 @@
+.\buildEOP.ps1 -modFolder "D:\M2TWEOP\"
