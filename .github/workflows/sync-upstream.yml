@@ -1,0 +1,32 @@
+name: Sync with upstream
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 每天凌晨0点执行（UTC时间，可根据需要调整）
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 拉取所有历史记录
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "五味杂陈"
+          git config --global user.email "1162817775@qq.com"
+
+      - name: Add upstream repository
+        run: git remote add upstream https://github.com/youneuoy/M2TWEOP-library.git  # 替换为上游仓库地址
+
+      - name: Fetch upstream changes
+        run: git fetch upstream
+
+      - name: Merge upstream changes
+        run: |
+          git checkout main  # 切换到你要同步的分支（通常是main或master）
+          git merge upstream/main  # 合并上游仓库的main分支（与上面保持一致）
+          git push origin main  # 推送到你的fork仓库
