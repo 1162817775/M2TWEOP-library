@@ -2977,14 +2977,44 @@ const ImWchar*  ImFontAtlas::GetGlyphRangesChineseFull()
 {
     static const ImWchar ranges[] =
     {
-        0x0020, 0x00FF, // Basic Latin + Latin Supplement
-        0x2000, 0x206F, // General Punctuation
-        0x3000, 0x30FF, // CJK Symbols and Punctuations, Hiragana, Katakana
-        0x31F0, 0x31FF, // Katakana Phonetic Extensions
-        0xFF00, 0xFFEF, // Half-width characters
-        0xFFFD, 0xFFFD, // Invalid
-        0x4e00, 0x9FAF, // CJK Ideograms
-        0,
+        // 基本拉丁字符和拉丁补充（ASCII + 西欧符号）
+        0x0020, 0x00FF, // Basic Latin + Latin Supplement 
+
+        // 中文符号和标点 
+        0x2000, 0x206F, // General Punctuation（中文省略号、破折号等）
+        0x3000, 0x30FF, // CJK Symbols and Punctuations（全角标点、日文假名）
+        0x31F0, 0x31FF, // Katakana Phonetic Extensions 
+        0xFF00, 0xFFEF, // Half-width and Full-width Forms（半角/全角符号）
+        0xFE10, 0xFE1F, // Vertical Forms（竖排标点）
+        0xFE30, 0xFE4F, // CJK Compatibility Forms（兼容符号）
+
+        // 中文数字、单位、带圈字符 
+        0x2150, 0x218F, // Number Forms（Ⅷ, Ⅻ）
+        0x3200, 0x32FF, // Enclosed CJK Letters and Months（㊤, ㋀）
+        0x3300, 0x33FF, // CJK Compatibility（中文单位：㎏, ㎡）
+
+        // 几何图形（● ▲ ▼ ◆ ■ ★ ☑ ✓ ✗等）
+        0x25A0, 0x25FF, // Geometric Shapes（●=0x25CF, ▲=0x25B2）
+        0x2600, 0x26FF, // Miscellaneous Symbols（☀, ☁, ♥, ♠）
+        0x2700, 0x27BF, // Dingbats（✓=0x2713, ✗=0x2717, ★=0x2605）
+
+        // 中文汉字（全部Unicode区块，覆盖简体、繁体、古籍字）
+        0x4E00, 0x9FFF,  // CJK Unified Ideographs（基本区）
+        0x3400, 0x4DBF,  // CJK Extension A（扩展A区）
+        0x20000, 0x2A6DF, // CJK Extension B（扩展B区）
+        0x2A700, 0x2B73F, // CJK Extension C（扩展C区）
+        0x2B740, 0x2B81F, // CJK Extension D（扩展D区）
+        0x2B820, 0x2CEAF, // CJK Extension E（扩展E区）
+        0x2CEB0, 0x2EBEF, // CJK Extension F（扩展F区）
+        0x30000, 0x3134F, // CJK Extension G（扩展G区）
+
+        // Emoji（可选，需字体支持）
+        0x1F600, 0x1F64F, // Emoticons（😀, 😅）
+        0x1F300, 0x1F5FF, // Miscellaneous Symbols and Pictographs（🌈, 🎮）
+        0x1F900, 0x1F9FF, // Supplemental Symbols and Pictographs（🦄, 🧀）
+
+        // 终止标记 
+        0
     };
     return &ranges[0];
 }
