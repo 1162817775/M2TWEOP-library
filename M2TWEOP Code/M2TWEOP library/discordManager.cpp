@@ -61,8 +61,7 @@ namespace discordManager
 		{
 			jsonManager::setJsonInFile(
 				R"(\eopData\config\discordRichPresenceCfg.json)",
-				"status",
-				"On the campaign map 🗺️");
+				"status","(On the campaign map 🗺️)");
 			if (const auto campaignData = campaignHelpers::getCampaignData())
 			{
 				jsonManager::setJsonInFile(
