@@ -22,7 +22,7 @@ The M2TW Engine Overhaul Project (M2TWEOP) is designed to expand the capabilitie
 
 ## Features
 
-* [Lua scripting system with 1000+ functions](https://youneuoy.github.io/M2TWEOP-library/_static/LuaLib/index.html) 
+* [Lua scripting system with 1000+ functions](https://EOP-Labs.github.io/M2TWEOP-library/_static/LuaLib/index.html) 
   * Full documentation with code examples and VSCode Intellisense
   * Seamless integration with existing campaign_script scripts
   * Hot-reload
@@ -91,7 +91,7 @@ function onGeneralAssaultsGeneral(eventData)
     end
 end
 ```
-For a full list of EOP Events, see [here](https://youneuoy.github.io/M2TWEOP-library/_static/LuaLib/index.html)
+For a full list of EOP Events, see [here](https://EOP-Labs.github.io/M2TWEOP-library/_static/LuaLib/index.html)
 
 ## Getting Started with M2TWEOP Lua Scripting
 [![M2TWEOP-Tutorials](https://i.imgur.com/ByebdSI.png)](https://youtu.be/hUvbcz8i7Wk)

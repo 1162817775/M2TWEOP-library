@@ -1,6 +1,6 @@
 # Upgrading to EOP V3
 
-The only major difference between EOP v2 and EOP v3 Lua scripts is that any [EOP Events](https://youneuoy.github.io/M2TWEOP-library/_static/LuaLib/index.html#EOP_Events) now export `eventData` instead of individual parameters like `selectedChar` or `settlement`
+The only major difference between EOP v2 and EOP v3 Lua scripts is that any [EOP Events](https://EOP-Labs.github.io/M2TWEOP-library/_static/LuaLib/index.html#EOP_Events) now export `eventData` instead of individual parameters like `selectedChar` or `settlement`
 
 Let's look at an example using `onCharacterSelected`
 

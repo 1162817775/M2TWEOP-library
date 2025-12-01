@@ -18,7 +18,7 @@ suggest new entries in our discord!
 	Run `M2TWEOPGUI.exe` and hit 'Run Mod'.
 
 *I heard that M2TWEOP allows you to write plugins in the lua programming language. How to do it?*
-	Read https://youneuoy.github.io/M2TWEOP-library/_static/LuaLib/index.html or watch a tutorial here: https://youtu.be/hUvbcz8i7Wk
+	Read https://EOP-Labs.github.io/M2TWEOP-library/_static/LuaLib/index.html or watch a tutorial here: https://youtu.be/hUvbcz8i7Wk
 
 *How can I prevent users from running my mod without having EOP enabled?*
 	You should run the M2TWEOP launcher, check the "Block modification launch without EOP" parameter in the settings ("game" submenu). Next, you should replace all "type" fields in your "export_descr_unit.txt" file with "eopOnlyType". After that, your mod will not work unless the user launches it with EOP.

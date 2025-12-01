@@ -20,7 +20,7 @@ The latest version of M2TWEOP can be found at https://github.com/EOP-Labs/M2TWEO
 This program works with game versions 1.5 (disk version) and 1.52 (steam version).
 
 ## Usage
-* Check the [F.A.Q](https://youneuoy.github.io/M2TWEOP-library/faq.html#questions-and-answers)
+* Check the [F.A.Q](https://EOP-Labs.github.io/M2TWEOP-library/faq.html#questions-and-answers)
 
 If you use an antivirus, add an exception to the Medieval II folder! There may be false positives.
 

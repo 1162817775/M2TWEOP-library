@@ -18,7 +18,7 @@ M2TW Engine Overhaul Project is designed to expand the capabilities of the game 
 
 ## How does it work?
 
-EOP uses C++ and Assembly to modify the game's code in-memory and exposes this to the end user via a Lua API and the [EOP Lua Library](https://youneuoy.github.io/M2TWEOP-library/_static/LuaLib/index.html)
+EOP uses C++ and Assembly to modify the game's code in-memory and exposes this to the end user via a Lua API and the [EOP Lua Library](https://EOP-Labs.github.io/M2TWEOP-library/_static/LuaLib/index.html)
 
 ## Features
 
@@ -67,7 +67,7 @@ function onGeneralAssaultsGeneral(attacker, defender)
     end
 end
 ```
-For a full list of EOP Events, see [here](https://youneuoy.github.io/M2TWEOP-library/_static/LuaLib/index.html)
+For a full list of EOP Events, see [here](https://EOP-Labs.github.io/M2TWEOP-library/_static/LuaLib/index.html)
 
 ### Developers
 * **youneuoy** - Project founder, Main Developer
@@ -92,7 +92,7 @@ For a full list of EOP Events, see [here](https://youneuoy.github.io/M2TWEOP-lib
 This program works with game versions 1.5 (disk version) and 1.52 (steam version).
 
 ### Usage
-* Check the [F.A.Q](https://youneuoy.github.io/M2TWEOP-library/faq.html#questions-and-answers)
+* Check the [F.A.Q](https://EOP-Labs.github.io/M2TWEOP-library/faq.html#questions-and-answers)
 
 If you use an antivirus, add the program to the exceptions! There may be false positives.
 
