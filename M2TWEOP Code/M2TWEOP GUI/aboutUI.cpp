@@ -84,7 +84,7 @@ For a full list of EOP Events, see [here](https://youneuoy.github.io/M2TWEOP-lib
 * **Mekkerman** - Patron of the project
 
 ## Projects
-* [M2TWEOP Library](https://github.com/youneuoy/M2TWEOP-library) - Main project (C++ and Assembly)
+* [M2TWEOP Library](https://github.com/EOP-Labs/M2TWEOP-library) - Main project (C++ and Assembly)
 * [M2TWEOP LUA plugin](https://github.com/youneuoy/M2TWEOP-luaPlugin) - Allows you to write custom scripts in the Lua programming using M2TWEOP-library
 
 ### Compatibility
@@ -140,7 +140,7 @@ https://github.com/MSeys/sol2_ImGui_Bindings
 
 ## Version History
 * **v.2+**
-https://github.com/youneuoy/M2TWEOP-library/releases
+https://github.com/EOP-Labs/M2TWEOP-library/releases
 * **v.2.0:**
 A huge number of fixes and optimizations. Lots of new features in the lua plugin, as well as features exported for use in other plugins.
 * **v.2.0 test2:**

@@ -7,8 +7,8 @@
 
 <div align="center">
 
-[![Build Status](https://img.shields.io/github/v/release/youneuoy/M2TWEOP-library?style=for-the-badge&color=3d1d00)](https://github.com/youneuoy/M2TWEOP-library/releases)
-[![Build Status](https://img.shields.io/github/downloads/youneuoy/M2TWEOP-library/total?style=for-the-badge&color=a87300)](https://github.com/youneuoy/M2TWEOP-library/releases)
+[![Build Status](https://img.shields.io/github/v/release/EOP-Labs/M2TWEOP-library?style=for-the-badge&color=3d1d00)](https://github.com/EOP-Labs/M2TWEOP-library/releases)
+[![Build Status](https://img.shields.io/github/downloads/EOP-Labs/M2TWEOP-library/total?style=for-the-badge&color=a87300)](https://github.com/EOP-Labs/M2TWEOP-library/releases)
 [![Build Status](https://img.shields.io/discord/713369537948549191?style=for-the-badge&label=Discord&color=b33102)](https://discord.gg/Epqjm8u2WK)
 
 </div>
@@ -53,8 +53,8 @@ The M2TW Engine Overhaul Project (M2TWEOP) is designed to expand the capabilitie
 ## Contributions
 This project wouldn't be possible without all the amazing contributions from the Medieval 2 modding community. Thank you to all of our contributors so far!
 <div align=center>
-  <a href="https://github.com/youneuoy/M2TWEOP-library/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=youneuoy/M2TWEOP-library" />
+  <a href="https://github.com/EOP-Labs/M2TWEOP-library/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=EOP-Labs/M2TWEOP-library" />
   </a>
   </p>
 </div>
@@ -128,10 +128,10 @@ You can get support for building/developing on our [Discord](https://discord.gg/
 ### Documentation
 If you want to open a PR to fix documentation/Intellisense issue, please refer to the following files
 
-* `LuaDocs.lua` is generated from the files defined in [config.ld](https://github.com/youneuoy/M2TWEOP-library/blob/master/documentationGenerator/config.ld#L3)
-* `LuaImGuiDocs.lua` is generated from [sol_ImGui.cpp](https://github.com/youneuoy/M2TWEOP-library/blob/master/M2TWEOP%20Code/M2TWEOP%20library/imgui/sol_ImGui.cpp)
+* `LuaDocs.lua` is generated from the files defined in [config.ld](https://github.com/EOP-Labs/M2TWEOP-library/blob/master/documentationGenerator/config.ld#L3)
+* `LuaImGuiDocs.lua` is generated from [sol_ImGui.cpp](https://github.com/EOP-Labs/M2TWEOP-library/blob/master/M2TWEOP%20Code/M2TWEOP%20library/imgui/sol_ImGui.cpp)
 
-See the [README](https://github.com/youneuoy/M2TWEOP-library/tree/master/documentationGenerator) in the documentationGenerator folder for more details 
+See the [README](https://github.com/EOP-Labs/M2TWEOP-library/tree/master/documentationGenerator) in the documentationGenerator folder for more details 
 
 ## Disclaimer
 
@@ -149,7 +149,7 @@ See the [README](https://github.com/youneuoy/M2TWEOP-library/tree/master/documen
 
 ## Version History
 * **v.2+**
-<https://github.com/youneuoy/M2TWEOP-library/releases>
+<https://github.com/EOP-Labs/M2TWEOP-library/releases>
 * **v.2.0:**
 A huge number of fixes and optimizations. Lots of new features in the lua plugin, as well as features exported for use in other plugins.
 * **v.2.0 test2:**
