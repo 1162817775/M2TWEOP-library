@@ -222,7 +222,7 @@ namespace redistUI
 		}
 		if (ImGui::Button("View information on the M2TWEOP website", helpers::getScreen().centerXButton))
 		{
-			ShellExecuteA(NULL, "open", "https://youneuoy.github.io/M2TWEOP-library/ ", NULL, NULL, SW_SHOWNORMAL);
+			ShellExecuteA(NULL, "open", "https://EOP-Labs.github.io/M2TWEOP-library/ ", NULL, NULL, SW_SHOWNORMAL);
 		}
 		ImGui::NewLine();
 		if (ImGui::Button("To main menu", helpers::getScreen().centerXButton))
