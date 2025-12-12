@@ -1867,7 +1867,7 @@ namespace factionHelpers
 		@tfield bool forceInvade
 		@tfield bool wantBeProtect
 		@tfield bool wantOfferProtect
-		@tfield bool allianceAgainst
+		@tfield int allianceAgainst
 		@tfield int ptsDesire
 		@tfield int ptsAlliance
 		@tfield int pointsInvasion
