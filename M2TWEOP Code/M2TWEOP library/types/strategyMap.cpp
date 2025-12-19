@@ -99,7 +99,7 @@ settlementStruct* minorSettlementDb::getSettlement(const int regionId, const int
 		load();
 	if (!m_Loaded)
 		return nullptr;
-	const auto setts = regionMinorSettlements[regionId];
+	const auto& setts = regionMinorSettlements[regionId];
 	for (const auto& sett : setts)
 	{
 		if (sett->minorSettlementIndex == settlementIndex)
@@ -120,7 +120,7 @@ settlementStruct* minorSettlementDb::getSettlementAtIndex(const int regionId, co
 {
 	if (!m_Loaded)
 		load();
-	const auto setts = regionMinorSettlements[regionId];
+	const auto& setts = regionMinorSettlements[regionId];
 	if (setts.empty())
 		load();
 	if (index < 0 || index >= static_cast<int>(setts.size()))
@@ -453,7 +453,7 @@ bool regionStruct::hasFaction(const int factionId)
 	return false;
 }
 
-bool regionStruct::hasAlliesToFaction(int factionId, bool trustedOnly)
+bool regionStruct::hasAlliesToFaction(const int factionId, const bool trustedOnly)
 {
 	const int settCount = settlementCount();
 	const auto campaignData = campaignHelpers::getCampaignData();
@@ -473,7 +473,7 @@ bool regionStruct::hasAlliesToFaction(int factionId, bool trustedOnly)
 	return false;
 }
 
-int regionStruct::getEnemySettsToFaction(int factionId)
+int regionStruct::getEnemySettsToFaction(const int factionId)
 {
 	const auto campaign = campaignHelpers::getCampaignData();
 	const int settCount = settlementCount();
@@ -491,9 +491,8 @@ int regionStruct::getEnemySettsToFaction(int factionId)
 	return enemyNum;
 }
 
-int regionStruct::getNeutralSettsToFaction(int factionId)
+int regionStruct::getNeutralSettsToFaction(const int factionId)
 {
-	const auto campaign = campaignHelpers::getCampaignData();
 	const int settCount = settlementCount();
 	if (settCount == 1)
 		return factionOwner->factionID != factionId ? 1 : 0;
@@ -529,7 +528,7 @@ oneTile* regionStruct::getDevastatedTile(const int index)
 	return &map->tilesArr[devastatedTiles[index]];
 }
 
-oneTile* regionStruct::getTile(int index)
+oneTile* regionStruct::getTile(const int index)
 {
 	if (index < 0 || index >= tileCount)
 		return nullptr;
@@ -539,7 +538,7 @@ oneTile* regionStruct::getTile(int index)
 	return &map->tilesArr[tiles[index]];
 }
 
-oneTile* regionStruct::getFertileTile(int index)
+oneTile* regionStruct::getFertileTile(const int index)
 {
 	if (index < 0 || index >= fertileTilesCount)
 		return nullptr;
@@ -549,7 +548,7 @@ oneTile* regionStruct::getFertileTile(int index)
 	return &map->tilesArr[fertileTiles[index]];
 }
 
-oneTile* regionStruct::getTileBorderingEdgeOfMap(int index)
+oneTile* regionStruct::getTileBorderingEdgeOfMap(const int index)
 {
 	if (index < 0 || index >= tilesBorderingEdgeOfMapCount)
 		return nullptr;
@@ -585,7 +584,7 @@ int oneTile::getTileCharacterCount()
 	return count;
 }
 
-character* oneTile::getTileCharacterAtIndex(int index)
+character* oneTile::getTileCharacterAtIndex(const int index)
 {
 	int count = 0;
 	const auto thisChar = getCharacter();
@@ -845,6 +844,29 @@ namespace stratMapHelpers
 		}
 	}
 
+	namespace
+	{
+		std::pair<int, int> findValidTileNearTileLua(const int x, const int y, const int charType)
+		{
+			return findValidTileNearTile(x, y, charType);
+		}
+
+		mapTilesDb* getMapTilesDb()
+		{
+			return *reinterpret_cast<mapTilesDb**>(dataOffsets::offsets.mapTilesDb);
+		}
+
+		void clearAllMapArrows()
+		{
+			const auto mapTiles = getMapTilesDb();
+			const auto arrows = mapTiles->mapArrows;
+			for (uint32_t i = 0; i < arrows->pathsNum; i++)
+			{
+				GAME_FUNC(void(__cdecl*)(uint32_t), clearMapPath)(i);
+			}
+		}
+	}
+
 	void updateTerrain()
 	{
 		GAME_FUNC(void(__cdecl*)(), updateTerrain)();
@@ -909,18 +931,18 @@ namespace stratMapHelpers
 		return nullptr;
 	}
 	
-	bool isTileFreeLua(int x, int y)
+	bool isTileFreeLua(const int x, const int y)
 	{
 		int xy[2]{x, y};
 		return isTileFree(xy);
 	}
 	
-	UINT32 getTileRegionID(int x, int y)
+	UINT32 getTileRegionID(const int x, const int y)
 	{
 		return getTile(x, y)->regionId;
 	}
 	
-	float getTileMoveCost(int x, int y, int destX, int destY)
+	float getTileMoveCost(const int x, const int y, const int destX, const int destY)
 	{
 		if (const auto map = getStratMap(); !map || !map->isOpen ||
 			(x < 0 || x > map->mapWidth || y < 0 || y > map->mapHeight))
@@ -951,21 +973,6 @@ namespace stratMapHelpers
 		}
 		return neighbours;
 	}
-
-	mapTilesDb* getMapTilesDb()
-	{
-		return *reinterpret_cast<mapTilesDb**>(dataOffsets::offsets.mapTilesDb);
-	}
-
-	void clearAllMapArrows()
-	{
-		const auto mapTiles = getMapTilesDb();
-		const auto arrows = mapTiles->mapArrows;
-		for (uint32_t i = 0; i < arrows->pathsNum; i++)
-		{
-			GAME_FUNC(void(__cdecl*)(uint32_t), clearMapPath)(i);
-		}
-	}
 	
 	void clearSundries(character* thisChar)
 	{
@@ -981,11 +988,6 @@ namespace stratMapHelpers
 		if (!GAME_FUNC(bool(__stdcall*)(coordPair*, int, int), isTileValidForCharacter)(coords.get(), charType, 1))
 			return false;
 		return isTileFree(&coords->xCoord);
-	}
-
-	std::pair<int, int> findValidTileNearTileLua(const int x, const int y, const int charType)
-	{
-		return findValidTileNearTile(x, y, charType);
 	}
 
 	std::pair<int, int> findValidTileNearTile(int x, int y, const int charType)
@@ -1139,10 +1141,9 @@ namespace stratMapHelpers
 			return baseObj;
 		}
 
-		strategyObject objT = callVFunc<4, strategyObject>(baseObj);
-		switch (objT)
+		switch (callVFunc<4, strategyObject>(baseObj))
 		{
-		case strategyObject::floatingGeneral:
+		case strategyObject::floatingGeneral:  // NOLINT(bugprone-branch-clone)
 			break;
 		case strategyObject::settlement:
 			break;
@@ -1151,6 +1152,12 @@ namespace stratMapHelpers
 		case strategyObject::port:
 			break;
 		case strategyObject::character:
+			break;
+		case strategyObject::watchtower:
+			break;
+		case strategyObject::sundry:
+			break;
+		case strategyObject::battleSiteMarker:
 			break;
 		case strategyObject::rallyPointSundry:
 			{

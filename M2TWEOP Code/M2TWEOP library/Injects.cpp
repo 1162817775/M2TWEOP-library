@@ -5520,24 +5520,37 @@ onGeneralAssaultAction::onGeneralAssaultAction(MemWork* mem, LPVOID addr, int ve
 void onGeneralAssaultAction::SetNewCode()
 {
 	const auto a = new Assembler();
-	a->push(eax);
+	const auto label = a->newLabel();
 	a->push(edx);
 	a->push(ebx);
 	a->push(ecx);
 	a->push(esp);
 	a->push(ebp);
-	a->push(edi);
+	a->push(eax);
 	a->mov(esi, ecx);
 	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
 	a->call(eax);
-	a->test(byte_ptr(esi, 0x4), 2);
 	a->pop(edi);
 	a->pop(ebp);
 	a->pop(esp);
 	a->pop(ecx);
 	a->pop(ebx);
 	a->pop(edx);
-	a->pop(eax);
+	a->test(eax, eax);
+	a->mov(eax, edi);
+	a->jnz(label);
+	if (m_adress == 0x5BEDA1)
+	{
+		a->push(edi);
+		a->mov(eax, 0x5BEE4A);
+	}
+	else
+	{
+		a->mov(eax, 0x5BE96A);
+	}
+	a->jmp(eax);
+	a->bind(label);
+	a->test(byte_ptr(esi, 0x4), 2);
 	a->ret();
 	m_cheatBytes = static_cast<unsigned char*>(a->make());
 	delete a;

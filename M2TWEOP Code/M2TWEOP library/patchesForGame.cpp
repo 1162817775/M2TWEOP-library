@@ -891,12 +891,18 @@ void patchesForGame::onSetSettlementModel(settlementStruct* settlement)
 	}
 }
 
-void patchesForGame::onGeneralAssaultAction(generalAssault* assault)
+int patchesForGame::onGeneralAssaultAction(generalAssault* assault)
 {
 	if (!assault || !assault->settlement)
-		return;
+		return 1;
 	if (!assault->settlement->army)
+	{
 		gameHelpers::logStringGame("GeneralAssaultAction: No army in settlement: " + std::string(assault->settlement->name));
+		assault->finished = true;
+		assault->init = false;
+		return 0;
+	}
+	return 1;
 }
 
 mountedEngine* patchesForGame::onGetMountedEngine(const stringWithHash* name)
