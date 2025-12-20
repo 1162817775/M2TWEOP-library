@@ -1542,8 +1542,7 @@ void characterRecord::giveRandomName(const int nameFactionId)
 
 void characterRecord::giveRandomPortrait(const int cultureId, const int religionId)
 {
-	const auto randomPortrait = cultures::getRandomPortrait(cultureId, religionId);
-	if (!randomPortrait.empty())
+	if (const auto randomPortrait = cultures::getRandomPortrait(cultureId, religionId); !randomPortrait.empty())
 		setPortrait(randomPortrait);
 	else
 	{
@@ -1709,7 +1708,7 @@ void eopCharacterDataDb::onGameLoaded()
 					if (rec->gen->getTypeID() == data->characterType)
 					{
 						if (!data->model.empty())
-							stratModelsChange::setCharacterModel(thisChar, data->model.c_str());
+							stratModelsChange::setCharacterModel(thisChar, data->model);
 						if (!data->portrait.empty())
 							rec->setPortrait(data->portrait);
 						if (!data->internalName.empty())
