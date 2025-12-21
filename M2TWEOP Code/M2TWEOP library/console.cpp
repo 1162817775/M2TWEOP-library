@@ -3,6 +3,7 @@
 #include "luaPlugin.h"
 #include "gameHelpers.h"
 #include "graphicsEvents.h"
+#include <Windows.h>
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_stdlib.h"
@@ -90,13 +91,21 @@ namespace console
 			gameHelpers::scriptCommand("disable_shortcuts", "false");
 			consoleData.controlsDisabled = false;
 		}	
-		
+
 		// Run Script Button
 		if (ImGui::Button("Run script"))
 		{
 			applyCommand();
 			consoleData.pressAmount = 0;
 		}
+
+		// Open Documentation
+		ImGui::SameLine();
+		
+		if (ImGui::Button("Documentation"))
+		{
+			ShellExecuteA(NULL, "open", ("mods\\" + gameHelpers::getModFolderName() + "\\eopData\\documentation\\_static\\LuaLib\\index.html").c_str(), NULL, NULL, SW_SHOWNORMAL);
+		}		
 
 		ImGui::SameLine();
 		ImGui::Checkbox("Clear Input", &consoleData.clearInput);
