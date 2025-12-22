@@ -564,6 +564,19 @@ int factionStruct::getAliveCharacterNumOfType(characterTypeStrat charType)
 	return num;
 }
 
+int factionStruct::getNetIncome()
+{
+	int income = 0;
+	income += factionEconomyTable[0].farmingIncome;
+	income += factionEconomyTable[0].tradeIncome;
+	income += factionEconomyTable[0].taxesIncome;
+	income += factionEconomyTable[0].miningIncome;
+	income += kingsPurse;
+	income -= factionEconomyTable[0].upkeepExpense;
+	income -= factionEconomyTable[0].wagesExpense;
+	return income;
+}
+
 #pragma endregion factionStruct methods
 
 void factionTileStruct::updateFromObject(void* object)
@@ -911,7 +924,7 @@ namespace factionHelpers
 		@tfield int missionCount
 		@tfield int freezeFactionAI
 		@tfield int treasuryTurnStart
-		@tfield int incomeDoubled
+		@tfield int netIncome Get only! farms + taxes + mining + trade + kingsPurse - upkeep - wages
 		@tfield int battlesWon
 		@tfield int battlesLost
 		@tfield int settlementsCaptured
@@ -1035,6 +1048,7 @@ namespace factionHelpers
 		types.factionStruct.set("revoltReason", &factionStruct::revoltReason);
 		types.factionStruct.set("freezeFactionAI", &factionStruct::freezeFactionAI);
 		types.factionStruct.set("treasuryTurnStart", &factionStruct::treasuryTurnStart);
+		types.factionStruct.set("netIncome", sol::property(&factionStruct::getNetIncome));
 		types.factionStruct.set("incomeDoubled", &factionStruct::incomeDoubled);
 		types.factionStruct.set("battlesWon", &factionStruct::battlesWon);
 		types.factionStruct.set("battlesLost", &factionStruct::battlesLost);

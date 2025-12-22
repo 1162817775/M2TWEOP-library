@@ -327,6 +327,7 @@ public:
 	void setFactionBanner(const std::string& newFac);
 	characterRecord* ancillaryExists(const std::string& ancName);
 	int getAliveCharacterNumOfType(characterTypeStrat charType);
+	int getNetIncome();
 	int getCharacterCountOfType(int characterType)
 	{
 		return getAliveCharacterNumOfType(static_cast<characterTypeStrat>(characterType));

@@ -185,7 +185,8 @@ legacyNames = ["getTileRegionID",
                 "settlementYCoord",
                 "siegeHoldoutTurns",
                 "haveAttributeLegio",
-                "isCanDeploy"
+                "isCanDeploy",
+                "incomeDoubled",
                 ]
 
 classes = {}
