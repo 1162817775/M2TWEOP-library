@@ -5575,15 +5575,15 @@ void onCreateGeneralUnit::SetNewCode()
 	a->push(ebp);
 	a->push(esi);
 	a->push(edi);
-	a->mov(eax, dword_ptr(esp, 0x20)); // arg6
+	a->mov(eax, dword_ptr(esp, 0x28)); // arg6
 	a->push(eax);
-	a->mov(eax, dword_ptr(esp, 0x20)); // arg5
+	a->mov(eax, dword_ptr(esp, 0x28)); // arg5
 	a->push(eax);
-	a->mov(eax, dword_ptr(esp, 0x20)); // arg4
+	a->mov(eax, dword_ptr(esp, 0x28)); // arg4
 	a->push(eax);
-	a->mov(eax, dword_ptr(esp, 0x20)); // arg3
+	a->mov(eax, dword_ptr(esp, 0x28)); // arg3
 	a->push(eax);
-	a->mov(edx, dword_ptr(esp, 0x20)); // arg2
+	a->mov(edx, dword_ptr(esp, 0x28)); // arg2
 	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
 	a->call(eax);
 	a->mov(esi, eax);
