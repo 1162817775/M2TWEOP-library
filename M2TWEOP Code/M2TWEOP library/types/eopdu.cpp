@@ -310,7 +310,6 @@ eduEntry* eopDu::findGeneralUpgradeUnit(const int factionId)
 
 unit* eopDu::createGeneralUnit(character* general, const int exp, const int wpnlvl, const int armlvl, const eduEntry* entry)
 {
-	gameHelpers::logStringGame("Creating general unit");
 	const auto experience = exp + max(general->characterRecord->bodyguardValour, 0);
 	const auto facId = general->getFaction()->factionID;
 	auto bgEntry = entry;
