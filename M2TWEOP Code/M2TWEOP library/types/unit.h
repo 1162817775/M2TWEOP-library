@@ -802,18 +802,17 @@ struct soldierInBattle {
 struct generalInfo
 {
 public:
-	char** generalModelName; //0x0000
+	eduOfficer* eduOfficer; //0x0000
 	struct unit* unit; //0x0004
 	struct characterRecord* namedChar; //0x0008
-	char pad_000C[48]; //0x000C
-	int8_t N00010FEA; //0x003C
-	char pad_003D[43]; //0x003D
+	soldierData soldierOnStratMap; //0x000C
+	unitStats stats; //0x0010
 	struct soldierInBattle* soldier; //0x0068
-	int8_t isCharacter; //0x006C
-	int8_t alive; //0x006D
-	char pad_006E[2]; //0x006E
+	bool isGeneral; //0x006C
+	bool isAlive; //0x006D
+	char pad[2]; //0x006E
 	struct heroAbility* ability; //0x0070
-	char pad_0074[144]; //0x0074
+	int spSharedCount; //0x0074
 }; //Size: 0x0104
 
 struct heroAbility

@@ -1575,6 +1575,7 @@ void luaPlugin::initUnits()
 		sol::usertype<unitStats> unitStats;
 		sol::usertype<unitAiGroupData> unitAiGroupData;
 		sol::usertype<vector3> vector3;
+		sol::usertype<generalInfo> generalBattleStruct;
 	}types;
 	
 	///Unit
@@ -2506,6 +2507,23 @@ void luaPlugin::initUnits()
 	types.vector3.set("xCoord", &vector3::x);
 	types.vector3.set("yCoord", &vector3::y);
 	types.vector3.set("zCoord", &vector3::z);
+	
+	/***
+
+	@tfield unit unit
+	@tfield characterRecord record
+	@tfield unitStats stats
+	@tfield bool isGeneral
+	@tfield bool isAlive
+
+	@table generalBattleStruct
+	*/
+	types.generalBattleStruct = luaState.new_usertype<generalInfo>("generalBattleStruct");
+	types.generalBattleStruct.set("unit", &generalInfo::unit);
+	types.generalBattleStruct.set("record", &generalInfo::namedChar);
+	types.generalBattleStruct.set("stats", &generalInfo::stats);
+	types.generalBattleStruct.set("isGeneral", &generalInfo::isGeneral);
+	types.generalBattleStruct.set("isAlive", &generalInfo::isAlive);
 	
 	///Edu Entry
 	//@section Edu Entry
