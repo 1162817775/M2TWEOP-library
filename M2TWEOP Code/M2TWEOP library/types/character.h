@@ -179,12 +179,7 @@ struct character
 	int8_t padEnd[2]; //0x03BE
 public:
 	//methods
-	factionStruct* getFaction()
-	{
-		if (faction)
-			return *faction;
-		return nullptr;
-	}
+	factionStruct* getFaction();
 	void joinCrusade();
 	void clearCharacterStuff();
 	void leaveCrusade(bool triggerEvent);

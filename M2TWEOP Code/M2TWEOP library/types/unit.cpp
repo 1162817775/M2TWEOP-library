@@ -978,7 +978,7 @@ namespace unitHelpers
 		}
 		
 		regionStruct* region = stratMapHelpers::getRegion(regionId);
-		const auto un = GAME_FUNC(unit*(__stdcall*)(regionStruct*, int, int, int, int), createUnitFunc2)(region, index, facNum, exp, soldiers);
+		const auto un = GAME_FUNC(unit*(__thiscall*)(unitDb*, regionStruct*, int, int, int, int), createUnitFunc2)(getEdu(), region, index, facNum, exp, soldiers);
 		if (un)
 		{
 			un->setArmour(arm);

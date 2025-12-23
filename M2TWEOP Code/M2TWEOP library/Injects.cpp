@@ -5556,6 +5556,74 @@ void onGeneralAssaultAction::SetNewCode()
 	delete a;
 }
 
+onCreateGeneralUnit::onCreateGeneralUnit(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x8EEC30;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x8EE1B0;
+}
+
+void onCreateGeneralUnit::SetNewCode()
+{
+	const auto a = new Assembler();
+	// arg1 in ecx
+	a->push(ecx);
+	a->push(ebx);
+	a->push(ebp);
+	a->push(esi);
+	a->push(edi);
+	a->mov(eax, dword_ptr(esp, 0x20)); // arg6
+	a->push(eax);
+	a->mov(eax, dword_ptr(esp, 0x20)); // arg5
+	a->push(eax);
+	a->mov(eax, dword_ptr(esp, 0x20)); // arg4
+	a->push(eax);
+	a->mov(eax, dword_ptr(esp, 0x20)); // arg3
+	a->push(eax);
+	a->mov(edx, dword_ptr(esp, 0x20)); // arg2
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->mov(esi, eax);
+	if (m_adress == 0x8EEC30)
+		a->mov(eax, 0x8EEDF2);
+	else
+		a->mov(eax, 0x8EE372);
+	a->jmp(eax);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+onCalcBgSize::onCalcBgSize(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x8EC7D0;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x8EBD50;
+}
+
+void onCalcBgSize::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->mov(ecx, dword_ptr(esp, 0x4));
+	a->mov(edx, dword_ptr(esp, 0x8));
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	if (m_adress == 0x8EC7D0)
+		a->mov(edx, 0x8EC81F);
+	else
+		a->mov(edx, 0x8EBD9F);
+	a->jmp(edx);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
 onAddBuildingCapsAfterConstruction::onAddBuildingCapsAfterConstruction(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {

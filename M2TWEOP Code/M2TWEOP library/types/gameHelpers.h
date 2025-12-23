@@ -357,6 +357,14 @@ public:
 	static void setUseEopFrontiers(const bool value) { useEopFrontiers = value; }
 	static int getUseEopFrontiers() { return useEopFrontiers; }
 	static int getWeaponBonusModifier() { return weaponBonusModifier; }
+	static int getMaxBodyguardSize() { return maxBodyguardSize; }
+	static int getMinBodyguardSize() { return minBodyguardSize; }
+	static int getExtraLeaderSoldiers() { return extraLeaderSoldiers; }
+	static void setExtraLeaderSoldiers(const int value) { extraLeaderSoldiers = value; }
+	static int getExtraHeirSoldiers() { return extraHeirSoldiers; }
+	static void setExtraHeirSoldiers(const int value) { extraHeirSoldiers = value; }
+	static void setMaxBodyguardSize(const int value) { maxBodyguardSize = value; }
+	static void setMinBodyguardSize(const int value) { minBodyguardSize = value; }
 	static void setWeaponBonusModifier(const int value) { weaponBonusModifier = value & 0xFF; }
 	static DWORD getColor() { return (static_cast<uint32_t>(0xFF) << 24) | (khakiTextRed << 16) | (khakiTextGreen << 8) | khakiTextBlue; }
 	static void setKhakiTextColor(const uint8_t red, const uint8_t green, const uint8_t blue) { khakiTextRed = red; khakiTextGreen = green; khakiTextBlue = blue; }
@@ -370,6 +378,10 @@ public:
 	static uint8_t khakiTextBlue;
 	static int watchTowerRange;
 	static int weaponBonusModifier;
+	static int maxBodyguardSize;
+	static int minBodyguardSize;
+	static int extraLeaderSoldiers;
+	static int extraHeirSoldiers;
 };
 
 struct boostLightMutex
@@ -514,6 +526,7 @@ namespace gameHelpers
 	void setAncLimit(uint8_t limit);
 	void setMaxUnitSize(signed short min, signed short max);
 	void setMaxBgSize(unsigned char size);
+	void setMinBgSize(unsigned char size);
 	void fixReligionTrigger();
 	void unlockConsoleCommands();
 	void toggleUnitHighlight();
@@ -523,6 +536,8 @@ namespace gameHelpers
 	int getUnitSize();
 	void setTextureCacheSize();
 	void unlockWeaponLimit();
+	float getUnitSizeMultiplier();
+	int calculateMaxBodyguardSize(const character* general, const eduEntry* bgEntry);
 
 	religionDatabase* getReligionDatabase();
 	gameDataAllStruct* getGameDataAll();

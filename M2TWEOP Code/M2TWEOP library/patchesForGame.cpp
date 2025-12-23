@@ -905,6 +905,17 @@ int patchesForGame::onGeneralAssaultAction(generalAssault* assault)
 	return 1;
 }
 
+int patchesForGame::onCalcBgSize(character* general, eduEntry* entry)
+{
+	return gameHelpers::calculateMaxBodyguardSize(general, entry);
+}
+
+unit* patchesForGame::onCreateGeneralUnit(unitDb* edu, character* general, int exp, int wpnlvl, int armlvl,
+                                          eduEntry* entry)
+{
+	return eopDu::createGeneralUnit(general, exp, wpnlvl, armlvl, entry);
+}
+
 mountedEngine* patchesForGame::onGetMountedEngine(const stringWithHash* name)
 {
 	if (!name || !name->name)

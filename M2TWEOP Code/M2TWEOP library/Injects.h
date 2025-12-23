@@ -1148,6 +1148,30 @@ private:
 	LPVOID funcAddress;
 };
 
+class onCalcBgSize
+	:public AATemplate
+{
+public:
+	onCalcBgSize(MemWork* mem, LPVOID adr, int ver);
+	~onCalcBgSize() = default;
+
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onCreateGeneralUnit
+	:public AATemplate
+{
+public:
+	onCreateGeneralUnit(MemWork* mem, LPVOID adr, int ver);
+	~onCreateGeneralUnit() = default;
+
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 class onGetUnitStatsUi1
 	:public AATemplate
 {

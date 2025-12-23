@@ -1324,6 +1324,18 @@ void managerF::execPatches()
 	toGetBuildingPicConstructed->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onCreateGeneralUnit patch" << '\n';
+	onCreateGeneralUnit* toCreateGeneralUnit = new onCreateGeneralUnit(mem, (LPVOID)patchesForGame::onCreateGeneralUnit, globals::dataS.gameVersion);
+	toCreateGeneralUnit->SetNewCode();
+	toCreateGeneralUnit->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onCalcBgSize patch" << '\n';
+	onCalcBgSize* toCalcBgSize = new onCalcBgSize(mem, (LPVOID)patchesForGame::onCalcBgSize, globals::dataS.gameVersion);
+	toCalcBgSize->SetNewCode();
+	toCalcBgSize->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying toGetBuildingPicConstructed2 patch" << '\n';
 	onGetBrowserPicConstructed2* toGetBuildingPicConstructed2 = new onGetBrowserPicConstructed2(mem, (LPVOID)patchesForGame::getBuildingPicConstructed, globals::dataS.gameVersion);
 	toGetBuildingPicConstructed2->SetNewCode();

@@ -6,6 +6,9 @@
 #include "pch.h"
 #include "eopdu.h"
 
+#include <algorithm>
+
+#include "campaign.h"
 #include "faction.h"
 #include "functionsOffsets.h"
 #include "gameHelpers.h"
@@ -261,6 +264,86 @@ void eopDu::setEntrySoldierModelLua(int idx, const char* newModel)
 {
 	const eopEduEntry* entry = getEopEduEntryInternal(idx);
 	entry->setEntrySoldierModel(newModel);
+}
+
+eduEntry* eopDu::findGeneralUnit(const int factionId)
+{
+	const auto eduNum = eopDuHelpers::getEduEntryNum();
+	for (int unitIdx = 0; unitIdx < eduNum; unitIdx++)
+	{
+		const auto entry = unitHelpers::getEDUEntryById(unitIdx);
+		if (entry->hasOwnership(factionId) && entry->generalUnit)
+		{
+			return entry;
+		}
+	}
+	for (const auto& entry : eopUnitDb)
+	{
+		if (entry->data.edu.hasOwnership(factionId) && entry->data.edu.generalUnit)
+		{
+			return &entry->data.edu;
+		}
+	}
+	return nullptr;
+}
+
+eduEntry* eopDu::findGeneralUpgradeUnit(const int factionId)
+{
+	const auto eduNum = eopDuHelpers::getEduEntryNum();
+	for (int unitIdx = 0; unitIdx < eduNum; unitIdx++)
+	{
+		const auto entry = unitHelpers::getEDUEntryById(unitIdx);
+		if (entry->hasOwnership(factionId) && entry->generalUnitUpgrade)
+		{
+			return entry;
+		}
+	}
+	for (const auto& entry : eopUnitDb)
+	{
+		if (entry->data.edu.hasOwnership(factionId) && entry->data.edu.generalUnitUpgrade)
+		{
+			return &entry->data.edu;
+		}
+	}
+	return nullptr;
+}
+
+unit* eopDu::createGeneralUnit(character* general, const int exp, const int wpnlvl, const int armlvl, const eduEntry* entry)
+{
+	gameHelpers::logStringGame("Creating general unit");
+	const auto experience = exp + max(general->characterRecord->bodyguardValour, 0);
+	const auto facId = general->getFaction()->factionID;
+	auto bgEntry = entry;
+	if (!bgEntry)
+	{
+		const auto campaign = campaignHelpers::getCampaignData();
+		if (campaign->marianReformsActive)
+		{
+			bgEntry = findGeneralUpgradeUnit(facId);
+		}
+		if (!bgEntry)
+		{
+			bgEntry = findGeneralUnit(facId);
+		}
+	}
+	if (!bgEntry)
+	{
+		gameHelpers::logStringGame("createGeneralUnit: No general unit found for faction " + std::string(general->getFaction()->factionRecord->facName));
+		return nullptr;
+	}
+	auto soldiers = gameHelpers::calculateMaxBodyguardSize(general, bgEntry);
+	soldiers = static_cast<int>(soldiers * gameHelpers::getUnitSizeMultiplier());
+	const auto regionId = stratMapHelpers::getTile(general->xCoord, general->yCoord)->regionId;
+	const auto un = unitHelpers::createUnitIdx2(
+		bgEntry->index,
+		regionId,
+		facId,
+		experience,
+		static_cast<uint8_t>(wpnlvl),
+		static_cast<uint8_t>(armlvl),
+		soldiers
+		);
+	return un;
 }
 
 void eopDu::fixCustomBattleGeneralEntries()

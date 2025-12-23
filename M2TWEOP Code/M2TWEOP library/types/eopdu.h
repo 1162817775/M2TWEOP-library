@@ -40,6 +40,9 @@ public:
     static eduEntry* getEduEntry(int idx);
     static void setEntrySoldierModelLua(int idx, const char* newModel);
     static void fixCustomBattleGeneralEntries();
+    static unit* createGeneralUnit(character* general, int exp, int wpnlvl, int armlvl, const eduEntry* entry);
+    static eduEntry* findGeneralUnit(int factionId);
+    static eduEntry* findGeneralUpgradeUnit(int factionId);
 };
 
 namespace eopDuHelpers

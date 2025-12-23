@@ -372,6 +372,7 @@ public:
 		DWORD destroyLogObject = NULL;
 		DWORD createMountedEngineRecord = NULL;
 		DWORD createAiProductionController = NULL;
+		DWORD getUnitSizeMultiplier = NULL;
 	}offsets;
 
 	static void initCodes(int gameVer);

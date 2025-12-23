@@ -1423,6 +1423,15 @@ namespace characterHelpers
 }
 
 
+factionStruct* character::getFaction()
+{
+	if (faction)
+		return *faction;
+	if (const auto record = characterRecord; record && record->faction)
+		return record->faction;
+	return nullptr;
+}
+
 void character::joinCrusade()
 {
 	const auto newCrusade = &campaignHelpers::getCampaignData()->crusade;

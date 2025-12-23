@@ -13,6 +13,7 @@
 #include "globals.h"
 #include "MemWork.h"
 #include "techFuncs.h"
+#include "unit.h"
 
 bool m2tweopOptions::hideUnknownUnitTooltips = false;
 bool m2tweopOptions::eopHandleUnitCards = true;
@@ -20,9 +21,13 @@ bool m2tweopOptions::enableFamilyEventsForTeutonic = true;
 bool m2tweopOptions::useEopFrontiers = true;
 int m2tweopOptions::watchTowerRange = 10;
 int m2tweopOptions::weaponBonusModifier = 3;
-uint8_t m2tweopOptions::khakiTextRed = 0x80;
-uint8_t m2tweopOptions::khakiTextGreen = 0x77;
-uint8_t m2tweopOptions::khakiTextBlue = 0x61;
+uint8_t m2tweopOptions::khakiTextRed = 0x0;//0x80;
+uint8_t m2tweopOptions::khakiTextGreen = 0x0; //0x77;
+uint8_t m2tweopOptions::khakiTextBlue = 0x0; //0x61;
+int m2tweopOptions::maxBodyguardSize = 31;
+int m2tweopOptions::minBodyguardSize = 4;
+int m2tweopOptions::extraLeaderSoldiers = 6;
+int m2tweopOptions::extraHeirSoldiers = 4;
 
 scriptCommand::scriptCommand(const char* name) : className(name)
 {
@@ -3379,6 +3384,30 @@ namespace gameHelpers
 		const DWORD retAdr = dataOffsets::offsets.maxBgSize2 + 1;
 		MemWork::WriteData(&size, cmpAdr, 1);
 		MemWork::WriteData(&size, retAdr, 1);
+		m2tweopOptions::setMaxBodyguardSize(size);
+	}
+	
+	void setMinBgSize(unsigned char size)
+	{
+		m2tweopOptions::setMinBodyguardSize(size);
+	}
+
+	int calculateMaxBodyguardSize(const character* general, const eduEntry* bgEntry)
+	{
+		const auto record = general->characterRecord;
+		auto soldiers = static_cast<int>(bgEntry->soldierCount);
+		if (record->isLeader())
+		{
+			soldiers += m2tweopOptions::getExtraLeaderSoldiers();
+		}
+		else if (record->isHeir())
+		{
+			soldiers += m2tweopOptions::getExtraHeirSoldiers();
+		}
+		soldiers += (record->bodyguardSize + record->personalSecurity);
+		soldiers = min(soldiers, m2tweopOptions::getMaxBodyguardSize());
+		soldiers = max(soldiers, m2tweopOptions::getMinBodyguardSize());
+		return soldiers;
 	}
 
 	void fixReligionTrigger()
@@ -3497,6 +3526,11 @@ namespace gameHelpers
 		MemWork::WriteData(&fix2, limit9, 1);
 
 		//historic battle?
+	}
+
+	float getUnitSizeMultiplier()
+	{
+		return GAME_FUNC(float (__thiscall*)(campaign*), getUnitSizeMultiplier)(campaignHelpers::getCampaignData());
 	}
 
 	void addToLua(sol::state& luaState)

@@ -235,6 +235,9 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield setAncillariesLimit setAncillariesLimit
 	@tfield unlockGameConsoleCommands unlockGameConsoleCommands
 	@tfield setMaxBgSize setMaxBgSize
+	@tfield setMinBgSize setMinBgSize
+	@tfield setExtraLeaderSoldiers setExtraLeaderSoldiers
+	@tfield setExtraHeirSoldiers setExtraHeirSoldiers
 	@tfield toggleUnitsBMapHighlight toggleUnitsBMapHighlight
 	@tfield getBattleCamCoords getBattleCamCoords
 	@tfield setReligionsLimit setReligionsLimit
@@ -555,13 +558,40 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	/***
 	Sets the maximum amount of soldiers a general's bodyguard unit can replenish to. The value is multiplied by the unit size modifiers (e.g Huge = 2.5 multiplier)
 	@function M2TWEOP.setMaxBgSize
-	@tparam int newSize
+	@tparam int newSize Default: 31
 	@usage
 	M2TWEOP.setMaxBgSize(100) -- On huge unit size, 100*2.5 = 250 max bodyguard size
 	M2TWEOP.setMaxBgSize(150) -- On huge unit size, 150*2.5 = 300 max bodyguard size
 	M2TWEOP.setMaxBgSize(50)  -- On huge unit size, 50*2.5 = 125 max bodyguard size
 	*/
 	tables.M2TWEOP.set_function("setMaxBgSize", &gameHelpers::setMaxBgSize);
+	
+	/***
+	Sets the minimum amount of soldiers a general's bodyguard unit can replenish to. The value is multiplied by the unit size modifiers (e.g Huge = 2.5 multiplier)
+	@function M2TWEOP.setMinBgSize
+	@tparam int newSize Default: 4
+	@usage
+	M2TWEOP.setMaxBgSize(1)
+	*/
+	tables.M2TWEOP.set_function("setMinBgSize", &gameHelpers::setMinBgSize);
+	
+	/***
+	Sets the extra amount of soldiers faction leaders get. The value is multiplied by the unit size modifiers (e.g Huge = 2.5 multiplier)
+	@function M2TWEOP.setExtraLeaderSoldiers
+	@tparam int newSize Default: 6
+	@usage
+	M2TWEOP.setExtraLeaderSoldiers(8)
+	*/
+	tables.M2TWEOP.set_function("setExtraLeaderSoldiers", &m2tweopOptions::setExtraLeaderSoldiers);
+	
+	/***
+	Sets the extra amount of soldiers faction heirs get. The value is multiplied by the unit size modifiers (e.g Huge = 2.5 multiplier)
+	@function M2TWEOP.setExtraHeirSoldiers
+	@tparam int newSize Default: 4
+	@usage
+	M2TWEOP.setExtraHeirSoldiers(6)
+	*/
+	tables.M2TWEOP.set_function("setExtraHeirSoldiers", &m2tweopOptions::setExtraHeirSoldiers);
 
 	/***
 	Sets the new maximum soldier count.
