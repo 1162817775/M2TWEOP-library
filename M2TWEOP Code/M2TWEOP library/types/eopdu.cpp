@@ -5,6 +5,8 @@
 //@license GPL-3.0
 #include "pch.h"
 #include "eopdu.h"
+
+#include "faction.h"
 #include "functionsOffsets.h"
 #include "gameHelpers.h"
 
@@ -259,6 +261,61 @@ void eopDu::setEntrySoldierModelLua(int idx, const char* newModel)
 {
 	const eopEduEntry* entry = getEopEduEntryInternal(idx);
 	entry->setEntrySoldierModel(newModel);
+}
+
+void eopDu::fixCustomBattleGeneralEntries()
+{
+	const auto smFactionsCount = factionHelpers::getFactionRecordNum();
+	for (int facIdx = 0; facIdx < smFactionsCount; facIdx++)
+	{
+		std::bitset<4> eras;
+		bool found = false;
+		const auto eduNum = eopDuHelpers::getEduEntryNum();
+		for (int unitIdx = 0; unitIdx < eduNum; unitIdx++)
+		{
+			const auto entry = unitHelpers::getEDUEntryById(unitIdx);
+			if (!found && entry->hasOwnership(facIdx) && entry->generalUnit)
+			{
+				found = true;
+			}
+			for (int era = 0; era < 4; era++)
+			{
+				if (entry->eraOwnerShips[era] & (1 << facIdx))
+				{
+					eras[era] = true;
+				}
+			}
+		}
+		for (const auto& entry : eopUnitDb)
+		{
+			if (!found && entry->data.edu.hasOwnership(facIdx) && entry->data.edu.generalUnit)
+			{
+				found = true;
+			}
+			for (int era = 0; era < 4; era++)
+			{
+				if (entry->data.edu.eraOwnerShips[era] & (1 << facIdx))
+				{
+					eras[era] = true;
+				}
+			}
+		}
+		const auto facRecord = factionHelpers::getFactionRecord(facIdx);
+		if(!found)
+		{
+			gameHelpers::logStringGame("There is no general unit for faction" + std::string(facRecord->facName));
+		}
+		if (facRecord->customBattleAvailability)
+		{
+			for (int era = 0; era < 4; era++)
+			{
+				if (!eras[era])
+				{
+					facRecord->periodsUnavailableInCustomBattle &= ~(1 << era);
+				}
+			}
+		}
+	}
 }
 
 int eopDuHelpers::getEduEntryNum()

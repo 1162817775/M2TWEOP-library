@@ -1887,6 +1887,7 @@ void __stdcall patchesForGame::onGameInit()
 	eopFactionDataDb::get()->getOriginalData();
 	gameEvents::onGameInit();
 	*reinterpret_cast<bool*>(dataOffsets::offsets.bugReport) = true;
+	eopDu::fixCustomBattleGeneralEntries();
 }
 
 void __stdcall patchesForGame::onUnloadCampaign()
