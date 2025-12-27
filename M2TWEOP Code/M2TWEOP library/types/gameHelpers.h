@@ -472,7 +472,9 @@ namespace gameHelpers
 	std::string getModFolderName();
 	void copyFileLua(const std::string& file, const std::string& to);
 	void setExpandedString(const std::string& key, const std::string& value);
+	std::string getExpandedString(const std::string& key);
 	void setStratString(const std::string& key, const std::string& value);
+	std::string getStratString(const std::string& key);
 	std::string getModString(const std::string& path);
 	int getGameVersion();
 	void generateSprite(const std::string& model);

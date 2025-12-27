@@ -225,7 +225,9 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield getTraitByIndex getTraitByIndex
 	@tfield getTraitCount getTraitCount
 	@tfield setExpandedString setExpandedString
+	@tfield getExpandedString getExpandedString
 	@tfield setStratString setStratString
+	@tfield getStratString getStratString
 	@tfield getGameVersion getGameVersion
 	@tfield setPerfectSpy setPerfectSpy
 	@tfield getLocalFactionID getLocalFactionID
@@ -445,6 +447,16 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	tables.M2TWEOP.set_function("setExpandedString", &gameHelpers::setExpandedString);
 	
 	/***
+	Get a string from the expanded string table.
+	@function M2TWEOP.getExpandedString
+	@tparam string key
+	@treturn string value
+	@usage
+	    local value = M2TWEOP.getExpandedString("EMT_TURKS_FACTION_LEADER");
+	*/
+	tables.M2TWEOP.set_function("getExpandedString", &gameHelpers::getExpandedString);
+	
+	/***
 	Set a string in the strat string table.
 	@function M2TWEOP.setStratString
 	@tparam string key
@@ -453,6 +465,16 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 		M2TWEOP.setStratString("SMT_GAMES_FREQUENCY_YEARLY", "Yearly Sacrifices");
 	*/
 	tables.M2TWEOP.set_function("setStratString", &gameHelpers::setStratString);
+	
+	/***
+	Get a string from the strat string table.
+	@function M2TWEOP.getStratString
+	@tparam string key
+	@treturn string value
+	@usage
+		local value = M2TWEOP.getStratString("SMT_GAMES_FREQUENCY_YEARLY");
+	*/
+	tables.M2TWEOP.set_function("getStratString", &gameHelpers::getStratString);
 	
 	/***
 	Function to get the game version.

@@ -645,6 +645,18 @@ namespace gameHelpers
 		gameStringHelpers::createUniString(*uniString, value.c_str());
 	}
 
+	std::string getExpandedString(const std::string& key)
+	{
+		const auto stringTable = *reinterpret_cast<void**>(dataOffsets::offsets.expandedBinTable);
+		const auto uniString = getHashedUniString(stringTable, key);
+		if (!uniString || !*uniString)
+		{
+			logStringGame("getExpandedString: Could not find key " + key);
+			return "";
+		}
+		return gameStringHelpers::uniStringToStr(*uniString);
+	}
+
 	enum stratTextEnum
 	{
 		SMT_END_TURN,
@@ -3284,6 +3296,24 @@ namespace gameHelpers
 			return;
 		}
 		gameStringHelpers::createUniString(*uniString, value.c_str());
+	}
+
+	std::string getStratString(const std::string& key)
+	{
+		const auto stringTable = *reinterpret_cast<void**>(dataOffsets::offsets.stratBinTable);
+		if (stratTextEnumMap.find(key) == stratTextEnumMap.end())
+		{
+			logStringGame("getStratString: Could not find key " + key);
+			return "";
+		}
+		const auto enumVal = stratTextEnumMap.at(key);
+		const auto uniString = callClassFunc<void*, UNICODE_STRING***, int>(stringTable, 0x8, enumVal);
+		if (!uniString || !*uniString)
+		{
+			logStringGame("getStratString: Could not get string for key " + key);
+			return "";
+		}
+		return gameStringHelpers::uniStringToStr(*uniString);
 	}
 
 	void setEquipmentCosts(const int equipType, const int cost)
