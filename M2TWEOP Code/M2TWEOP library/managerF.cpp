@@ -1332,8 +1332,8 @@ void managerF::execPatches()
 	
 	f1 << "Start applying onExitToMenu2 patch" << '\n';
 	onExitToMenu2* toExitToMenu2 = new onExitToMenu2(mem, (LPVOID)patchesForGame::onExitToMenu, globals::dataS.gameVersion);
-	//toExitToMenu2->SetNewCode();
-	//toExitToMenu2->Enable();
+	toExitToMenu2->SetNewCode();
+	toExitToMenu2->Enable();
 	f1 << "Done" << '\n';
 	
 	f1 << "Start applying onExitToMenu patch" << '\n';
