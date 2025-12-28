@@ -46,7 +46,7 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.campaignDb = 0x16666BC;
 		offsets.campaignDbExtra = 0x18AA87C;
 		
-		offsets.scriptCommandVFT = 0x0134E3A0;
+		offsets.scriptCommandVFT = 0x13933D0;
 		
 		offsets.religionDatabase = 0x016E9DC0;
 		offsets.perfectSpy = 0x016F0E5C;
@@ -169,7 +169,7 @@ void dataOffsets::initDataOffsets(int gameVer)
 
 		offsets.guildDataStart = 0x18B47E8;
 		
-		offsets.scriptCommandVFT = 0x013933D0;
+		offsets.scriptCommandVFT = 0x134E3A0;
 		
 		offsets.religionDatabase = 0x016A0B90;
 		offsets.perfectSpy = 0x016A7CC4;

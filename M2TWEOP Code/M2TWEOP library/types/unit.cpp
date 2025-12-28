@@ -333,7 +333,9 @@ namespace unitActions
     void attackUnit(unit* un, const unit* targetUnit, bool run)
     {
         if (un == nullptr)
-            return;
+        	return;
+    	if (targetUnit == nullptr)
+    		return;
         if (!battleHelpers::inBattle())
             return;
         un->aiActiveSet = 2;
