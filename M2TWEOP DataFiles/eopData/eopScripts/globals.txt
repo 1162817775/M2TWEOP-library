@@ -348,6 +348,7 @@
 "onNewGameStart",
 "onEduParsed",
 "onGameInit",
+"onExitToMenu",
 "onNewGameLoaded",
 "onUnloadCampaign",
 "onAiTurn",

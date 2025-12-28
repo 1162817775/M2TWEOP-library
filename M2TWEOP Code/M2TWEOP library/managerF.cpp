@@ -1330,6 +1330,18 @@ void managerF::execPatches()
 	toInitControllers->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onExitToMenu2 patch" << '\n';
+	onExitToMenu2* toExitToMenu2 = new onExitToMenu2(mem, (LPVOID)patchesForGame::onExitToMenu, globals::dataS.gameVersion);
+	//toExitToMenu2->SetNewCode();
+	//toExitToMenu2->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onExitToMenu patch" << '\n';
+	onExitToMenu* toExitToMenu = new onExitToMenu(mem, (LPVOID)patchesForGame::onExitToMenu, globals::dataS.gameVersion);
+	toExitToMenu->SetNewCode();
+	toExitToMenu->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying onCreateGeneralUnit patch" << '\n';
 	onCreateGeneralUnit* toCreateGeneralUnit = new onCreateGeneralUnit(mem, (LPVOID)patchesForGame::onCreateGeneralUnit, globals::dataS.gameVersion);
 	toCreateGeneralUnit->SetNewCode();

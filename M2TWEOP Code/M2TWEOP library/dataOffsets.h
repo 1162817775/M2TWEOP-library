@@ -14,6 +14,7 @@ public:
 
 		DWORD stratMapAllOffsetStart = NULL;
 		DWORD stringTable = NULL;
+		DWORD menuHandler = NULL;
 		DWORD stratCursorCoords = NULL;
 		DWORD battleCursorCoords = NULL;
 		DWORD groundMoveCosts = NULL;

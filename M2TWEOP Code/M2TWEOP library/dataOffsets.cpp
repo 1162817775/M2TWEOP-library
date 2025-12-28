@@ -20,6 +20,8 @@ void dataOffsets::initDataOffsets(int gameVer)
 
 		offsets.stringTable = 0x02CB97E8;
 		
+		offsets.menuHandler = 0x2C75034;
+		
 		offsets.globalSett = 0x016F10D0;
 
 		offsets.someStratMapPointer = 0x019b3134;
@@ -144,6 +146,8 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.stratMapAllOffsetStart = 0x02c2bf3c;
 
 		offsets.stringTable = 0x02C70760;
+		
+		offsets.menuHandler = 0x2C2BF7C;
 
 		offsets.someStratMapPointer = 0x0196a004;
 

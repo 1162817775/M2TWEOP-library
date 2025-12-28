@@ -230,6 +230,7 @@ namespace gameEvents
 	
 	void onReadGameDbsAtStart();
 	void onGameInit();
+	void onExitToMenu();
 	void onUnloadCampaign();
 	void onRemoveFromUnitQueue(const unitRQ* item);
 	void onNewGameLoaded();

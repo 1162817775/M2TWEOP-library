@@ -915,6 +915,17 @@ void patchesForGame::onInitControllers(aiPersonalityValues* personality)
 	personality->initControllers();
 }
 
+void patchesForGame::onExitToMenu()
+{
+	gameHelpers::logStringGame("GAME EXIT TO MENU - CLEAR DATA");
+	minorSettlementDb::clear();
+	eopSettlementDataDb::get()->clearData();
+	plugData::data.luaAll.hashLoaded = false;
+	gameHelpers::logStringGame("DATA CLEARED");
+	gameEvents::onExitToMenu();
+	gameHelpers::logStringGame("EXIT TO MENU EVENTS PROCESSED");
+}
+
 unit* patchesForGame::onCreateGeneralUnit(unitDb* edu, character* general, int exp, int wpnlvl, int armlvl,
                                           eduEntry* entry)
 {

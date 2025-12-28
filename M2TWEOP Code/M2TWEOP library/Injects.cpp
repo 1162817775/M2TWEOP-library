@@ -6222,6 +6222,59 @@ void onInitControllers::SetNewCode()
 	delete a;
 }
 
+onExitToMenu::onExitToMenu(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0xC3480B;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0xC3A43B;
+}
+
+void onExitToMenu::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->push(0x1F);
+	a->push(0);
+	a->push(ecx);
+	a->pushad();
+	a->pushf();
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->popf();
+	a->popad();
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+onExitToMenu2::onExitToMenu2(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0xC23259;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0xC28E99;
+}
+
+void onExitToMenu2::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->mov(eax, dataOffsets::offsets.menuHandler);
+	a->mov(eax, dword_ptr(eax));
+	a->pushad();
+	a->pushf();
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->popf();
+	a->popad();
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
 onSetBuildPolicies::onSetBuildPolicies(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {

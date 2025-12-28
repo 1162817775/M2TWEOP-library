@@ -2333,6 +2333,30 @@ private:
 	LPVOID funcAddress;
 };
 
+class onExitToMenu
+	:public AATemplate
+{
+public:
+	onExitToMenu(MemWork* mem, LPVOID addr, int ver);
+	~onExitToMenu() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onExitToMenu2
+	:public AATemplate
+{
+public:
+	onExitToMenu2(MemWork* mem, LPVOID addr, int ver);
+	~onExitToMenu2() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 class onSetBuildPolicies
 	:public AATemplate
 {
