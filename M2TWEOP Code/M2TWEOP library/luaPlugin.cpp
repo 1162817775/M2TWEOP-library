@@ -1268,6 +1268,16 @@ void luaPlugin::fillHashMaps()
 	gameHelpers::logStringGame("Hashmaps filled");
 }
 
+void luaPlugin::clearHashMapsCampaign()
+{
+	factions.clear();
+	regions.clear();
+	settlements.clear();
+	climateNames.clear();
+	climateIndex.clear();
+	hashLoaded = false;
+}
+
 void luaPlugin::fillHashMapsNonCampaign()
 {
 	for (int i = 0; i < gameHelpers::getReligionCount(); i++)

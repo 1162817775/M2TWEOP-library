@@ -920,7 +920,7 @@ void patchesForGame::onExitToMenu()
 	gameHelpers::logStringGame("GAME EXIT TO MENU - CLEAR DATA");
 	minorSettlementDb::clear();
 	eopSettlementDataDb::get()->clearData();
-	plugData::data.luaAll.hashLoaded = false;
+	plugData::data.luaAll.clearHashMapsCampaign();
 	gameHelpers::logStringGame("DATA CLEARED");
 	gameEvents::onExitToMenu();
 	gameHelpers::logStringGame("EXIT TO MENU EVENTS PROCESSED");

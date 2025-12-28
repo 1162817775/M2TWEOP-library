@@ -587,6 +587,7 @@ namespace campaignHelpers
 		@tfield bool marianReformsDisabled
 		@tfield factionStruct slaveFaction
 		@tfield int factionTurnID
+		@tfield int parsingType 1 = load, 2 = campaign, 3 = custom battle
 		@tfield int tickCount
 		@tfield int campaignWinnerID
 		@tfield int millisecondCount
@@ -616,6 +617,7 @@ namespace campaignHelpers
 		@tfield int fortsNum
 		@tfield bool speedUp
 		@tfield bool ignoreSpeedUp
+		@tfield bool isLoaded
 		@tfield bool isPaused
 		@tfield bool followMovement
 		@tfield int portsBuildingsNum
@@ -668,6 +670,8 @@ namespace campaignHelpers
 		typeAll.campaignTable.set("collegeOfCardinals", &campaign::collegeOfCardinals);
 		typeAll.campaignTable.set("currentFaction", &campaign::currentFactionTurn);
 		typeAll.campaignTable.set("windSpeed", &campaign::windSpeed);
+		typeAll.campaignTable.set("parsingType", &campaign::type);
+		typeAll.campaignTable.set("isLoaded", &campaign::isOpen);
 		typeAll.campaignTable.set("timeOfDay", &campaign::timeOfDay);
 		typeAll.campaignTable.set("weather", &campaign::weatherData);
 		typeAll.campaignTable.set("factionTurnID", &campaign::factionTurnID);

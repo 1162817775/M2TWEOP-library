@@ -83,6 +83,7 @@ public:
 	void fillHashMaps();
 	void fillHashMapsNonCampaign();
 	void fillHashMapsVnv();
+	void clearHashMapsCampaign();
 	
 	bool hashLoaded = false;
 	bool hashNonCampaignLoaded = false;
