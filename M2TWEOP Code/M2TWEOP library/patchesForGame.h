@@ -73,6 +73,7 @@ public:
 	static void __fastcall onSetSettlementModel(settlementStruct* settlement);
 	static int __fastcall onGeneralAssaultAction(generalAssault* assault);
 	static int __fastcall onCalcBgSize(character* general, eduEntry* entry);
+	static void __fastcall onInitControllers(aiPersonalityValues* personality);
 	static unit* __fastcall onCreateGeneralUnit(unitDb* edu, character* general, int exp, int wpnlvl, int armlvl, eduEntry* entry); 
 	static mountedEngine* __fastcall onGetMountedEngine(const stringWithHash* name);
 	static bool __fastcall onParseMountedEngines(mountedEngineDb* db, descrParser* parser);

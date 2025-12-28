@@ -2321,6 +2321,18 @@ private:
 	LPVOID funcAddress;
 };
 
+class onInitControllers
+	:public AATemplate
+{
+public:
+	onInitControllers(MemWork* mem, LPVOID addr, int ver);
+	~onInitControllers() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 class onSetBuildPolicies
 	:public AATemplate
 {

@@ -910,6 +910,11 @@ int patchesForGame::onCalcBgSize(character* general, eduEntry* entry)
 	return gameHelpers::calculateMaxBodyguardSize(general, entry);
 }
 
+void patchesForGame::onInitControllers(aiPersonalityValues* personality)
+{
+	personality->initControllers();
+}
+
 unit* patchesForGame::onCreateGeneralUnit(unitDb* edu, character* general, int exp, int wpnlvl, int armlvl,
                                           eduEntry* entry)
 {

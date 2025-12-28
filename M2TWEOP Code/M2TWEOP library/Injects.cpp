@@ -6193,6 +6193,35 @@ void onStartProductionTurn::SetNewCode()
 	delete a;
 }
 
+onInitControllers::onInitControllers(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x53201B;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x531A0B;
+}
+
+void onInitControllers::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	if (m_adress == 0x53201B)
+	{
+		a->mov(eax, 0x53228F);
+	}
+	else
+	{
+		a->mov(eax, 0x531C4A);
+	}
+	a->jmp(eax);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
 onSetBuildPolicies::onSetBuildPolicies(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {

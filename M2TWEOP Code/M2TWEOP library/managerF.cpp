@@ -1324,6 +1324,12 @@ void managerF::execPatches()
 	toGetBuildingPicConstructed->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onInitControllers patch" << '\n';
+	onInitControllers* toInitControllers = new onInitControllers(mem, (LPVOID)patchesForGame::onInitControllers, globals::dataS.gameVersion);
+	toInitControllers->SetNewCode();
+	toInitControllers->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying onCreateGeneralUnit patch" << '\n';
 	onCreateGeneralUnit* toCreateGeneralUnit = new onCreateGeneralUnit(mem, (LPVOID)patchesForGame::onCreateGeneralUnit, globals::dataS.gameVersion);
 	toCreateGeneralUnit->SetNewCode();

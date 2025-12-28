@@ -271,8 +271,8 @@ eduEntry* eopDu::findGeneralUnit(const int factionId)
 	const auto eduNum = eopDuHelpers::getEduEntryNum();
 	for (int unitIdx = 0; unitIdx < eduNum; unitIdx++)
 	{
-		const auto entry = unitHelpers::getEDUEntryById(unitIdx);
-		if (entry->hasOwnership(factionId) && entry->generalUnit)
+		if (const auto entry = unitHelpers::getEDUEntryById(unitIdx);
+			entry->hasOwnership(factionId) && entry->generalUnit)
 		{
 			return entry;
 		}
@@ -292,8 +292,8 @@ eduEntry* eopDu::findGeneralUpgradeUnit(const int factionId)
 	const auto eduNum = eopDuHelpers::getEduEntryNum();
 	for (int unitIdx = 0; unitIdx < eduNum; unitIdx++)
 	{
-		const auto entry = unitHelpers::getEDUEntryById(unitIdx);
-		if (entry->hasOwnership(factionId) && entry->generalUnitUpgrade)
+		if (const auto entry = unitHelpers::getEDUEntryById(unitIdx);
+			entry->hasOwnership(factionId) && entry->generalUnitUpgrade)
 		{
 			return entry;
 		}
