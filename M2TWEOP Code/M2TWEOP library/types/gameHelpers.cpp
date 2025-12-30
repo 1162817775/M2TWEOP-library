@@ -35,6 +35,122 @@ scriptCommand::scriptCommand(const char* name) : className(name)
 }
 
 eopLogging* eopLogging::m_Instance = new eopLogging();
+std::unique_ptr<gameStringDataDb> gameStringDataDb::m_Instance = std::make_unique<gameStringDataDb>();
+
+void gameStringDataDb::onGameLoad(const std::vector<std::string>& filePaths)
+{
+	for (auto& path : filePaths)
+	{
+		if (path.find("gameStringData.json") == string::npos)
+			continue;
+		jsn::json json;
+		try
+		{
+			std::ifstream file(path);
+			file >> json;
+			file.close();
+		}
+		catch (jsn::json::parse_error& e)
+		{
+			MessageBoxA(nullptr, e.what(), "Warning!", MB_APPLMODAL | MB_SETFOREGROUND);
+		}
+		try
+		{
+			deserialize(json);
+			onGameLoaded();
+		}
+		catch (jsn::json::exception& e)
+		{
+			MessageBoxA(nullptr, e.what(), "Warning!", MB_APPLMODAL | MB_SETFOREGROUND);
+		}
+		return;
+	}
+}
+
+void gameStringDataDb::onGameLoaded()
+{
+	m_Restoring = true;
+	for (const auto& [key, value] : m_ChangedExpandedStrings)
+	{
+		gameHelpers::logStringGame("Restoring expanded string: " + value.key + " to value: " + value.newValue);
+		gameHelpers::setExpandedString(value.key, value.newValue);
+	}
+	for (const auto&  [key, value] : m_ChangedStratStrings)
+	{
+		gameHelpers::logStringGame("Restoring strat string: " + value.key + " to value: " + value.newValue);
+		gameHelpers::setStratString(value.key, value.newValue);
+	}
+	m_Restoring = false;
+}
+
+void gameStringDataDb::addStratEntry(const std::string& key, const std::string& newValue)
+{
+	if (m_Restoring)
+		return;
+	if (m_ChangedStratStrings.find(key) == m_ChangedStratStrings.end())
+	{
+		gameStringData data{};
+		data.key = key;
+		data.original = gameHelpers::getStratString(key);
+		data.newValue = newValue;
+		m_ChangedStratStrings.insert_or_assign(key, data);
+	}
+	else
+	{
+		auto& data = m_ChangedStratStrings.at(key);
+		data.newValue = newValue;
+	}
+}
+
+void gameStringDataDb::addExpandedEntry(const std::string& key, const std::string& newValue)
+{
+	if (m_Restoring)
+		return;
+	if (m_ChangedExpandedStrings.find(key) == m_ChangedExpandedStrings.end())
+	{
+		gameStringData data{};
+		data.key = key;
+		data.original = gameHelpers::getExpandedString(key);
+		data.newValue = newValue;
+		m_ChangedExpandedStrings.insert_or_assign(key, data);
+	}
+	else
+	{
+		auto& data = m_ChangedExpandedStrings.at(key);
+		data.newValue = newValue;
+	}
+}
+
+void gameStringDataDb::restoreOriginal()
+{
+	m_Restoring = true;
+	for (const auto& [key, value] : m_ChangedExpandedStrings)
+	{
+		gameHelpers::logStringGame("Restoring expanded string: " + value.key + " to original value: " + value.original);
+		gameHelpers::setExpandedString(value.key, value.original);
+	}
+	m_ChangedExpandedStrings.clear();
+	for (const auto&  [key, value] : m_ChangedStratStrings)
+	{
+		gameHelpers::logStringGame("Restoring strat string: " + value.key + " to original value: " + value.original);
+		gameHelpers::setStratString(value.key, value.original);
+	}
+	m_ChangedStratStrings.clear();
+	m_Restoring = false;
+}
+
+std::string gameStringDataDb::onGameSave()
+{
+	std::string fPath = gameHelpers::getModPath();
+	fPath += "\\eopData\\TempSaveData";
+	std::string outFile = fPath;
+	outFile += "\\gameStringData.json";
+	ofstream f1(outFile);
+	jsn::json json = serialize();
+	f1 << setw(4) << json;
+	f1.close();
+	return outFile;
+}
 
 char* descrParser::getFileName()
 {
@@ -642,6 +758,7 @@ namespace gameHelpers
 			logStringGame("setExpandedString: Could not find key " + key);
 			return;
 		}
+		gameStringDataDb::getInstance()->addExpandedEntry(key, value);
 		gameStringHelpers::createUniString(*uniString, value.c_str());
 	}
 
@@ -3295,6 +3412,7 @@ namespace gameHelpers
 			logStringGame("setStratString: Could not get string for key " + key);
 			return;
 		}
+		gameStringDataDb::getInstance()->addStratEntry(key, value);
 		gameStringHelpers::createUniString(*uniString, value.c_str());
 	}
 

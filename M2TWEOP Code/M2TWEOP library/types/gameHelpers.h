@@ -343,6 +343,76 @@ struct countersObjectS
 	void* testCounterSValue;
 };
 
+class gameStringData
+{
+public:
+	gameStringData() = default;
+	std::string key{};
+	std::string original{};
+	std::string newValue{};
+	nlohmann::json serialize() const
+	{
+		nlohmann::json json;
+		json["key"] = key;
+		json["original"] = original;
+		json["newValue"] = newValue;
+		return json;
+	}
+	void deserialize(const nlohmann::json& json)
+	{
+		key = json.value("key", "");
+		original = json.value("original", "");
+		newValue = json.value("newValue", "");
+	}
+};
+
+class gameStringDataDb
+{
+public:
+	void addStratEntry(const std::string& key, const std::string& newValue);
+	void addExpandedEntry(const std::string& key, const std::string& newValue);
+	void restoreOriginal();
+	static gameStringDataDb* getInstance() {return m_Instance.get();}
+	nlohmann::json serialize()
+	{
+		nlohmann::json json;
+		for (const auto& [key, value] : m_ChangedExpandedStrings)
+		{
+			json["expandedStrings"].push_back(value.serialize());
+		}
+		for (const auto& [key, value] : m_ChangedStratStrings)
+		{
+			json["stratStrings"].push_back(value.serialize());
+		}
+		return json;
+	}
+	void deserialize(const nlohmann::json& json)
+	{
+		m_ChangedExpandedStrings.clear();
+		m_ChangedStratStrings.clear();
+		for (const auto& item : json["expandedStrings"])
+		{
+			auto data = gameStringData();
+			data.deserialize(item);
+			m_ChangedExpandedStrings.insert_or_assign(data.key, data);
+		}
+		for (const auto& item : json["stratStrings"])
+		{
+			auto data = gameStringData();
+			data.deserialize(item);
+			m_ChangedStratStrings.insert_or_assign(data.key, data);
+		}
+	}
+	void onGameLoad(const std::vector<std::string>& filePaths);
+	void onGameLoaded();
+	std::string onGameSave();
+private:
+	static std::unique_ptr<gameStringDataDb> m_Instance;
+	std::unordered_map<std::string, gameStringData> m_ChangedExpandedStrings;
+	std::unordered_map<std::string, gameStringData> m_ChangedStratStrings;
+	bool m_Restoring = false;
+};
+
 class m2tweopOptions
 {
 public:

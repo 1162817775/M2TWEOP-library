@@ -1886,6 +1886,7 @@ void __stdcall patchesForGame::onNewGameStart()
 {
 	minorSettlementDb::clear();
 	eopSettlementDataDb::get()->clearData();
+	gameStringDataDb::getInstance()->restoreOriginal();
 	gameEvents::onNewGameStart();
 	plannedRetreatRoute::onNewGameStart();
 }
@@ -2307,6 +2308,7 @@ void __fastcall patchesForGame::onLoadSaveFile(UNICODE_STRING**& savePath)
 	eopFortDataDb::get()->onGameLoad(files);
 	eopCharacterDataDb::get()->onGameLoad(files);
 	eopFactionDataDb::get()->onGameLoad(files);
+	gameStringDataDb::getInstance()->onGameLoad(files);
 	gameEvents::onLoadGamePl(&files);
 	plannedRetreatRoute::onGameLoad(files);
 	techFuncs::deleteFiles(files);
@@ -2342,6 +2344,8 @@ void __fastcall patchesForGame::onSaveGame(UNICODE_STRING**& savePath)
 		files.push_back(characterData);
 	if (const std::string factionData = eopFactionDataDb::get()->onGameSave(); !factionData.empty())
 		files.push_back(factionData);
+	if (const std::string gameStringData = gameStringDataDb::getInstance()->onGameSave(); !gameStringData.empty())
+		files.push_back(gameStringData);
 	techFuncs::saveGameMakeArchive(savePath, files);
 	techFuncs::deleteFiles(files);
 }
