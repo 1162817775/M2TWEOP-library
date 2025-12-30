@@ -926,6 +926,12 @@ void patchesForGame::onExitToMenu()
 	gameHelpers::logStringGame("EXIT TO MENU EVENTS PROCESSED");
 }
 
+void patchesForGame::onSpawnArmy(factionStruct* faction, coordPair* coords, armyStruct* army)
+{
+	GAME_FUNC(void (__thiscall*)(factionStruct*, coordPair*), factionResurrectStuffFunc)(faction, coords);
+	gameEvents::onSpawnArmy(army);
+}
+
 unit* patchesForGame::onCreateGeneralUnit(unitDb* edu, character* general, int exp, int wpnlvl, int armlvl,
                                           eduEntry* entry)
 {
@@ -2100,6 +2106,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 	const DWORD characterTurnStart = gameVersion == 1 ? 0x0136BFE4 : 0x01326FBC;
 	const DWORD postBattle = gameVersion == 1 ? 0x01367ADC : 0x01322AB4; 
 	const DWORD preBattleWithdrawal = gameVersion == 1 ? 0x01366D54 : 0x01321D2C; 
+	const DWORD generalAssaultsResidence = gameVersion == 1 ? 0x0136A3E4 : 0x013253BC; 
 	if (eventCode == scrollOpenedCode)
 	{
 		char* str = reinterpret_cast<char*>(vTab[1]);
@@ -2257,7 +2264,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 			sett->aiProductionController->isAutoManagedTaxes = false;
 		}
 	}
-	else if (eventCode == postBattle || eventCode == preBattleWithdrawal)
+	else if (eventCode == postBattle || eventCode == preBattleWithdrawal || eventCode == generalAssaultsResidence)
 	{
 		campaignHelpers::getCampaignData()->ignoreSpeedUp = false;
 	}

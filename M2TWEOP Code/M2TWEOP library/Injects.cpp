@@ -6275,6 +6275,31 @@ void onExitToMenu2::SetNewCode()
 	delete a;
 }
 
+onSpawnArmy::onSpawnArmy(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x00A8D696;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x00A8C636;
+}
+
+void onSpawnArmy::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->pushad();
+	a->pushf();
+	a->push(ebp);
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->popf();
+	a->popad();
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
 onSetBuildPolicies::onSetBuildPolicies(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {

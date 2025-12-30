@@ -848,6 +848,14 @@ void onSetProductionControllers(aiPersonalityValues* personality)
 	}
 }
 
+void onSpawnArmy(armyStruct* army)
+{
+	if (plugData::data.luaAll.onSpawnArmy != nullptr)
+	{
+		tryLua((*plugData::data.luaAll.onSpawnArmy)(army))
+	}
+}
+
 std::string* onSelectWorldpkgdesc(const char* selectedRec, const char* selectedGroup)
 {
 	std::string tmpS;
@@ -1402,6 +1410,7 @@ void luaPlugin::onPluginLoadF()
 	@tfield onAiTurn onAiTurn
 	@tfield onCalculateLTGD onCalculateLTGD
 	@tfield onSetProductionControllers onSetProductionControllers
+	@tfield onSpawnArmy onSpawnArmy
 	@tfield onClickAtTile onClickAtTile
 	@tfield onCharacterClicked onCharacterClicked
 	@tfield onCampaignTick onCampaignTick
@@ -4277,6 +4286,21 @@ void luaPlugin::onPluginLoadF()
 
 	onSetProductionControllers = new sol::function(luaState["onSetProductionControllers"]);
 	checkLuaFunc(&onSetProductionControllers);
+
+	/***
+	Called when an army has been spawned via campaign_script or lua spawnArmy
+
+	@function onSpawnArmy
+	@tparam armyStruct army
+
+	@usage
+	function onSpawnArmy(army)
+	--something here
+	end
+	*/
+
+	onSpawnArmy = new sol::function(luaState["onSpawnArmy"]);
+	checkLuaFunc(&onSpawnArmy);
 
 	/***
 	Called on clicking the stratmap.

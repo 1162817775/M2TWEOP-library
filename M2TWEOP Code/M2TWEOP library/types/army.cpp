@@ -10,6 +10,7 @@
 #include "cultures.h"
 #include "dataOffsets.h"
 #include "eopdu.h"
+#include "events.h"
 #include "faction.h"
 #include "fort.h"
 #include "gameHelpers.h"
@@ -837,7 +838,7 @@ namespace armyHelpers
 		GAME_FUNC(void(__thiscall*)(factionStruct*, coordPair*), factionResurrectStuffFunc)(faction, &spawnCoords);
 		if (army && label && strcmp(label, "") != 0)
 			gameStringHelpers::setHashedString(&gen->characterRecord->label, label);
-    	
+    	gameEvents::onSpawnArmy(army);
 		return army;
 	}
     

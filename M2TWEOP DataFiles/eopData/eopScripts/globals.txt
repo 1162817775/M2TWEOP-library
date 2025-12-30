@@ -354,6 +354,7 @@
 "onAiTurn",
 "onCalculateLTGD",
 "onSetProductionControllers",
+"onSpawnArmy",
 "onClickAtTile",
 "onCharacterClicked",
 "onCampaignTick",

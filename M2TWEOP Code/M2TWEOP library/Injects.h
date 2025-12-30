@@ -2345,6 +2345,18 @@ private:
 	LPVOID funcAddress;
 };
 
+class onSpawnArmy
+	:public AATemplate
+{
+public:
+	onSpawnArmy(MemWork* mem, LPVOID addr, int ver);
+	~onSpawnArmy() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 class onExitToMenu2
 	:public AATemplate
 {

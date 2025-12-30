@@ -1336,6 +1336,12 @@ void managerF::execPatches()
 	toExitToMenu2->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onSpawnArmy patch" << '\n';
+	onSpawnArmy* toSpawnArmy = new onSpawnArmy(mem, (LPVOID)patchesForGame::onSpawnArmy, globals::dataS.gameVersion);
+	toSpawnArmy->SetNewCode();
+	toSpawnArmy->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying onExitToMenu patch" << '\n';
 	onExitToMenu* toExitToMenu = new onExitToMenu(mem, (LPVOID)patchesForGame::onExitToMenu, globals::dataS.gameVersion);
 	toExitToMenu->SetNewCode();
