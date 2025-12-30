@@ -2357,6 +2357,18 @@ private:
 	LPVOID funcAddress;
 };
 
+class onUiBitmapTexture
+	:public AATemplate
+{
+public:
+	onUiBitmapTexture(MemWork* mem, LPVOID addr, int ver);
+	~onUiBitmapTexture() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 class onExitToMenu2
 	:public AATemplate
 {

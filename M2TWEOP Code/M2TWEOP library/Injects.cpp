@@ -5624,6 +5624,34 @@ void onCalcBgSize::SetNewCode()
 	delete a;
 }
 
+onUiBitmapTexture::onUiBitmapTexture(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0xC98AD5;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0xC9E695;
+}
+
+void onUiBitmapTexture::SetNewCode()
+{
+	const auto a = new Assembler();
+	auto label = a->newLabel();
+	// if ebx > 400, make it 0
+	a->cmp(ebx, 0x18F);
+	a->jle(label);
+	a->mov(ebx, 0);
+	a->bind(label);
+	a->mov(eax, ebx);
+	a->imul(eax, 0x4);
+	a->lea(eax, dword_ptr(ebx, eax));
+	a->shl(eax, 4);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
 onAddBuildingCapsAfterConstruction::onAddBuildingCapsAfterConstruction(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {

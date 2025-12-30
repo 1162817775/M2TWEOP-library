@@ -1342,6 +1342,12 @@ void managerF::execPatches()
 	toSpawnArmy->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onUiBitmapTexture patch" << '\n';
+	onUiBitmapTexture* toUiBitmapTexture = new onUiBitmapTexture(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
+	toUiBitmapTexture->SetNewCode();
+	toUiBitmapTexture->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying onExitToMenu patch" << '\n';
 	onExitToMenu* toExitToMenu = new onExitToMenu(mem, (LPVOID)patchesForGame::onExitToMenu, globals::dataS.gameVersion);
 	toExitToMenu->SetNewCode();
