@@ -2369,6 +2369,18 @@ private:
 	LPVOID funcAddress;
 };
 
+class onCheckOwnership
+	:public AATemplate
+{
+public:
+	onCheckOwnership(MemWork* mem, LPVOID addr, int ver);
+	~onCheckOwnership() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 class onExitToMenu2
 	:public AATemplate
 {

@@ -288,6 +288,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield setWatchTowerRange setWatchTowerRange
 	@tfield enableFamilyEventsWithoutTree enableFamilyEventsWithoutTree
 	@tfield useEopFrontiers useEopFrontiers
+	@tfield ignoreOwnershipRecruitment ignoreOwnershipRecruitment
 	@tfield setKhakiTextColor setKhakiTextColor
 	@tfield getMinorSettlementBalance getMinorSettlementBalance
 	@tfield generateSprite generateSprite
@@ -1059,6 +1060,15 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 		M2TWEOP.useEopFrontiers(true)
 	*/
 	tables.M2TWEOP.set_function("useEopFrontiers", &m2tweopOptions::setUseEopFrontiers);
+	
+	/***
+	Don't require edu ownership for recruitment. Disabled by default.
+	@function M2TWEOP.ignoreOwnershipRecruitment
+	@tparam bool set
+	@usage
+		M2TWEOP.ignoreOwnershipRecruitment(true)
+	*/
+	tables.M2TWEOP.set_function("ignoreOwnershipRecruitment", &m2tweopOptions::setIgnoreOwnershipRecruitment);
 	
 	/***
 	Faction specific unit cards are always chosen if found. Enabled by default.

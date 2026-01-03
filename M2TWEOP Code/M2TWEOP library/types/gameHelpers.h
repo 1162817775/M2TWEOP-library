@@ -435,23 +435,26 @@ public:
 	static void setExtraHeirSoldiers(const int value) { extraHeirSoldiers = value; }
 	static void setMaxBodyguardSize(const int value) { maxBodyguardSize = value; }
 	static void setMinBodyguardSize(const int value) { minBodyguardSize = value; }
+	static void setIgnoreOwnershipRecruitment(const bool value) { ignoreOwnershipRecruitment = value; }
+	static bool getIgnoreOwnershipRecruitment() { return ignoreOwnershipRecruitment; }
 	static void setWeaponBonusModifier(const int value) { weaponBonusModifier = value & 0xFF; }
 	static DWORD getColor() { return (static_cast<uint32_t>(0xFF) << 24) | (khakiTextRed << 16) | (khakiTextGreen << 8) | khakiTextBlue; }
 	static void setKhakiTextColor(const uint8_t red, const uint8_t green, const uint8_t blue) { khakiTextRed = red; khakiTextGreen = green; khakiTextBlue = blue; }
-	static bool hideUnknownUnitTooltips;
-	static bool eopHandleUnitCards;
-	static bool enableFamilyEventsForTeutonic;
-	static bool useEopFrontiers;
-	static bool fixHeroAbilityKillChance;
-	static uint8_t khakiTextRed;
-	static uint8_t khakiTextGreen;
-	static uint8_t khakiTextBlue;
 	static int watchTowerRange;
 	static int weaponBonusModifier;
 	static int maxBodyguardSize;
 	static int minBodyguardSize;
 	static int extraLeaderSoldiers;
 	static int extraHeirSoldiers;
+	static bool hideUnknownUnitTooltips;
+	static bool eopHandleUnitCards;
+	static bool enableFamilyEventsForTeutonic;
+	static bool useEopFrontiers;
+	static bool fixHeroAbilityKillChance;
+	static bool ignoreOwnershipRecruitment;
+	static uint8_t khakiTextRed;
+	static uint8_t khakiTextGreen;
+	static uint8_t khakiTextBlue;
 };
 
 struct boostLightMutex

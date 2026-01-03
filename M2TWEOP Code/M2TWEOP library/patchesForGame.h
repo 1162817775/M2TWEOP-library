@@ -76,6 +76,7 @@ public:
 	static int __fastcall onCalcBgSize(character* general, eduEntry* entry);
 	static void __fastcall onInitControllers(aiPersonalityValues* personality);
 	static void __fastcall onExitToMenu();
+	static int __fastcall onCheckOwnership(uint32_t facShifted, const eduEntry* entry);
 	static void __fastcall onSpawnArmy(factionStruct* faction, coordPair* coords, armyStruct* army);
 	static unit* __fastcall onCreateGeneralUnit(unitDb* edu, character* general, int exp, int wpnlvl, int armlvl, eduEntry* entry); 
 	static mountedEngine* __fastcall onGetMountedEngine(const stringWithHash* name);

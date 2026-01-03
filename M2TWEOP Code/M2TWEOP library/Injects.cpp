@@ -5652,6 +5652,39 @@ void onUiBitmapTexture::SetNewCode()
 	delete a;
 }
 
+onCheckOwnership::onCheckOwnership(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x5E6259;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x5E5DF9;
+}
+
+void onCheckOwnership::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->push(esi);
+	a->push(edi);
+	a->push(ecx);
+	a->push(eax);
+	a->shl(edx, cl);
+	a->mov(ecx, edx);
+	a->mov(edx, esi);
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->mov(edx, eax);
+	a->pop(eax);
+	a->pop(ecx);
+	a->pop(edi);
+	a->pop(esi);
+	a->test(edx, edx);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
 onAddBuildingCapsAfterConstruction::onAddBuildingCapsAfterConstruction(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {

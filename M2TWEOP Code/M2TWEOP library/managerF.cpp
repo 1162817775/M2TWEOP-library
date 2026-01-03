@@ -1348,6 +1348,12 @@ void managerF::execPatches()
 	toUiBitmapTexture->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onCheckOwnership patch" << '\n';
+	onCheckOwnership* toCheckOwnership = new onCheckOwnership(mem, (LPVOID)patchesForGame::onCheckOwnership, globals::dataS.gameVersion);
+	toCheckOwnership->SetNewCode();
+	toCheckOwnership->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying onExitToMenu patch" << '\n';
 	onExitToMenu* toExitToMenu = new onExitToMenu(mem, (LPVOID)patchesForGame::onExitToMenu, globals::dataS.gameVersion);
 	toExitToMenu->SetNewCode();

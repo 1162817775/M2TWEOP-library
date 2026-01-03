@@ -28,6 +28,7 @@ int m2tweopOptions::maxBodyguardSize = 31;
 int m2tweopOptions::minBodyguardSize = 4;
 int m2tweopOptions::extraLeaderSoldiers = 6;
 int m2tweopOptions::extraHeirSoldiers = 4;
+bool m2tweopOptions::ignoreOwnershipRecruitment = false;
 
 scriptCommand::scriptCommand(const char* name) : className(name)
 {

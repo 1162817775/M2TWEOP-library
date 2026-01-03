@@ -926,6 +926,13 @@ void patchesForGame::onExitToMenu()
 	gameHelpers::logStringGame("EXIT TO MENU EVENTS PROCESSED");
 }
 
+int patchesForGame::onCheckOwnership(const uint32_t facShifted, const eduEntry* entry)
+{
+	if (m2tweopOptions::getIgnoreOwnershipRecruitment())
+		return 1;
+	return entry->ownership & facShifted;
+}
+
 void patchesForGame::onSpawnArmy(factionStruct* faction, coordPair* coords, armyStruct* army)
 {
 	GAME_FUNC(void (__thiscall*)(factionStruct*, coordPair*), factionResurrectStuffFunc)(faction, coords);
