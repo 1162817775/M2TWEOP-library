@@ -440,6 +440,8 @@ namespace eopDuHelpers
 		@tfield getEduIndexByType getEduIndexByType
 		@tfield getEduEntryNum getEduEntryNum
 		@tfield getEopEntryNum getEopEntryNum
+		@tfield findGeneralUnit findGeneralUnit
+		@tfield findGeneralUpgradeUnit findGeneralUpgradeUnit
 		@table M2TWEOPDU
 		*/
 			
@@ -540,5 +542,23 @@ namespace eopDuHelpers
 		M2TWEOPDU.setEntrySoldierModel(1000,"Sword_and_Buckler_Men");
 		*/
 		tables.M2TWEOPEDUTable.set_function("setEntrySoldierModel", &eopDu::setEntrySoldierModelLua);
+		/***
+		Get the faction's standard bodyguard unit.
+		@function M2TWEOPDU.findGeneralUnit
+		@tparam int factionID
+		@treturn eduEntry retEntry
+		@usage
+		local bgEntry = M2TWEOPDU.findGeneralUnit(5);
+		*/
+		tables.M2TWEOPEDUTable.set_function("findGeneralUnit", &eopDu::findGeneralUnit);
+		/***
+		Get the faction's standard bodyguard upgrade unit.
+		@function M2TWEOPDU.findGeneralUpgradeUnit
+		@tparam int factionID
+		@treturn eduEntry retEntry
+		@usage
+		local bgEntry = M2TWEOPDU.findGeneralUpgradeUnit(5);
+		*/
+		tables.M2TWEOPEDUTable.set_function("findGeneralUpgradeUnit", &eopDu::findGeneralUpgradeUnit);
 	}
 }

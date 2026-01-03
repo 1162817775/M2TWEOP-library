@@ -1581,6 +1581,8 @@ bool characterRecord::hasAncType(const std::string& ancType)
 
 std::string characterRecord::getEopSetModel()
 {
+	if (!label)
+		return "";
 	if (const auto data = eopCharacterDataDb::get()->getCharacterData(label);
 		data && !data->model.empty())
 		return data->model;

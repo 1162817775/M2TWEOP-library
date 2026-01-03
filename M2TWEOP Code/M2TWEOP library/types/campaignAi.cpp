@@ -113,7 +113,7 @@ namespace campaignAi
 					enemyStr += army->settlement ? army->totalStrength / 8 : army->totalStrength / 4;
 			}
 		}
-		int balance = static_cast<int>(enemyStr - ownStr * strModifier);
+		int balance = static_cast<int>(enemyStr * 1.5 - ownStr * strModifier);
 		if (const int po = settlement->stats.settlementStats.PublicOrder; po < 80)
 			balance += 1000 - po * 10;
 		if (balance < -100)
@@ -122,9 +122,9 @@ namespace campaignAi
 				return 10000;
 			return 0;
 		}
-		balance += clamp(settlement->stats.settlementStats.TotalIncomeWithoutAdmin / 10, 0, 5000);
-		balance += clamp(gsdData->regionValue / 5, 0, 5000);
-		return clamp(balance, 0, 50000);
+		balance += clamp(settlement->stats.settlementStats.TotalIncomeWithoutAdmin / 10, 0, 10000);
+		balance += clamp(gsdData->regionValue / 5, 0, 10000);
+		return clamp(balance, 0, 100000);
 	}
 	
 
