@@ -6275,7 +6275,7 @@ void onInitControllers::SetNewCode()
 	}
 	else
 	{
-		a->mov(eax, 0x531C4A);
+		a->mov(eax, 0x531C7F);
 	}
 	a->jmp(eax);
 	a->ret();
