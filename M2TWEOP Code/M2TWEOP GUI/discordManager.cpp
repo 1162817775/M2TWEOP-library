@@ -96,7 +96,7 @@ namespace discordManager
         // EUR
         else if ( findString(dataG::data.gameData.modTitle, "Divide and Conquer EUR")  || findString(currentPath, "Divide_and_Conquer_EUR") == true)
         {
-            discordData.activity.GetAssets().SetLargeText("Third Age: Total War Extended (4.0)");
+            discordData.activity.GetAssets().SetLargeText("Epic Unity Rework");
             return 1123942808609374270;
         }
         // Third Age: Total War (Vanilla)
