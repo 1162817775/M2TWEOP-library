@@ -46,7 +46,7 @@ namespace discordManager
 			jsonManager::setJsonInFile(
 				R"(\eopData\config\discordRichPresenceCfg.json)",
 				"factionName",
-				"");
+				"Choosing a faction");
 			
 			jsonManager::setJsonInFile(
 				R"(\eopData\config\discordRichPresenceCfg.json)",
@@ -69,7 +69,20 @@ namespace discordManager
 					R"(\eopData\config\discordRichPresenceCfg.json)",
 					"turnNum",
 					std::to_string(campaignData->turnNumber + 1));
+
+				const auto fac = campaignHelpers::getCampaignData()->getFactionById(campaignHelpers::getLocalFactionID());
+				if (fac == nullptr)
+					return;
+				const auto name = factionHelpers::getLocalizedFactionName(fac);
+				if (name == "")
+					return;
+				jsonManager::setJsonInFile(
+				R"(\eopData\config\discordRichPresenceCfg.json)",
+					"factionName",
+					name);
 			}
+			
+		
 		}
 	}
 

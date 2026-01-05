@@ -1877,7 +1877,6 @@ bool NEED_BUILD_FRONTIERS = true;
 
 void __stdcall patchesForGame::afterCampaignMapLoaded()
 {
-	discordManager::onCampaignMapLoaded();
 	globals::dataS.Modules.tacticalMapViewer.unView();
 	plugData::data.luaAll.fillHashMaps();
 	gameEvents::onCampaignMapLoaded();
@@ -1887,6 +1886,7 @@ void __stdcall patchesForGame::afterCampaignMapLoaded()
 		stratMapHelpers::rebuildFrontiers();
 		NEED_BUILD_FRONTIERS = false;
 	}
+	discordManager::onCampaignMapLoaded();
 }
 
 void __stdcall patchesForGame::onNewGameStart()
