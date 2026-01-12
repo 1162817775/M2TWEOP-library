@@ -13,7 +13,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # 拉取所有历史记录
-          persist-credentials: true  # 保留凭证用于推送
+          # 确保能推送到仓库（需要写入权限）
+          persist-credentials: true
 
       - name: Set up Git
         run: |
@@ -22,46 +23,48 @@ jobs:
 
       - name: Add upstream repository
         run: |
+          # 先检查upstream是否已存在，避免重复添加报错
           if ! git remote | grep -q upstream; then
             git remote add upstream https://github.com/EOP-Labs/M2TWEOP-library.git
           fi
+          # 打印远程仓库信息，便于调试
           git remote -v
 
       - name: Fetch upstream changes
         run: |
           git fetch upstream
+          # 打印分支信息，确认上游分支存在
           git branch -r
 
-      - name: Merge upstream changes (handle modify/delete conflict)
+      - name: Merge upstream changes (with conflict handling)
         run: |
-          # 切换到master并拉取最新本地代码
+          # 切换到master分支并确保是最新的
           git checkout master
           git pull origin master
 
           # 尝试合并上游分支
           if git merge upstream/master --no-edit; then
+            # 合并成功，推送到远程
             echo "Merge successful, pushing to origin..."
             git push origin master
           else
-            echo "Merge conflict detected! Handling conflicts..."
+            # 合并失败（冲突），打印冲突信息并尝试自动解决（可选）
+            echo "Merge conflict detected! Showing conflict details:"
             git status
+            git diff
 
-            # 处理globals.txt的modify/delete冲突：恢复上游版本（保留文件）
-            # 如果你想保留删除（不恢复文件），将 --theirs 改为 --ours
-            if git ls-files --unmerged | grep -q "globals.txt"; then
-              echo "Resolving globals.txt modify/delete conflict (restore upstream version)..."
-              git checkout --theirs "M2TWEOP DataFiles/eopData/eopScripts/globals.txt"
-              git add "M2TWEOP DataFiles/eopData/eopScripts/globals.txt"
-            fi
+            # 方案1：放弃合并（默认）- 保留工作流不崩溃，仅输出冲突信息
+            echo "Aborting merge due to conflicts. Please resolve manually."
+            git merge --abort
 
-            # 检查是否还有其他未解决的冲突
-            if git ls-files --unmerged | grep -q .; then
-              echo "Other conflicts found, aborting merge (please resolve manually)..."
-              git merge --abort
-              exit 1
-            else
-              echo "All conflicts resolved, committing and pushing..."
-              git commit -m "Resolve merge conflict: restore globals.txt from upstream"
-              git push origin master
-            fi
+            # 方案2：自动使用上游版本覆盖冲突（谨慎启用！）
+            # 取消下面注释则会用上游文件覆盖本地冲突文件
+            # echo "Resolving conflicts by using upstream versions..."
+            # git checkout --theirs .  # 用上游版本覆盖所有冲突文件
+            # git add .
+            # git commit -m "Resolve merge conflicts by using upstream versions"
+            # git push origin master
+
+            # 抛出错误，让工作流标记为失败（提醒你手动处理）
+            exit 1
           fi
