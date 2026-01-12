@@ -13,6 +13,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # 拉取所有历史记录
+          # 确保能推送到仓库（需要写入权限）
+          persist-credentials: true
 
       - name: Set up Git
         run: |
@@ -20,13 +22,49 @@ jobs:
           git config --global user.email "1162817775@qq.com"
 
       - name: Add upstream repository
-        run: git remote add upstream https://github.com/EOP-Labs/M2TWEOP-library.git  # 替换为上游仓库地址
+        run: |
+          # 先检查upstream是否已存在，避免重复添加报错
+          if ! git remote | grep -q upstream; then
+            git remote add upstream https://github.com/EOP-Labs/M2TWEOP-library.git
+          fi
+          # 打印远程仓库信息，便于调试
+          git remote -v
 
       - name: Fetch upstream changes
-        run: git fetch upstream
-
-      - name: Merge upstream changes
         run: |
-          git checkout master  # 切换到你要同步的分支（通常是main或master）
-          git merge upstream/master  # 合并上游仓库的main分支（与上面保持一致）
-          git push origin master  # 推送到你的fork仓库
+          git fetch upstream
+          # 打印分支信息，确认上游分支存在
+          git branch -r
+
+      - name: Merge upstream changes (with conflict handling)
+        run: |
+          # 切换到master分支并确保是最新的
+          git checkout master
+          git pull origin master
+
+          # 尝试合并上游分支
+          if git merge upstream/master --no-edit; then
+            # 合并成功，推送到远程
+            echo "Merge successful, pushing to origin..."
+            git push origin master
+          else
+            # 合并失败（冲突），打印冲突信息并尝试自动解决（可选）
+            echo "Merge conflict detected! Showing conflict details:"
+            git status
+            git diff
+
+            # 方案1：放弃合并（默认）- 保留工作流不崩溃，仅输出冲突信息
+            echo "Aborting merge due to conflicts. Please resolve manually."
+            git merge --abort
+
+            # 方案2：自动使用上游版本覆盖冲突（谨慎启用！）
+            # 取消下面注释则会用上游文件覆盖本地冲突文件
+            # echo "Resolving conflicts by using upstream versions..."
+            # git checkout --theirs .  # 用上游版本覆盖所有冲突文件
+            # git add .
+            # git commit -m "Resolve merge conflicts by using upstream versions"
+            # git push origin master
+
+            # 抛出错误，让工作流标记为失败（提醒你手动处理）
+            exit 1
+          fi
