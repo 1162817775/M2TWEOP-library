@@ -1148,6 +1148,30 @@ private:
 	LPVOID funcAddress;
 };
 
+class onCalcBgSize
+	:public AATemplate
+{
+public:
+	onCalcBgSize(MemWork* mem, LPVOID adr, int ver);
+	~onCalcBgSize() = default;
+
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onCreateGeneralUnit
+	:public AATemplate
+{
+public:
+	onCreateGeneralUnit(MemWork* mem, LPVOID adr, int ver);
+	~onCreateGeneralUnit() = default;
+
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 class onGetUnitStatsUi1
 	:public AATemplate
 {
@@ -2291,6 +2315,78 @@ class onStartProductionTurn
 public:
 	onStartProductionTurn(MemWork* mem, LPVOID addr, int ver);
 	~onStartProductionTurn() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onInitControllers
+	:public AATemplate
+{
+public:
+	onInitControllers(MemWork* mem, LPVOID addr, int ver);
+	~onInitControllers() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onExitToMenu
+	:public AATemplate
+{
+public:
+	onExitToMenu(MemWork* mem, LPVOID addr, int ver);
+	~onExitToMenu() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onSpawnArmy
+	:public AATemplate
+{
+public:
+	onSpawnArmy(MemWork* mem, LPVOID addr, int ver);
+	~onSpawnArmy() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onUiBitmapTexture
+	:public AATemplate
+{
+public:
+	onUiBitmapTexture(MemWork* mem, LPVOID addr, int ver);
+	~onUiBitmapTexture() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onCheckOwnership
+	:public AATemplate
+{
+public:
+	onCheckOwnership(MemWork* mem, LPVOID addr, int ver);
+	~onCheckOwnership() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onExitToMenu2
+	:public AATemplate
+{
+public:
+	onExitToMenu2(MemWork* mem, LPVOID addr, int ver);
+	~onExitToMenu2() = default;
 	
 	void SetNewCode();
 private:

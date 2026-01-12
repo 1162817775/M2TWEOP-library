@@ -343,6 +343,76 @@ struct countersObjectS
 	void* testCounterSValue;
 };
 
+class gameStringData
+{
+public:
+	gameStringData() = default;
+	std::string key{};
+	std::string original{};
+	std::string newValue{};
+	nlohmann::json serialize() const
+	{
+		nlohmann::json json;
+		json["key"] = key;
+		json["original"] = original;
+		json["newValue"] = newValue;
+		return json;
+	}
+	void deserialize(const nlohmann::json& json)
+	{
+		key = json.value("key", "");
+		original = json.value("original", "");
+		newValue = json.value("newValue", "");
+	}
+};
+
+class gameStringDataDb
+{
+public:
+	void addStratEntry(const std::string& key, const std::string& newValue);
+	void addExpandedEntry(const std::string& key, const std::string& newValue);
+	void restoreOriginal();
+	static gameStringDataDb* getInstance() {return m_Instance.get();}
+	nlohmann::json serialize()
+	{
+		nlohmann::json json;
+		for (const auto& [key, value] : m_ChangedExpandedStrings)
+		{
+			json["expandedStrings"].push_back(value.serialize());
+		}
+		for (const auto& [key, value] : m_ChangedStratStrings)
+		{
+			json["stratStrings"].push_back(value.serialize());
+		}
+		return json;
+	}
+	void deserialize(const nlohmann::json& json)
+	{
+		m_ChangedExpandedStrings.clear();
+		m_ChangedStratStrings.clear();
+		for (const auto& item : json["expandedStrings"])
+		{
+			auto data = gameStringData();
+			data.deserialize(item);
+			m_ChangedExpandedStrings.insert_or_assign(data.key, data);
+		}
+		for (const auto& item : json["stratStrings"])
+		{
+			auto data = gameStringData();
+			data.deserialize(item);
+			m_ChangedStratStrings.insert_or_assign(data.key, data);
+		}
+	}
+	void onGameLoad(const std::vector<std::string>& filePaths);
+	void onGameLoaded();
+	std::string onGameSave();
+private:
+	static std::unique_ptr<gameStringDataDb> m_Instance;
+	std::unordered_map<std::string, gameStringData> m_ChangedExpandedStrings;
+	std::unordered_map<std::string, gameStringData> m_ChangedStratStrings;
+	bool m_Restoring = false;
+};
+
 class m2tweopOptions
 {
 public:
@@ -357,19 +427,34 @@ public:
 	static void setUseEopFrontiers(const bool value) { useEopFrontiers = value; }
 	static int getUseEopFrontiers() { return useEopFrontiers; }
 	static int getWeaponBonusModifier() { return weaponBonusModifier; }
+	static int getMaxBodyguardSize() { return maxBodyguardSize; }
+	static int getMinBodyguardSize() { return minBodyguardSize; }
+	static int getExtraLeaderSoldiers() { return extraLeaderSoldiers; }
+	static void setExtraLeaderSoldiers(const int value) { extraLeaderSoldiers = value; }
+	static int getExtraHeirSoldiers() { return extraHeirSoldiers; }
+	static void setExtraHeirSoldiers(const int value) { extraHeirSoldiers = value; }
+	static void setMaxBodyguardSize(const int value) { maxBodyguardSize = value; }
+	static void setMinBodyguardSize(const int value) { minBodyguardSize = value; }
+	static void setIgnoreOwnershipRecruitment(const bool value) { ignoreOwnershipRecruitment = value; }
+	static bool getIgnoreOwnershipRecruitment() { return ignoreOwnershipRecruitment; }
 	static void setWeaponBonusModifier(const int value) { weaponBonusModifier = value & 0xFF; }
 	static DWORD getColor() { return (static_cast<uint32_t>(0xFF) << 24) | (khakiTextRed << 16) | (khakiTextGreen << 8) | khakiTextBlue; }
 	static void setKhakiTextColor(const uint8_t red, const uint8_t green, const uint8_t blue) { khakiTextRed = red; khakiTextGreen = green; khakiTextBlue = blue; }
+	static int watchTowerRange;
+	static int weaponBonusModifier;
+	static int maxBodyguardSize;
+	static int minBodyguardSize;
+	static int extraLeaderSoldiers;
+	static int extraHeirSoldiers;
 	static bool hideUnknownUnitTooltips;
 	static bool eopHandleUnitCards;
 	static bool enableFamilyEventsForTeutonic;
 	static bool useEopFrontiers;
 	static bool fixHeroAbilityKillChance;
+	static bool ignoreOwnershipRecruitment;
 	static uint8_t khakiTextRed;
 	static uint8_t khakiTextGreen;
 	static uint8_t khakiTextBlue;
-	static int watchTowerRange;
-	static int weaponBonusModifier;
 };
 
 struct boostLightMutex
@@ -460,7 +545,9 @@ namespace gameHelpers
 	std::string getModFolderName();
 	void copyFileLua(const std::string& file, const std::string& to);
 	void setExpandedString(const std::string& key, const std::string& value);
+	std::string getExpandedString(const std::string& key);
 	void setStratString(const std::string& key, const std::string& value);
+	std::string getStratString(const std::string& key);
 	std::string getModString(const std::string& path);
 	int getGameVersion();
 	void generateSprite(const std::string& model);
@@ -514,6 +601,7 @@ namespace gameHelpers
 	void setAncLimit(uint8_t limit);
 	void setMaxUnitSize(signed short min, signed short max);
 	void setMaxBgSize(unsigned char size);
+	void setMinBgSize(unsigned char size);
 	void fixReligionTrigger();
 	void unlockConsoleCommands();
 	void toggleUnitHighlight();
@@ -523,6 +611,8 @@ namespace gameHelpers
 	int getUnitSize();
 	void setTextureCacheSize();
 	void unlockWeaponLimit();
+	float getUnitSizeMultiplier();
+	int calculateMaxBodyguardSize(const character* general, const eduEntry* bgEntry);
 
 	religionDatabase* getReligionDatabase();
 	gameDataAllStruct* getGameDataAll();

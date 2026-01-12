@@ -905,6 +905,46 @@ int patchesForGame::onGeneralAssaultAction(generalAssault* assault)
 	return 1;
 }
 
+int patchesForGame::onCalcBgSize(character* general, eduEntry* entry)
+{
+	return gameHelpers::calculateMaxBodyguardSize(general, entry);
+}
+
+void patchesForGame::onInitControllers(aiPersonalityValues* personality)
+{
+	personality->initControllers();
+}
+
+void patchesForGame::onExitToMenu()
+{
+	gameHelpers::logStringGame("GAME EXIT TO MENU - CLEAR DATA");
+	minorSettlementDb::clear();
+	eopSettlementDataDb::get()->clearData();
+	plugData::data.luaAll.clearHashMapsCampaign();
+	gameHelpers::logStringGame("DATA CLEARED");
+	gameEvents::onExitToMenu();
+	gameHelpers::logStringGame("EXIT TO MENU EVENTS PROCESSED");
+}
+
+int patchesForGame::onCheckOwnership(const uint32_t facShifted, const eduEntry* entry)
+{
+	if (m2tweopOptions::getIgnoreOwnershipRecruitment())
+		return 1;
+	return entry->ownership & facShifted;
+}
+
+void patchesForGame::onSpawnArmy(factionStruct* faction, coordPair* coords, armyStruct* army)
+{
+	GAME_FUNC(void (__thiscall*)(factionStruct*, coordPair*), factionResurrectStuffFunc)(faction, coords);
+	gameEvents::onSpawnArmy(army);
+}
+
+unit* patchesForGame::onCreateGeneralUnit(unitDb* edu, character* general, int exp, int wpnlvl, int armlvl,
+                                          eduEntry* entry)
+{
+	return eopDu::createGeneralUnit(general, exp, wpnlvl, armlvl, entry);
+}
+
 mountedEngine* patchesForGame::onGetMountedEngine(const stringWithHash* name)
 {
 	if (!name || !name->name)
@@ -1837,7 +1877,6 @@ bool NEED_BUILD_FRONTIERS = true;
 
 void __stdcall patchesForGame::afterCampaignMapLoaded()
 {
-	discordManager::onCampaignMapLoaded();
 	globals::dataS.Modules.tacticalMapViewer.unView();
 	plugData::data.luaAll.fillHashMaps();
 	gameEvents::onCampaignMapLoaded();
@@ -1847,12 +1886,14 @@ void __stdcall patchesForGame::afterCampaignMapLoaded()
 		stratMapHelpers::rebuildFrontiers();
 		NEED_BUILD_FRONTIERS = false;
 	}
+	discordManager::onCampaignMapLoaded();
 }
 
 void __stdcall patchesForGame::onNewGameStart()
 {
 	minorSettlementDb::clear();
 	eopSettlementDataDb::get()->clearData();
+	gameStringDataDb::getInstance()->restoreOriginal();
 	gameEvents::onNewGameStart();
 	plannedRetreatRoute::onNewGameStart();
 }
@@ -1887,6 +1928,7 @@ void __stdcall patchesForGame::onGameInit()
 	eopFactionDataDb::get()->getOriginalData();
 	gameEvents::onGameInit();
 	*reinterpret_cast<bool*>(dataOffsets::offsets.bugReport) = true;
+	eopDu::fixCustomBattleGeneralEntries();
 }
 
 void __stdcall patchesForGame::onUnloadCampaign()
@@ -2072,6 +2114,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 	const DWORD characterTurnStart = gameVersion == 1 ? 0x0136BFE4 : 0x01326FBC;
 	const DWORD postBattle = gameVersion == 1 ? 0x01367ADC : 0x01322AB4; 
 	const DWORD preBattleWithdrawal = gameVersion == 1 ? 0x01366D54 : 0x01321D2C; 
+	const DWORD generalAssaultsResidence = gameVersion == 1 ? 0x0136A3E4 : 0x013253BC; 
 	if (eventCode == scrollOpenedCode)
 	{
 		char* str = reinterpret_cast<char*>(vTab[1]);
@@ -2229,7 +2272,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 			sett->aiProductionController->isAutoManagedTaxes = false;
 		}
 	}
-	else if (eventCode == postBattle || eventCode == preBattleWithdrawal)
+	else if (eventCode == postBattle || eventCode == preBattleWithdrawal || eventCode == generalAssaultsResidence)
 	{
 		campaignHelpers::getCampaignData()->ignoreSpeedUp = false;
 	}
@@ -2272,6 +2315,7 @@ void __fastcall patchesForGame::onLoadSaveFile(UNICODE_STRING**& savePath)
 	eopFortDataDb::get()->onGameLoad(files);
 	eopCharacterDataDb::get()->onGameLoad(files);
 	eopFactionDataDb::get()->onGameLoad(files);
+	gameStringDataDb::getInstance()->onGameLoad(files);
 	gameEvents::onLoadGamePl(&files);
 	plannedRetreatRoute::onGameLoad(files);
 	techFuncs::deleteFiles(files);
@@ -2307,6 +2351,8 @@ void __fastcall patchesForGame::onSaveGame(UNICODE_STRING**& savePath)
 		files.push_back(characterData);
 	if (const std::string factionData = eopFactionDataDb::get()->onGameSave(); !factionData.empty())
 		files.push_back(factionData);
+	if (const std::string gameStringData = gameStringDataDb::getInstance()->onGameSave(); !gameStringData.empty())
+		files.push_back(gameStringData);
 	techFuncs::saveGameMakeArchive(savePath, files);
 	techFuncs::deleteFiles(files);
 }

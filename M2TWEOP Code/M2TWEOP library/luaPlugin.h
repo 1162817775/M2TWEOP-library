@@ -83,6 +83,7 @@ public:
 	void fillHashMaps();
 	void fillHashMapsNonCampaign();
 	void fillHashMapsVnv();
+	void clearHashMapsCampaign();
 	
 	bool hashLoaded = false;
 	bool hashNonCampaignLoaded = false;
@@ -121,6 +122,7 @@ public:
 	sol::function* onReadGameDbsAtStart = nullptr;
 	sol::function* onEduParsed = nullptr;
 	sol::function* onGameInit = nullptr;
+	sol::function* onExitToMenu = nullptr;
 	sol::function* onUnloadCampaign = nullptr;
 	sol::function* onAiTurn = nullptr;
 	sol::function* onEndSiege = nullptr;
@@ -135,6 +137,7 @@ public:
 	sol::function* onBattleTick = nullptr;
 	sol::function* onCalculateLTGD = nullptr;
 	sol::function* onSetProductionControllers = nullptr;
+	sol::function* onSpawnArmy = nullptr;
 	sol::function* onNewGameStart = nullptr;
 	sol::function* onPluginLoad = nullptr;
 	sol::function* onCreateSaveFile = nullptr;

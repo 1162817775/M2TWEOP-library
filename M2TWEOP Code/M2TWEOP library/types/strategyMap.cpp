@@ -116,6 +116,15 @@ int minorSettlementDb::getSettlementCount(const int regionId)
 	return static_cast<int>(regionMinorSettlements[regionId].size());
 }
 
+void minorSettlementDb::clear()
+{
+	for (auto& vec : regionMinorSettlements)
+	{
+		vec.clear();
+	}
+	m_Loaded = false;
+}
+
 settlementStruct* minorSettlementDb::getSettlementAtIndex(const int regionId, const int index)
 {
 	if (!m_Loaded)

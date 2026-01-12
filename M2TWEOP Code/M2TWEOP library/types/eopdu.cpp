@@ -5,6 +5,11 @@
 //@license GPL-3.0
 #include "pch.h"
 #include "eopdu.h"
+
+#include <algorithm>
+
+#include "campaign.h"
+#include "faction.h"
 #include "functionsOffsets.h"
 #include "gameHelpers.h"
 
@@ -261,6 +266,140 @@ void eopDu::setEntrySoldierModelLua(int idx, const char* newModel)
 	entry->setEntrySoldierModel(newModel);
 }
 
+eduEntry* eopDu::findGeneralUnit(const int factionId)
+{
+	const auto eduNum = eopDuHelpers::getEduEntryNum();
+	for (int unitIdx = 0; unitIdx < eduNum; unitIdx++)
+	{
+		if (const auto entry = unitHelpers::getEDUEntryById(unitIdx);
+			entry->hasOwnership(factionId) && entry->generalUnit)
+		{
+			return entry;
+		}
+	}
+	for (const auto& entry : eopUnitDb)
+	{
+		if (entry->data.edu.hasOwnership(factionId) && entry->data.edu.generalUnit)
+		{
+			return &entry->data.edu;
+		}
+	}
+	return nullptr;
+}
+
+eduEntry* eopDu::findGeneralUpgradeUnit(const int factionId)
+{
+	const auto eduNum = eopDuHelpers::getEduEntryNum();
+	for (int unitIdx = 0; unitIdx < eduNum; unitIdx++)
+	{
+		if (const auto entry = unitHelpers::getEDUEntryById(unitIdx);
+			entry->hasOwnership(factionId) && entry->generalUnitUpgrade)
+		{
+			return entry;
+		}
+	}
+	for (const auto& entry : eopUnitDb)
+	{
+		if (entry->data.edu.hasOwnership(factionId) && entry->data.edu.generalUnitUpgrade)
+		{
+			return &entry->data.edu;
+		}
+	}
+	return nullptr;
+}
+
+unit* eopDu::createGeneralUnit(character* general, const int exp, const int wpnlvl, const int armlvl, const eduEntry* entry)
+{
+	const auto experience = exp + max(general->characterRecord->bodyguardValour, 0);
+	const auto facId = general->getFaction()->factionID;
+	auto bgEntry = entry;
+	if (!bgEntry)
+	{
+		const auto campaign = campaignHelpers::getCampaignData();
+		if (campaign->marianReformsActive)
+		{
+			bgEntry = findGeneralUpgradeUnit(facId);
+		}
+		if (!bgEntry)
+		{
+			bgEntry = findGeneralUnit(facId);
+		}
+	}
+	if (!bgEntry)
+	{
+		gameHelpers::logStringGame("createGeneralUnit: No general unit found for faction " + std::string(general->getFaction()->factionRecord->facName));
+		return nullptr;
+	}
+	auto soldiers = gameHelpers::calculateMaxBodyguardSize(general, bgEntry);
+	soldiers = static_cast<int>(soldiers * gameHelpers::getUnitSizeMultiplier());
+	const auto regionId = stratMapHelpers::getTile(general->xCoord, general->yCoord)->regionId;
+	const auto un = unitHelpers::createUnitIdx2(
+		bgEntry->index,
+		regionId,
+		facId,
+		experience,
+		static_cast<uint8_t>(wpnlvl),
+		static_cast<uint8_t>(armlvl),
+		soldiers
+		);
+	return un;
+}
+
+void eopDu::fixCustomBattleGeneralEntries()
+{
+	const auto smFactionsCount = factionHelpers::getFactionRecordNum();
+	for (int facIdx = 0; facIdx < smFactionsCount; facIdx++)
+	{
+		std::bitset<4> eras;
+		bool found = false;
+		const auto eduNum = eopDuHelpers::getEduEntryNum();
+		for (int unitIdx = 0; unitIdx < eduNum; unitIdx++)
+		{
+			const auto entry = unitHelpers::getEDUEntryById(unitIdx);
+			if (!found && entry->hasOwnership(facIdx) && entry->generalUnit)
+			{
+				found = true;
+			}
+			for (int era = 0; era < 4; era++)
+			{
+				if (entry->eraOwnerShips[era] & (1 << facIdx))
+				{
+					eras[era] = true;
+				}
+			}
+		}
+		for (const auto& entry : eopUnitDb)
+		{
+			if (!found && entry->data.edu.hasOwnership(facIdx) && entry->data.edu.generalUnit)
+			{
+				found = true;
+			}
+			for (int era = 0; era < 4; era++)
+			{
+				if (entry->data.edu.eraOwnerShips[era] & (1 << facIdx))
+				{
+					eras[era] = true;
+				}
+			}
+		}
+		const auto facRecord = factionHelpers::getFactionRecord(facIdx);
+		if(!found)
+		{
+			gameHelpers::logStringGame("There is no general unit for faction" + std::string(facRecord->facName));
+		}
+		if (facRecord->customBattleAvailability)
+		{
+			for (int era = 0; era < 4; era++)
+			{
+				if (!eras[era])
+				{
+					facRecord->periodsUnavailableInCustomBattle &= ~(1 << era);
+				}
+			}
+		}
+	}
+}
+
 int eopDuHelpers::getEduEntryNum()
 {
 	return unitHelpers::getEdu()->numberOfEntries;
@@ -301,6 +440,8 @@ namespace eopDuHelpers
 		@tfield getEduIndexByType getEduIndexByType
 		@tfield getEduEntryNum getEduEntryNum
 		@tfield getEopEntryNum getEopEntryNum
+		@tfield findGeneralUnit findGeneralUnit
+		@tfield findGeneralUpgradeUnit findGeneralUpgradeUnit
 		@table M2TWEOPDU
 		*/
 			
@@ -401,5 +542,23 @@ namespace eopDuHelpers
 		M2TWEOPDU.setEntrySoldierModel(1000,"Sword_and_Buckler_Men");
 		*/
 		tables.M2TWEOPEDUTable.set_function("setEntrySoldierModel", &eopDu::setEntrySoldierModelLua);
+		/***
+		Get the faction's standard bodyguard unit.
+		@function M2TWEOPDU.findGeneralUnit
+		@tparam int factionID
+		@treturn eduEntry retEntry
+		@usage
+		local bgEntry = M2TWEOPDU.findGeneralUnit(5);
+		*/
+		tables.M2TWEOPEDUTable.set_function("findGeneralUnit", &eopDu::findGeneralUnit);
+		/***
+		Get the faction's standard bodyguard upgrade unit.
+		@function M2TWEOPDU.findGeneralUpgradeUnit
+		@tparam int factionID
+		@treturn eduEntry retEntry
+		@usage
+		local bgEntry = M2TWEOPDU.findGeneralUpgradeUnit(5);
+		*/
+		tables.M2TWEOPEDUTable.set_function("findGeneralUpgradeUnit", &eopDu::findGeneralUpgradeUnit);
 	}
 }

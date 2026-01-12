@@ -225,7 +225,9 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield getTraitByIndex getTraitByIndex
 	@tfield getTraitCount getTraitCount
 	@tfield setExpandedString setExpandedString
+	@tfield getExpandedString getExpandedString
 	@tfield setStratString setStratString
+	@tfield getStratString getStratString
 	@tfield getGameVersion getGameVersion
 	@tfield setPerfectSpy setPerfectSpy
 	@tfield getLocalFactionID getLocalFactionID
@@ -235,6 +237,9 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield setAncillariesLimit setAncillariesLimit
 	@tfield unlockGameConsoleCommands unlockGameConsoleCommands
 	@tfield setMaxBgSize setMaxBgSize
+	@tfield setMinBgSize setMinBgSize
+	@tfield setExtraLeaderSoldiers setExtraLeaderSoldiers
+	@tfield setExtraHeirSoldiers setExtraHeirSoldiers
 	@tfield toggleUnitsBMapHighlight toggleUnitsBMapHighlight
 	@tfield getBattleCamCoords getBattleCamCoords
 	@tfield setReligionsLimit setReligionsLimit
@@ -283,6 +288,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield setWatchTowerRange setWatchTowerRange
 	@tfield enableFamilyEventsWithoutTree enableFamilyEventsWithoutTree
 	@tfield useEopFrontiers useEopFrontiers
+	@tfield ignoreOwnershipRecruitment ignoreOwnershipRecruitment
 	@tfield setKhakiTextColor setKhakiTextColor
 	@tfield getMinorSettlementBalance getMinorSettlementBalance
 	@tfield generateSprite generateSprite
@@ -442,6 +448,16 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	tables.M2TWEOP.set_function("setExpandedString", &gameHelpers::setExpandedString);
 	
 	/***
+	Get a string from the expanded string table.
+	@function M2TWEOP.getExpandedString
+	@tparam string key
+	@treturn string value
+	@usage
+	    local value = M2TWEOP.getExpandedString("EMT_TURKS_FACTION_LEADER");
+	*/
+	tables.M2TWEOP.set_function("getExpandedString", &gameHelpers::getExpandedString);
+	
+	/***
 	Set a string in the strat string table.
 	@function M2TWEOP.setStratString
 	@tparam string key
@@ -450,6 +466,16 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 		M2TWEOP.setStratString("SMT_GAMES_FREQUENCY_YEARLY", "Yearly Sacrifices");
 	*/
 	tables.M2TWEOP.set_function("setStratString", &gameHelpers::setStratString);
+	
+	/***
+	Get a string from the strat string table.
+	@function M2TWEOP.getStratString
+	@tparam string key
+	@treturn string value
+	@usage
+		local value = M2TWEOP.getStratString("SMT_GAMES_FREQUENCY_YEARLY");
+	*/
+	tables.M2TWEOP.set_function("getStratString", &gameHelpers::getStratString);
 	
 	/***
 	Function to get the game version.
@@ -555,13 +581,40 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	/***
 	Sets the maximum amount of soldiers a general's bodyguard unit can replenish to. The value is multiplied by the unit size modifiers (e.g Huge = 2.5 multiplier)
 	@function M2TWEOP.setMaxBgSize
-	@tparam int newSize
+	@tparam int newSize Default: 31
 	@usage
 	M2TWEOP.setMaxBgSize(100) -- On huge unit size, 100*2.5 = 250 max bodyguard size
 	M2TWEOP.setMaxBgSize(150) -- On huge unit size, 150*2.5 = 300 max bodyguard size
 	M2TWEOP.setMaxBgSize(50)  -- On huge unit size, 50*2.5 = 125 max bodyguard size
 	*/
 	tables.M2TWEOP.set_function("setMaxBgSize", &gameHelpers::setMaxBgSize);
+	
+	/***
+	Sets the minimum amount of soldiers a general's bodyguard unit can replenish to. The value is multiplied by the unit size modifiers (e.g Huge = 2.5 multiplier)
+	@function M2TWEOP.setMinBgSize
+	@tparam int newSize Default: 4
+	@usage
+	M2TWEOP.setMaxBgSize(1)
+	*/
+	tables.M2TWEOP.set_function("setMinBgSize", &gameHelpers::setMinBgSize);
+	
+	/***
+	Sets the extra amount of soldiers faction leaders get. The value is multiplied by the unit size modifiers (e.g Huge = 2.5 multiplier)
+	@function M2TWEOP.setExtraLeaderSoldiers
+	@tparam int newSize Default: 6
+	@usage
+	M2TWEOP.setExtraLeaderSoldiers(8)
+	*/
+	tables.M2TWEOP.set_function("setExtraLeaderSoldiers", &m2tweopOptions::setExtraLeaderSoldiers);
+	
+	/***
+	Sets the extra amount of soldiers faction heirs get. The value is multiplied by the unit size modifiers (e.g Huge = 2.5 multiplier)
+	@function M2TWEOP.setExtraHeirSoldiers
+	@tparam int newSize Default: 4
+	@usage
+	M2TWEOP.setExtraHeirSoldiers(6)
+	*/
+	tables.M2TWEOP.set_function("setExtraHeirSoldiers", &m2tweopOptions::setExtraHeirSoldiers);
 
 	/***
 	Sets the new maximum soldier count.
@@ -1009,6 +1062,15 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	tables.M2TWEOP.set_function("useEopFrontiers", &m2tweopOptions::setUseEopFrontiers);
 	
 	/***
+	Don't require edu ownership for recruitment. Disabled by default.
+	@function M2TWEOP.ignoreOwnershipRecruitment
+	@tparam bool set
+	@usage
+		M2TWEOP.ignoreOwnershipRecruitment(true)
+	*/
+	tables.M2TWEOP.set_function("ignoreOwnershipRecruitment", &m2tweopOptions::setIgnoreOwnershipRecruitment);
+	
+	/***
 	Faction specific unit cards are always chosen if found. Enabled by default.
 	@function M2TWEOP.handleUnitCards
 	@tparam bool set
@@ -1214,6 +1276,16 @@ void luaPlugin::fillHashMaps()
 	fillHashMapsNonCampaign();
 	hashLoaded = true;
 	gameHelpers::logStringGame("Hashmaps filled");
+}
+
+void luaPlugin::clearHashMapsCampaign()
+{
+	factions.clear();
+	regions.clear();
+	settlements.clear();
+	climateNames.clear();
+	climateIndex.clear();
+	hashLoaded = false;
 }
 
 void luaPlugin::fillHashMapsNonCampaign()

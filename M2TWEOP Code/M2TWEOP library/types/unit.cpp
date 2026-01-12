@@ -333,7 +333,9 @@ namespace unitActions
     void attackUnit(unit* un, const unit* targetUnit, bool run)
     {
         if (un == nullptr)
-            return;
+        	return;
+    	if (targetUnit == nullptr)
+    		return;
         if (!battleHelpers::inBattle())
             return;
         un->aiActiveSet = 2;
@@ -978,7 +980,7 @@ namespace unitHelpers
 		}
 		
 		regionStruct* region = stratMapHelpers::getRegion(regionId);
-		const auto un = GAME_FUNC(unit*(__stdcall*)(regionStruct*, int, int, int, int), createUnitFunc2)(region, index, facNum, exp, soldiers);
+		const auto un = GAME_FUNC(unit*(__thiscall*)(unitDb*, regionStruct*, int, int, int, int), createUnitFunc2)(getEdu(), region, index, facNum, exp, soldiers);
 		if (un)
 		{
 			un->setArmour(arm);
@@ -1575,6 +1577,7 @@ void luaPlugin::initUnits()
 		sol::usertype<unitStats> unitStats;
 		sol::usertype<unitAiGroupData> unitAiGroupData;
 		sol::usertype<vector3> vector3;
+		sol::usertype<generalInfo> generalBattleStruct;
 	}types;
 	
 	///Unit
@@ -2506,6 +2509,23 @@ void luaPlugin::initUnits()
 	types.vector3.set("xCoord", &vector3::x);
 	types.vector3.set("yCoord", &vector3::y);
 	types.vector3.set("zCoord", &vector3::z);
+	
+	/***
+
+	@tfield unit unit
+	@tfield characterRecord record
+	@tfield unitStats stats
+	@tfield bool isGeneral
+	@tfield bool isAlive
+
+	@table generalBattleStruct
+	*/
+	types.generalBattleStruct = luaState.new_usertype<generalInfo>("generalBattleStruct");
+	types.generalBattleStruct.set("unit", &generalInfo::unit);
+	types.generalBattleStruct.set("record", &generalInfo::namedChar);
+	types.generalBattleStruct.set("stats", &generalInfo::stats);
+	types.generalBattleStruct.set("isGeneral", &generalInfo::isGeneral);
+	types.generalBattleStruct.set("isAlive", &generalInfo::isAlive);
 	
 	///Edu Entry
 	//@section Edu Entry

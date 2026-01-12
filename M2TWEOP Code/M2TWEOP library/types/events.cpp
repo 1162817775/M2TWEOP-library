@@ -750,6 +750,14 @@ void onGameInit()
 	}
 }
 
+void  onExitToMenu()
+{
+	if (plugData::data.luaAll.onExitToMenu != nullptr)
+	{
+		tryLua((*plugData::data.luaAll.onExitToMenu)())
+	}
+}
+
 void onNewGameLoaded()
 {
 	if (plugData::data.luaAll.onNewGameLoaded != nullptr)
@@ -837,6 +845,14 @@ void onSetProductionControllers(aiPersonalityValues* personality)
 	if (plugData::data.luaAll.onSetProductionControllers != nullptr)
 	{
 		tryLua((*plugData::data.luaAll.onSetProductionControllers)(personality))
+	}
+}
+
+void onSpawnArmy(armyStruct* army)
+{
+	if (plugData::data.luaAll.onSpawnArmy != nullptr)
+	{
+		tryLua((*plugData::data.luaAll.onSpawnArmy)(army))
 	}
 }
 
@@ -1389,10 +1405,12 @@ void luaPlugin::onPluginLoadF()
 	@tfield onNewGameStart onNewGameStart
 	@tfield onEduParsed onEduParsed
 	@tfield onGameInit onGameInit
+	@tfield onExitToMenu onExitToMenu
 	@tfield onUnloadCampaign onUnloadCampaign
 	@tfield onAiTurn onAiTurn
 	@tfield onCalculateLTGD onCalculateLTGD
 	@tfield onSetProductionControllers onSetProductionControllers
+	@tfield onSpawnArmy onSpawnArmy
 	@tfield onClickAtTile onClickAtTile
 	@tfield onCharacterClicked onCharacterClicked
 	@tfield onCampaignTick onCampaignTick
@@ -4188,6 +4206,19 @@ void luaPlugin::onPluginLoadF()
 	checkLuaFunc(&onGameInit);
 
 	/***
+	Called after campaign has exited to the main menu.
+
+	@function onExitToMenu
+
+	@usage
+	function onExitToMenu()
+	--something here
+	end
+	*/
+	onExitToMenu = new sol::function(luaState["onExitToMenu"]);
+	checkLuaFunc(&onExitToMenu);
+
+	/***
 	Called after a new campaign's data has been loaded first time. (M2TW.stratMap and M2TW.campaign)
 	@function onNewGameLoaded
 	@usage
@@ -4255,6 +4286,21 @@ void luaPlugin::onPluginLoadF()
 
 	onSetProductionControllers = new sol::function(luaState["onSetProductionControllers"]);
 	checkLuaFunc(&onSetProductionControllers);
+
+	/***
+	Called when an army has been spawned via campaign_script or lua spawnArmy
+
+	@function onSpawnArmy
+	@tparam armyStruct army
+
+	@usage
+	function onSpawnArmy(army)
+	--something here
+	end
+	*/
+
+	onSpawnArmy = new sol::function(luaState["onSpawnArmy"]);
+	checkLuaFunc(&onSpawnArmy);
 
 	/***
 	Called on clicking the stratmap.

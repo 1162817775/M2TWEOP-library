@@ -709,7 +709,12 @@ namespace settlementHelpers
 				}
 			}
 		}
-		
+		if (newOwner->isHorde)
+		{
+			GAME_FUNC(int (__thiscall*)(factionStruct*), doHordeStuff2)(newOwner);
+			const auto settRegion = stratMapHelpers::getRegion(sett->regionID);
+			GAME_FUNC(int (__cdecl*)(factionStruct*, regionStruct*), doHordeStuff3)(newOwner, settRegion);
+		}
 		if (newOwner->factionHordeInfo && newOwner->factionHordeInfo->isHorde)
 		{
 			auto globalFort = reinterpret_cast<settlementStruct*>(dataOffsets::offsets.globalSett);

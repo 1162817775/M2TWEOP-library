@@ -1,4 +1,5 @@
 #pragma once
+#include "army.h"
 #include "stratModelsChange.h"
 #include "graphicsD3D.h"
 #include "cultures.h"
@@ -72,6 +73,12 @@ public:
 	static int __cdecl onGetWatchTowerRange();
 	static void __fastcall onSetSettlementModel(settlementStruct* settlement);
 	static int __fastcall onGeneralAssaultAction(generalAssault* assault);
+	static int __fastcall onCalcBgSize(character* general, eduEntry* entry);
+	static void __fastcall onInitControllers(aiPersonalityValues* personality);
+	static void __fastcall onExitToMenu();
+	static int __fastcall onCheckOwnership(uint32_t facShifted, const eduEntry* entry);
+	static void __fastcall onSpawnArmy(factionStruct* faction, coordPair* coords, armyStruct* army);
+	static unit* __fastcall onCreateGeneralUnit(unitDb* edu, character* general, int exp, int wpnlvl, int armlvl, eduEntry* entry); 
 	static mountedEngine* __fastcall onGetMountedEngine(const stringWithHash* name);
 	static bool __fastcall onParseMountedEngines(mountedEngineDb* db, descrParser* parser);
 	static bool __fastcall onParseEdu(unitDb* db, descrParser* parser);

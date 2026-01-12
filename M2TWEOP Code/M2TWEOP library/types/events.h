@@ -230,6 +230,7 @@ namespace gameEvents
 	
 	void onReadGameDbsAtStart();
 	void onGameInit();
+	void onExitToMenu();
 	void onUnloadCampaign();
 	void onRemoveFromUnitQueue(const unitRQ* item);
 	void onNewGameLoaded();
@@ -244,6 +245,7 @@ namespace gameEvents
 	void onBattleTick();
 	void onCalculateLTGD(aiLongTermGoalDirector* ltgd);
 	void onSetProductionControllers(aiPersonalityValues* personality);
+	void onSpawnArmy(armyStruct* army);
 	std::string * onSelectWorldpkgdesc(const char* selectedRec, const char* selectedGroup);
 	int onFortificationLevelS(settlementStruct * settlement, bool* isCastle, bool* isChanged);
 	float onCalculateUnitValue(eduEntry* entry, float value);

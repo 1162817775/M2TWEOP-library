@@ -1324,6 +1324,54 @@ void managerF::execPatches()
 	toGetBuildingPicConstructed->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onInitControllers patch" << '\n';
+	onInitControllers* toInitControllers = new onInitControllers(mem, (LPVOID)patchesForGame::onInitControllers, globals::dataS.gameVersion);
+	toInitControllers->SetNewCode();
+	toInitControllers->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onExitToMenu2 patch" << '\n';
+	onExitToMenu2* toExitToMenu2 = new onExitToMenu2(mem, (LPVOID)patchesForGame::onExitToMenu, globals::dataS.gameVersion);
+	toExitToMenu2->SetNewCode();
+	toExitToMenu2->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onSpawnArmy patch" << '\n';
+	onSpawnArmy* toSpawnArmy = new onSpawnArmy(mem, (LPVOID)patchesForGame::onSpawnArmy, globals::dataS.gameVersion);
+	toSpawnArmy->SetNewCode();
+	toSpawnArmy->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onUiBitmapTexture patch" << '\n';
+	onUiBitmapTexture* toUiBitmapTexture = new onUiBitmapTexture(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
+	toUiBitmapTexture->SetNewCode();
+	toUiBitmapTexture->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onCheckOwnership patch" << '\n';
+	onCheckOwnership* toCheckOwnership = new onCheckOwnership(mem, (LPVOID)patchesForGame::onCheckOwnership, globals::dataS.gameVersion);
+	toCheckOwnership->SetNewCode();
+	toCheckOwnership->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onExitToMenu patch" << '\n';
+	onExitToMenu* toExitToMenu = new onExitToMenu(mem, (LPVOID)patchesForGame::onExitToMenu, globals::dataS.gameVersion);
+	toExitToMenu->SetNewCode();
+	toExitToMenu->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onCreateGeneralUnit patch" << '\n';
+	onCreateGeneralUnit* toCreateGeneralUnit = new onCreateGeneralUnit(mem, (LPVOID)patchesForGame::onCreateGeneralUnit, globals::dataS.gameVersion);
+	toCreateGeneralUnit->SetNewCode();
+	toCreateGeneralUnit->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onCalcBgSize patch" << '\n';
+	onCalcBgSize* toCalcBgSize = new onCalcBgSize(mem, (LPVOID)patchesForGame::onCalcBgSize, globals::dataS.gameVersion);
+	toCalcBgSize->SetNewCode();
+	toCalcBgSize->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying toGetBuildingPicConstructed2 patch" << '\n';
 	onGetBrowserPicConstructed2* toGetBuildingPicConstructed2 = new onGetBrowserPicConstructed2(mem, (LPVOID)patchesForGame::getBuildingPicConstructed, globals::dataS.gameVersion);
 	toGetBuildingPicConstructed2->SetNewCode();

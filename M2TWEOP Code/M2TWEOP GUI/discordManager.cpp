@@ -13,9 +13,9 @@ discord::Core *discordCore{};
 struct
 {
     discord::Activity activity{};
-    string status = "At the main menu";
-    string factionName = "Unknown";
-    string turnNum = "Unknown";
+    string status = "At the main menu 🏰";
+    string factionName = "N/A";
+    string turnNum = "0";
     bool needsUpdate = false;
     time_t last;
     time_t now;
@@ -74,7 +74,7 @@ namespace discordManager
         string currentPath;
         helpers::getCurrentPath(currentPath);
         discordData.activity.GetTimestamps().SetStart(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
-        discordData.activity.SetDetails("At the main menu");
+        discordData.activity.SetDetails("At the main menu 🏰");
         discordData.activity.GetAssets().SetSmallText("Engine Overhaul Project");
         discordData.activity.GetAssets().SetSmallImage("small");
         discordData.activity.GetAssets().SetLargeImage("large");
@@ -93,10 +93,10 @@ namespace discordManager
             discordData.activity.GetAssets().SetLargeText("Third Age: Reforged");
             return 1123946532085969009;
         }
-        // Third Age: Total War Extended (4.0)
-        else if ( findString(dataG::data.gameData.modTitle, "third age extended")  || findString(currentPath, "third_age_4") == true)
+        // EUR
+        else if ( findString(dataG::data.gameData.modTitle, "Divide and Conquer EUR")  || findString(currentPath, "Divide_and_Conquer_EUR") == true)
         {
-            discordData.activity.GetAssets().SetLargeText("Third Age: Total War Extended (4.0)");
+            discordData.activity.GetAssets().SetLargeText("Epic Unity Rework");
             return 1123942808609374270;
         }
         // Third Age: Total War (Vanilla)
@@ -183,11 +183,11 @@ namespace discordManager
             discordData.activity.GetAssets().SetLargeText("Chivalry II: The Sicilian Vespers");
             return 1124057160662405231;
         }
-        // Divide and Conquer: AGO (SuS)
-        else if (findString(dataG::data.gameData.modTitle, "SuS") || findString(currentPath, "SuS") == true)
+        // Gondor at War
+        else if (findString(dataG::data.gameData.modTitle, "Gondor at War") || findString(currentPath, "Divide_and_conquer_GAW") == true)
         {
-            discordData.activity.GetAssets().SetLargeText("Divide and Conquer: SUS");
-            return 1123978207302004806;
+            discordData.activity.GetAssets().SetLargeText("Gondor at War");
+            return 1457847656398458996;
         }
         // Medieval 2: DenMod
         else if (findString(dataG::data.gameData.modTitle, "DenMod") || findString(currentPath, "DenMod") == true)
@@ -262,10 +262,18 @@ namespace discordManager
         try
         {
             // Create a formatted string with the campaign details
-            std::string details = string_format(
-                "%s - Turn %s",
-                discordData.factionName.c_str(),
-                discordData.turnNum.c_str());
+            std::string details;
+            if (discordData.turnNum == "0")
+            {
+                details = discordData.factionName.c_str();
+            }
+            else
+            {
+                details = string_format(
+                    "%s - Turn %s",
+                    discordData.factionName.c_str(),
+                    discordData.turnNum.c_str());
+            }
 
             // Update the state and details of the Rich Presence with details from the file
             discordData.activity.SetState(discordData.status.c_str());

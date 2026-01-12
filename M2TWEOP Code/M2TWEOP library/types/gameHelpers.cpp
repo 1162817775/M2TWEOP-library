@@ -13,6 +13,7 @@
 #include "globals.h"
 #include "MemWork.h"
 #include "techFuncs.h"
+#include "unit.h"
 
 bool m2tweopOptions::hideUnknownUnitTooltips = false;
 bool m2tweopOptions::eopHandleUnitCards = true;
@@ -20,9 +21,14 @@ bool m2tweopOptions::enableFamilyEventsForTeutonic = true;
 bool m2tweopOptions::useEopFrontiers = true;
 int m2tweopOptions::watchTowerRange = 10;
 int m2tweopOptions::weaponBonusModifier = 3;
-uint8_t m2tweopOptions::khakiTextRed = 0x80;
-uint8_t m2tweopOptions::khakiTextGreen = 0x77;
-uint8_t m2tweopOptions::khakiTextBlue = 0x61;
+uint8_t m2tweopOptions::khakiTextRed = 0x0;//0x80;
+uint8_t m2tweopOptions::khakiTextGreen = 0x0; //0x77;
+uint8_t m2tweopOptions::khakiTextBlue = 0x0; //0x61;
+int m2tweopOptions::maxBodyguardSize = 31;
+int m2tweopOptions::minBodyguardSize = 4;
+int m2tweopOptions::extraLeaderSoldiers = 6;
+int m2tweopOptions::extraHeirSoldiers = 4;
+bool m2tweopOptions::ignoreOwnershipRecruitment = false;
 
 scriptCommand::scriptCommand(const char* name) : className(name)
 {
@@ -30,6 +36,122 @@ scriptCommand::scriptCommand(const char* name) : className(name)
 }
 
 eopLogging* eopLogging::m_Instance = new eopLogging();
+std::unique_ptr<gameStringDataDb> gameStringDataDb::m_Instance = std::make_unique<gameStringDataDb>();
+
+void gameStringDataDb::onGameLoad(const std::vector<std::string>& filePaths)
+{
+	for (auto& path : filePaths)
+	{
+		if (path.find("gameStringData.json") == string::npos)
+			continue;
+		jsn::json json;
+		try
+		{
+			std::ifstream file(path);
+			file >> json;
+			file.close();
+		}
+		catch (jsn::json::parse_error& e)
+		{
+			MessageBoxA(nullptr, e.what(), "Warning!", MB_APPLMODAL | MB_SETFOREGROUND);
+		}
+		try
+		{
+			deserialize(json);
+			onGameLoaded();
+		}
+		catch (jsn::json::exception& e)
+		{
+			MessageBoxA(nullptr, e.what(), "Warning!", MB_APPLMODAL | MB_SETFOREGROUND);
+		}
+		return;
+	}
+}
+
+void gameStringDataDb::onGameLoaded()
+{
+	m_Restoring = true;
+	for (const auto& [key, value] : m_ChangedExpandedStrings)
+	{
+		gameHelpers::logStringGame("Restoring expanded string: " + value.key + " to value: " + value.newValue);
+		gameHelpers::setExpandedString(value.key, value.newValue);
+	}
+	for (const auto&  [key, value] : m_ChangedStratStrings)
+	{
+		gameHelpers::logStringGame("Restoring strat string: " + value.key + " to value: " + value.newValue);
+		gameHelpers::setStratString(value.key, value.newValue);
+	}
+	m_Restoring = false;
+}
+
+void gameStringDataDb::addStratEntry(const std::string& key, const std::string& newValue)
+{
+	if (m_Restoring)
+		return;
+	if (m_ChangedStratStrings.find(key) == m_ChangedStratStrings.end())
+	{
+		gameStringData data{};
+		data.key = key;
+		data.original = gameHelpers::getStratString(key);
+		data.newValue = newValue;
+		m_ChangedStratStrings.insert_or_assign(key, data);
+	}
+	else
+	{
+		auto& data = m_ChangedStratStrings.at(key);
+		data.newValue = newValue;
+	}
+}
+
+void gameStringDataDb::addExpandedEntry(const std::string& key, const std::string& newValue)
+{
+	if (m_Restoring)
+		return;
+	if (m_ChangedExpandedStrings.find(key) == m_ChangedExpandedStrings.end())
+	{
+		gameStringData data{};
+		data.key = key;
+		data.original = gameHelpers::getExpandedString(key);
+		data.newValue = newValue;
+		m_ChangedExpandedStrings.insert_or_assign(key, data);
+	}
+	else
+	{
+		auto& data = m_ChangedExpandedStrings.at(key);
+		data.newValue = newValue;
+	}
+}
+
+void gameStringDataDb::restoreOriginal()
+{
+	m_Restoring = true;
+	for (const auto& [key, value] : m_ChangedExpandedStrings)
+	{
+		gameHelpers::logStringGame("Restoring expanded string: " + value.key + " to original value: " + value.original);
+		gameHelpers::setExpandedString(value.key, value.original);
+	}
+	m_ChangedExpandedStrings.clear();
+	for (const auto&  [key, value] : m_ChangedStratStrings)
+	{
+		gameHelpers::logStringGame("Restoring strat string: " + value.key + " to original value: " + value.original);
+		gameHelpers::setStratString(value.key, value.original);
+	}
+	m_ChangedStratStrings.clear();
+	m_Restoring = false;
+}
+
+std::string gameStringDataDb::onGameSave()
+{
+	std::string fPath = gameHelpers::getModPath();
+	fPath += "\\eopData\\TempSaveData";
+	std::string outFile = fPath;
+	outFile += "\\gameStringData.json";
+	ofstream f1(outFile);
+	jsn::json json = serialize();
+	f1 << setw(4) << json;
+	f1.close();
+	return outFile;
+}
 
 char* descrParser::getFileName()
 {
@@ -637,7 +759,20 @@ namespace gameHelpers
 			logStringGame("setExpandedString: Could not find key " + key);
 			return;
 		}
+		gameStringDataDb::getInstance()->addExpandedEntry(key, value);
 		gameStringHelpers::createUniString(*uniString, value.c_str());
+	}
+
+	std::string getExpandedString(const std::string& key)
+	{
+		const auto stringTable = *reinterpret_cast<void**>(dataOffsets::offsets.expandedBinTable);
+		const auto uniString = getHashedUniString(stringTable, key);
+		if (!uniString || !*uniString)
+		{
+			logStringGame("getExpandedString: Could not find key " + key);
+			return "";
+		}
+		return gameStringHelpers::uniStringToStr(*uniString);
 	}
 
 	enum stratTextEnum
@@ -3278,7 +3413,26 @@ namespace gameHelpers
 			logStringGame("setStratString: Could not get string for key " + key);
 			return;
 		}
+		gameStringDataDb::getInstance()->addStratEntry(key, value);
 		gameStringHelpers::createUniString(*uniString, value.c_str());
+	}
+
+	std::string getStratString(const std::string& key)
+	{
+		const auto stringTable = *reinterpret_cast<void**>(dataOffsets::offsets.stratBinTable);
+		if (stratTextEnumMap.find(key) == stratTextEnumMap.end())
+		{
+			logStringGame("getStratString: Could not find key " + key);
+			return "";
+		}
+		const auto enumVal = stratTextEnumMap.at(key);
+		const auto uniString = callClassFunc<void*, UNICODE_STRING***, int>(stringTable, 0x8, enumVal);
+		if (!uniString || !*uniString)
+		{
+			logStringGame("getStratString: Could not get string for key " + key);
+			return "";
+		}
+		return gameStringHelpers::uniStringToStr(*uniString);
 	}
 
 	void setEquipmentCosts(const int equipType, const int cost)
@@ -3379,6 +3533,30 @@ namespace gameHelpers
 		const DWORD retAdr = dataOffsets::offsets.maxBgSize2 + 1;
 		MemWork::WriteData(&size, cmpAdr, 1);
 		MemWork::WriteData(&size, retAdr, 1);
+		m2tweopOptions::setMaxBodyguardSize(size);
+	}
+	
+	void setMinBgSize(unsigned char size)
+	{
+		m2tweopOptions::setMinBodyguardSize(size);
+	}
+
+	int calculateMaxBodyguardSize(const character* general, const eduEntry* bgEntry)
+	{
+		const auto record = general->characterRecord;
+		auto soldiers = static_cast<int>(bgEntry->soldierCount);
+		if (record->isLeader())
+		{
+			soldiers += m2tweopOptions::getExtraLeaderSoldiers();
+		}
+		else if (record->isHeir())
+		{
+			soldiers += m2tweopOptions::getExtraHeirSoldiers();
+		}
+		soldiers += (record->bodyguardSize + record->personalSecurity);
+		soldiers = min(soldiers, m2tweopOptions::getMaxBodyguardSize());
+		soldiers = max(soldiers, m2tweopOptions::getMinBodyguardSize());
+		return soldiers;
 	}
 
 	void fixReligionTrigger()
@@ -3497,6 +3675,11 @@ namespace gameHelpers
 		MemWork::WriteData(&fix2, limit9, 1);
 
 		//historic battle?
+	}
+
+	float getUnitSizeMultiplier()
+	{
+		return GAME_FUNC(float (__thiscall*)(campaign*), getUnitSizeMultiplier)(campaignHelpers::getCampaignData());
 	}
 
 	void addToLua(sol::state& luaState)
