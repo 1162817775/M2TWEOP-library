@@ -20,7 +20,7 @@ jobs:
           git config --global user.email "1162817775@qq.com"
 
       - name: Add upstream repository
-        run: git remote add upstream https://github.com/youneuoy/M2TWEOP-library.git  # 替换为上游仓库地址
+        run: git remote add upstream https://github.com/EOP-Labs/M2TWEOP-library.git  # 替换为上游仓库地址
 
       - name: Fetch upstream changes
         run: git fetch upstream
