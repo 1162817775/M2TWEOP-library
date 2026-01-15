@@ -2161,6 +2161,17 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 		globalEopAiConfig::getInstance()->turnStartMove(fac, false);
 		discordManager::onFactionTurnStart(fac);
 		plannedRetreatRoute::onFactionTurnStart(fac);
+		if (fac->isPlayerControlled == 1)
+		{
+			for (int i = 0; i < fac->settlementsNum; i++)
+			{
+				if (const auto sett = fac->settlements[i];
+					sett->aiProductionController)
+				{
+					sett->aiProductionController->isAutoManagedTaxes = false;
+				}
+			}
+		}
 		AI_ACTIVE = true;
 	}
 	else if (eventCode == preFactionTurnStartCode)
@@ -2267,7 +2278,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 	else if (eventCode == settlementTurnStart)
 	{
 		const auto sett = reinterpret_cast<settlementStruct*>(vTab[1]);
-		if (const auto fac = sett->faction; fac->isPlayerControlled == 1 && sett->aiProductionController && !sett->aiProductionController->isAutoManaged )
+		if (const auto fac = sett->faction; fac->isPlayerControlled == 1 && sett->aiProductionController )
 		{
 			sett->aiProductionController->isAutoManagedTaxes = false;
 		}
