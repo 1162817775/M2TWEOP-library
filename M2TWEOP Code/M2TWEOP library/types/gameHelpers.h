@@ -376,10 +376,12 @@ public:
 	nlohmann::json serialize()
 	{
 		nlohmann::json json;
+		json["expandedStrings"] = nlohmann::json::array();
 		for (const auto& [key, value] : m_ChangedExpandedStrings)
 		{
 			json["expandedStrings"].push_back(value.serialize());
 		}
+		json["stratStrings"] = nlohmann::json::array();
 		for (const auto& [key, value] : m_ChangedStratStrings)
 		{
 			json["stratStrings"].push_back(value.serialize());
