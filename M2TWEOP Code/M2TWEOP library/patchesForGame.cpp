@@ -1874,6 +1874,7 @@ void patchesForGame::onBattleTick()
 }
 
 bool NEED_BUILD_FRONTIERS = true;
+bool LOADING_SAVE = false;
 
 void __stdcall patchesForGame::afterCampaignMapLoaded()
 {
@@ -1887,6 +1888,11 @@ void __stdcall patchesForGame::afterCampaignMapLoaded()
 		NEED_BUILD_FRONTIERS = false;
 	}
 	discordManager::onCampaignMapLoaded();
+	if (LOADING_SAVE)
+	{
+		eopFactionDataDb::get()->onGameLoaded();
+		LOADING_SAVE = false;
+	}
 }
 
 void __stdcall patchesForGame::onNewGameStart()
@@ -2307,8 +2313,10 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 	gameEvents::onEventWrapper(eventCode, vTab);
 }
 
+
 void __fastcall patchesForGame::onLoadSaveFile(UNICODE_STRING**& savePath)
 {
+	LOADING_SAVE = true;
 	const string relativePath = techFuncs::uniToAnsi(savePath);
 	vector<string> files = techFuncs::getEopArchiveFiles(relativePath);
 	if (files.empty())
