@@ -1501,7 +1501,7 @@ void globalEopAiConfig::characterTurnStart(character* currentChar)
 	if (army->numOfUnits > 20)
 	{
 		gameHelpers::logStringGame("Character: " + string(currentChar->characterRecord->fullName) + " has more than 20 units!");
-		MessageBoxA(nullptr, "Army has more than 20 units!", "Error", MB_OK);
+		// MessageBoxA(nullptr, "Army has more than 20 units!", "Error", MB_OK);
 		const auto [newX, newY] = stratMapHelpers::findValidTileNearTile(army->getX() + 1, army->getY() + 1, 7);
 		sol::table unitTable = plugData::data.luaAll.luaState.create_table();
 		for (int i = army->numOfUnits - 1; i > 19; i--)
