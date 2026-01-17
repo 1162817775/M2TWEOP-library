@@ -2369,6 +2369,18 @@ private:
 	LPVOID funcAddress;
 };
 
+class onGeneralBesiegeBug
+	:public AATemplate
+{
+public:
+	onGeneralBesiegeBug(MemWork* mem, LPVOID addr, int ver);
+	~onGeneralBesiegeBug() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 class onCheckOwnership
 	:public AATemplate
 {
