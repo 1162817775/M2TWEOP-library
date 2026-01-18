@@ -2174,6 +2174,10 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 		globalEopAiConfig::getInstance()->turnStartMove(fac, false);
 		discordManager::onFactionTurnStart(fac);
 		plannedRetreatRoute::onFactionTurnStart(fac);
+		if (fac->factionID == campaignHelpers::getCampaignData()->getFactionByOrder(0)->factionID)
+		{
+			eopCharacterDataDb::get()->reapplyPortraits();
+		}
 		if (fac->isPlayerControlled == 1)
 		{
 			for (int i = 0; i < fac->settlementsNum; i++)

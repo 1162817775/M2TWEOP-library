@@ -39,6 +39,7 @@ namespace stratModelsChange
 	{
 		character* gen;
 		std::string modelId;
+		std::string label;
 	};
 
 	namespace
@@ -145,10 +146,14 @@ namespace stratModelsChange
 			changeModel(changeMod->x, changeMod->y, mod1->modelP, mod2->modelP);
 		}
 		
+		const auto campaign = campaignHelpers::getCampaignData();
 		for (const auto& changeMod : STRAT_MODEL_CHARACTER_CHANGE_LIST) //character models
 		{
-			if (changeMod->gen)
+			if (const auto rec = campaign->getCharacterByLabel(changeMod->label); rec && rec->gen)
+			{
+				changeMod->gen = rec->gen;
 				changeStratModel(changeMod->gen, changeMod->modelId);
+			}
 		}
 
 		for (UINT32 i = 0; i < STRAT_MODEL_CHARACTER_CHANGE_LIST.size(); i++) //remove character models from change list because it only has to happen once!
@@ -235,9 +240,10 @@ namespace stratModelsChange
 		const auto rec = std::make_shared<stratModelCharacterRecordChange>();
 		rec->gen = gen;
 		rec->modelId = model;
-		STRAT_MODEL_CHARACTER_CHANGE_LIST.push_back(rec);
 		const auto charData = eopCharacterDataDb::get()->getOrCreateData(gen->characterRecord->giveValidLabel(), gen->getTypeID());
 		charData->model = model;
+		rec->label = gen->characterRecord->label;
+		STRAT_MODEL_CHARACTER_CHANGE_LIST.push_back(rec);
 
 		CHANGE_MODELS_NEEDED_NOW = ModelsChangeStatus::NeedChange;
 	}
@@ -254,6 +260,8 @@ namespace stratModelsChange
 			return;
 		}
 		auto characterFacEntry = gen->genType;
+		if (!characterFacEntry)
+			return;
 		if (characterFacEntry->isEopEntry != 1)
 		{
 			characterFacEntry = techFuncs::createGameClass<genMod>(); //make new descr character faction entry
