@@ -1330,6 +1330,12 @@ void managerF::execPatches()
 	toInitControllers->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onGeneralBesiegeBug patch" << '\n';
+	onGeneralBesiegeBug* toGeneralBesiegeBug = new onGeneralBesiegeBug(mem, (LPVOID)patchesForGame::onGeneralSiegeBug, globals::dataS.gameVersion);
+	toGeneralBesiegeBug->SetNewCode();
+	toGeneralBesiegeBug->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying onExitToMenu2 patch" << '\n';
 	onExitToMenu2* toExitToMenu2 = new onExitToMenu2(mem, (LPVOID)patchesForGame::onExitToMenu, globals::dataS.gameVersion);
 	toExitToMenu2->SetNewCode();

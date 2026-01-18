@@ -869,6 +869,13 @@ int patchesForGame::onGetWatchTowerRange()
 	return m2tweopOptions::getWatchTowerRange();
 }
 
+int patchesForGame::onGeneralSiegeBug(const generalAssault* assault)
+{
+	if (!assault || !assault->character || !assault->character->army)
+		return 1;
+	return 0;
+}
+
 void patchesForGame::onSetSettlementModel(settlementStruct* settlement)
 {
 	bool changed = false;

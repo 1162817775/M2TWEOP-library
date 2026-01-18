@@ -71,6 +71,7 @@ public:
 	static int __fastcall onGetHiddenResource(const stringWithHash* name);
 	static int __fastcall onCheckHiddenResource(int id, int region);
 	static int __cdecl onGetWatchTowerRange();
+	static int __fastcall onGeneralSiegeBug(const generalAssault* assault);
 	static void __fastcall onSetSettlementModel(settlementStruct* settlement);
 	static int __fastcall onGeneralAssaultAction(generalAssault* assault);
 	static int __fastcall onCalcBgSize(character* general, eduEntry* entry);

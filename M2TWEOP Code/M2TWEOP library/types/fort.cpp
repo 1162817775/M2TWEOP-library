@@ -162,6 +162,10 @@ namespace fortHelpers
 	{
 		factionStruct* faction = fac;
 		const auto tile = stratMapHelpers::getStratMap()->getTile(x, y);
+		if (tile->settlement || tile->fort)
+		{
+			gameHelpers::logStringGame("createFortXYCulture: can't create - tile already has settlement or fort.");
+		}
 		auto neighbours = stratMapHelpers::getNeighbourTiles(x, y);
 		while (true)
 		{
