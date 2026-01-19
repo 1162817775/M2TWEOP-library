@@ -1634,6 +1634,17 @@ void characterRecord::addTraitPoints(const std::string& trait, const int points)
 		addTraitPoints)(this, entry, addPoints, true);
 }
 
+void eopCharacterDataDb::reapplyPortraits()
+{
+	for (const auto& [label, data] : *instance->eopCharData)
+	{
+		if (const auto charRec = campaignHelpers::getCampaignData()->getCharacterByLabel(label); charRec && !data->portrait.empty())
+		{
+			charRec->setPortrait(data->portrait);
+		}
+	}
+}
+
 void eopCharacterDataDb::validate()
 {
 	const auto campaign = campaignHelpers::getCampaignData();

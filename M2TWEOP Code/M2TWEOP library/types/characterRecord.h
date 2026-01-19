@@ -507,6 +507,7 @@ public:
 			(*eopCharData)[label] = std::make_shared<eopCharacterData>();
 		return (*eopCharData)[label];
 	}
+	void reapplyPortraits();
 	std::shared_ptr<eopCharacterData> getOrCreateData(const std::string& label, int characterType)
 	{
 		if (eopCharData->find(label) == eopCharData->end())
