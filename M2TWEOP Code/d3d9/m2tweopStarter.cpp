@@ -78,9 +78,29 @@ namespace m2tweopStarter
 		dataEOP.hmtw=LoadLibraryA(libPath.c_str());
 		if (dataEOP.hmtw == NULL)
 		{
-			string errmsg = "Cannot load ";
-			errmsg += libPath;
-			MessageBoxA(NULL, errmsg.c_str(), "ATTENTION!", NULL);
+			DWORD error = GetLastError();
+			string errmsg = "Cannot load DLL: " + libPath + "\n";
+			errmsg += "\nError code: " + to_string(error) + "\n";
+			
+			// Check if file exists
+			DWORD fileAttr = GetFileAttributesA(libPath.c_str());
+			if (fileAttr == INVALID_FILE_ATTRIBUTES) {
+				errmsg += "File does not exist or is inaccessible\n";
+			} else {
+				errmsg += "File exists but failed to load\n";
+			}
+			
+			// Common error explanations
+			switch (error) {
+				case 126: errmsg += "Missing dependencies or invalid DLL"; break;
+				case 127: errmsg += "Procedure not found"; break;
+				case 193: errmsg += "Not a valid Win32 application (architecture mismatch)"; break;
+				case 2: errmsg += "File not found"; break;
+				case 5: errmsg += "Access denied"; break;
+				default: errmsg += "Unknown error"; break;
+			}
+			
+			MessageBoxA(NULL, errmsg.c_str(), "DLL Load Error", MB_OK | MB_ICONERROR);
 			exit(0);
 		}
 		dataEOP.eopInitF = (m2tweopInit)GetProcAddress(dataEOP.hmtw, "initEOP");
