@@ -50,13 +50,47 @@ struct generalAssault
 	char pad[3];
 };
 
+struct fakeFormSquareVtbl
+{
+	char pad[0x4C];
+	int specPosGetFunc;
+	char pad2[0xF4];
+};
+
+struct formationGame
+{
+	fakeFormSquareVtbl* vtbl; 
+};
+
+struct formationData
+{
+	float offsetRowX;
+	float offsetRowY;
+	float offsetColumnX;
+	float offsetColumnY;
+	float spacingRows;
+	float spacingColumns;
+	float angle;
+	float entryXRadius;
+	float entryYRadius;
+	unsigned __int16 entries;
+	unsigned __int16 width;
+	unsigned __int8 specEntries;
+	unsigned __int8 remainder;
+	unsigned __int8 training;
+	unsigned __int8 allowRandomPerturbations;
+	void *auxiliaryData;
+	int movingThrough;
+};
+
+
 class patchesForGame
 {
 public:
 	//select worldpkgdesc from db
 	static worldRecord* __fastcall selectWorldpkgdesc(char* database, worldRecord* selectedRecord);
 
-
+	
 	static void __fastcall onLoadSettlementWorldpkgdesc(worldRecord* selectedRecord);
 	static int __fastcall onFortificationLevelS(settlementStruct* settlement, bool* isCastle);
 	static char* __fastcall onSaveEDUStringS(const eduEntry* eduEntry);
@@ -71,6 +105,8 @@ public:
 	static int __fastcall onGetHiddenResource(const stringWithHash* name);
 	static int __fastcall onCheckHiddenResource(int id, int region);
 	static int __cdecl onGetWatchTowerRange();
+	static void __fastcall posSpecAttackGet(formationGame* form, formationData* data, uint32_t index, vector2* outPos);
+	static uint32_t __fastcall onGetNormalPos(const formationData* data, uint32_t index);
 	static int __fastcall onGeneralSiegeBug(const generalAssault* assault);
 	static void __fastcall onSetSettlementModel(settlementStruct* settlement);
 	static int __fastcall onGeneralAssaultAction(generalAssault* assault);

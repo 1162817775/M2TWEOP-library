@@ -1113,6 +1113,18 @@ void managerF::execPatches()
 	toCreateBirthOption2->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onGetNormalPos patch" << '\n';
+	onGetNormalPos* toGetNormalPos = new onGetNormalPos(mem, (LPVOID)patchesForGame::onGetNormalPos, globals::dataS.gameVersion);
+	toGetNormalPos->SetNewCode();
+	toGetNormalPos->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onGetSpecPos patch" << '\n';
+	onGetSpecPos* toGetSpecPos = new onGetSpecPos(mem, (LPVOID)patchesForGame::posSpecAttackGet, globals::dataS.gameVersion);
+	toGetSpecPos->SetNewCode();
+	toGetSpecPos->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying onHiddenResourceConditionParse patch" << '\n';
 	onHiddenResourceConditionParse* toHiddenResourceConditionParse = new onHiddenResourceConditionParse(mem, (LPVOID)patchesForGame::onGetHiddenResource, globals::dataS.gameVersion);
 	toHiddenResourceConditionParse->SetNewCode();

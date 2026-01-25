@@ -283,6 +283,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield getFactionRecord getFactionRecord
 	@tfield getFactionRecordNum getFactionRecordNum
 	@tfield hideUnknownUnitTooltips hideUnknownUnitTooltips
+	@tfield changeGeneralPosition changeGeneralPosition
 	@tfield handleUnitCards handleUnitCards
 	@tfield setWeaponBonusModifier setWeaponBonusModifier
 	@tfield setWatchTowerRange setWatchTowerRange
@@ -1069,6 +1070,15 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 		M2TWEOP.ignoreOwnershipRecruitment(true)
 	*/
 	tables.M2TWEOP.set_function("ignoreOwnershipRecruitment", &m2tweopOptions::setIgnoreOwnershipRecruitment);
+	
+	/***
+	Place the general in inside the unit instead of the left edge to make him less vulnerable to cavalry charges. Also puts last officer in that spot for units without a general due to game limitations.
+	@function M2TWEOP.changeGeneralPosition
+	@tparam bool set
+	@usage
+		M2TWEOP.changeGeneralPosition(true)
+	*/
+	tables.M2TWEOP.set_function("changeGeneralPosition", &m2tweopOptions::setChangeGeneralPosition);
 	
 	/***
 	Faction specific unit cards are always chosen if found. Enabled by default.

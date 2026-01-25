@@ -2357,6 +2357,31 @@ private:
 	LPVOID funcAddress;
 };
 
+class onGetNormalPos
+	:public AATemplate
+{
+public:
+	onGetNormalPos(MemWork* mem, LPVOID addr, int ver);
+	~onGetNormalPos() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+
+class onGetSpecPos
+	:public AATemplate
+{
+public:
+	onGetSpecPos(MemWork* mem, LPVOID addr, int ver);
+	~onGetSpecPos() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 class onUiBitmapTexture
 	:public AATemplate
 {

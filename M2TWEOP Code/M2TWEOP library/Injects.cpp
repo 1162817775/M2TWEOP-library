@@ -6399,6 +6399,68 @@ void onSpawnArmy::SetNewCode()
 	delete a;
 }
 
+onGetNormalPos::onGetNormalPos(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x7B689C;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x7B6050;
+}
+
+void onGetNormalPos::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->mov(edx, dword_ptr(esp, 0x18));
+	a->push(ecx);
+	a->push(esi);
+	a->mov(ecx, esi);
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->mov(edi, eax);
+	a->pop(esi);
+	a->cmp(dword_ptr(esi, 0x2C), 0);
+	a->pop(ecx);
+	a->mov(ebx, ecx);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+
+onGetSpecPos::onGetSpecPos(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x7B4270;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x7B3A30;
+}
+
+void onGetSpecPos::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->mov(edx, dword_ptr(esp, 0x4));
+	a->push(dword_ptr(esp, 0xC));
+	a->push(dword_ptr(esp, 0xC));
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	if (m_adress == 0x7B4270)
+	{
+		a->mov(eax, 0x7B42AE);
+	}
+	else
+	{
+		a->mov(eax, 0x7B3A6E);
+	}
+	a->jmp(eax);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
 onSetBuildPolicies::onSetBuildPolicies(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {
