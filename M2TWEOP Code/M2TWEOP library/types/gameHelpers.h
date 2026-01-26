@@ -428,6 +428,8 @@ public:
 	static int getWatchTowerRange() { return watchTowerRange; }
 	static void setUseEopFrontiers(const bool value) { useEopFrontiers = value; }
 	static int getUseEopFrontiers() { return useEopFrontiers; }
+	static void setChangeGeneralPosition (const bool value) { changeGeneralPosition = value; }
+	static bool getChangeGeneralPosition() { return changeGeneralPosition; }
 	static int getWeaponBonusModifier() { return weaponBonusModifier; }
 	static int getMaxBodyguardSize() { return maxBodyguardSize; }
 	static int getMinBodyguardSize() { return minBodyguardSize; }
@@ -454,6 +456,7 @@ public:
 	static bool useEopFrontiers;
 	static bool fixHeroAbilityKillChance;
 	static bool ignoreOwnershipRecruitment;
+	static bool changeGeneralPosition;
 	static uint8_t khakiTextRed;
 	static uint8_t khakiTextGreen;
 	static uint8_t khakiTextBlue;

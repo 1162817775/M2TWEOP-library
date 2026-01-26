@@ -869,6 +869,68 @@ int patchesForGame::onGetWatchTowerRange()
 	return m2tweopOptions::getWatchTowerRange();
 }
 
+void patchesForGame::posSpecAttackGet(formationGame* form, formationData* data, uint32_t index, vector2* outPos)
+{
+	if (m2tweopOptions::getChangeGeneralPosition() && index == data->specEntries - 1)
+	{
+		const auto newIndex = data->entries + 1;
+		callClassFunc<formationGame*, void, formationData*, uint32_t, vector2*>(form, 0x44, data, newIndex, outPos);
+	}
+	else
+	{
+		outPos->x = data->offsetColumnX * -1.0f - index * data->offsetRowX;
+		outPos->y = data->offsetColumnY * -1.0f - index * data->offsetRowY;
+	}
+}
+
+/*
+void replaceGeneralUnitVtbl(unit* unit)
+{
+	gameHelpers::logStringGame("replaceGeneralUnitVtbl");
+	if (!unit || !unit->generalArmy || !unit->generalArmy->soldier)
+	{
+		gameHelpers::logStringGame("replaceGeneralUnitVtbl - no unit or no general army or no soldier");
+		return;
+	}
+	int formType = callClassFunc<formationGame*, int>(static_cast<formationGame*>(unit->formationsArray), 0x4);
+	if (formType != 2)
+	{
+		gameHelpers::logStringGame("replaceGeneralUnitVtbl - invalid form type");
+		return;
+	}
+	if (!FORMATION_CHANGED)
+	{
+		gameHelpers::logStringGame("creating new formation vtbl");
+		FORMATION_CHANGED = new formationGame();
+		auto existing = static_cast<formationGame*>(unit->formationsArray);
+		DWORD newFunc = reinterpret_cast<DWORD>(&posSpecAttackGetVfunc);
+		auto vtbl = existing->vtbl;
+		auto oldPosFunc = vtbl->specPosGetFunc;
+		//memcpy(FAKE_FORM_SQUARE_VTBL, reinterpret_cast<void*>(existing->vtbl), sizeof(fakeFormSquareVtbl));
+		vtbl->specPosGetFunc = newFunc;
+		//FORMATION_CHANGED->vtbl = reinterpret_cast<DWORD>(FAKE_FORM_SQUARE_VTBL);
+	}
+	gameHelpers::logStringGame("replaceGeneralUnitVtbl - vtbl replaced");
+	//unit->formationsArray = FORMATION_CHANGED;
+}*/
+
+uint32_t patchesForGame::onGetNormalPos(const formationData* data, const uint32_t index)
+{
+	if (data->specEntries == 0 || !m2tweopOptions::getChangeGeneralPosition())
+	{
+		return index;
+	}
+	if (index == data->entries / 2)
+	{
+		return data->entries;
+	}
+	if (index == data->entries + 1)
+	{
+		return data->entries / 2;
+	}
+	return index;
+}
+
 int patchesForGame::onGeneralSiegeBug(const generalAssault* assault)
 {
 	if (!assault || !assault->character || !assault->character->army)
@@ -2128,6 +2190,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 	const DWORD postBattle = gameVersion == 1 ? 0x01367ADC : 0x01322AB4; 
 	const DWORD preBattleWithdrawal = gameVersion == 1 ? 0x01366D54 : 0x01321D2C; 
 	const DWORD generalAssaultsResidence = gameVersion == 1 ? 0x0136A3E4 : 0x013253BC; 
+	const DWORD deploymentPhaseCommenced = gameVersion == 1 ? 0x01366FD4 : 0x01321FAC; 
 	if (eventCode == scrollOpenedCode)
 	{
 		char* str = reinterpret_cast<char*>(vTab[1]);
@@ -2211,9 +2274,13 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 		eopFactionDataDb::get()->onGameLoaded();
 		//eopCharacterDataDb::get()->onGameLoaded();
 	}
+	else if (eventCode == deploymentPhaseCommenced)
+	{
+	}
 	else if (eventCode == conflictPhaseCommenced)
 	{
 		const auto battle = battleHelpers::getBattleData();
+		gameHelpers::logStringGame("conflict phase commenced");
 		USED_GATES->clear();
 		if (battle && battle->battleType == battleType::siege)
 		{
