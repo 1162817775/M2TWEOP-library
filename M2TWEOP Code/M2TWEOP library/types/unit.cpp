@@ -1510,6 +1510,8 @@ namespace unitHelpers
 	
 	eduEntry* getEduEntryByName(const char* type)
 	{
+		if (!type)
+			return nullptr;
 		if (BASE_UNITS_LOOKUP.find(type) != BASE_UNITS_LOOKUP.end())
 			return getEDUEntryById(BASE_UNITS_LOOKUP[type]);
 		if (const auto data = eopDu::getEopEduEntryByName(type))
