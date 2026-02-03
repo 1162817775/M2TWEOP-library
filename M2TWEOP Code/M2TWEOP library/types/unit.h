@@ -546,6 +546,41 @@ struct mountedEngine
 	engineRecordBase record;
 	mountedEngine() = default;
 };
+
+struct autoResolveUnit
+{
+	struct unit* unit;
+	void* contacts[9];
+	int numSoldiers;
+	int numKills;
+	int numAttacks;
+	float soldierRoutFraction;
+	float allianceStr;
+	int soldierRoutLimit;
+	int soldierRoutBrokenLimit;
+	int routTimer;
+	int minSoldiers;
+	unitStats meleeStats;
+	unitStats missileStats;
+	int ammoRemaining;
+	int separationDistance;
+	struct unit* sinkingUnit;
+	int finalSoldiersDied;
+	int finalSoldiersKilled;
+	float soldiersHealedFraction;
+	bool general;
+	bool engaged;
+	bool exposed;
+	bool seperated;
+	bool routing;
+	bool routingBroken;
+	bool shipSunk;
+	bool hasSeenCombat;
+	bool limitedCasualties;
+	int numTakenPrisoner;
+	int finalNumTakenPrisoner;
+};
+
 	
 
 struct engineRecord {
@@ -2369,6 +2404,7 @@ namespace unitHelpers
 	int getEduIndex(const char* type);
 	eduEntry* getEduEntryByName(const char* type);
 	eduEntry* getEDUEntryById(int id);
+	bool modelExists(const std::string& model);
 	
 	unitGroup* defineUnitGroup(const armyStruct* army, const char* label, unit* un);
 	void addUnitToGroup(unitGroup* group, unit* un);

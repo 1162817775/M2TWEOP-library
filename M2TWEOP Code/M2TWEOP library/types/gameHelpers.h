@@ -439,6 +439,10 @@ public:
 	static void setExtraHeirSoldiers(const int value) { extraHeirSoldiers = value; }
 	static void setMaxBodyguardSize(const int value) { maxBodyguardSize = value; }
 	static void setMinBodyguardSize(const int value) { minBodyguardSize = value; }
+	static void setArmourBonusModifier(const int value) { armourBonusModifier = value & 0xFF; }
+	static int getArmourBonusModifier() { return armourBonusModifier; }
+	static void setEnableRangedWeaponUpg(const bool value) { enableRangedWeaponUpg = value; }
+	static bool getEnableRangedWeaponUpg() { return enableRangedWeaponUpg; }
 	static void setIgnoreOwnershipRecruitment(const bool value) { ignoreOwnershipRecruitment = value; }
 	static bool getIgnoreOwnershipRecruitment() { return ignoreOwnershipRecruitment; }
 	static void setWeaponBonusModifier(const int value) { weaponBonusModifier = value & 0xFF; }
@@ -446,6 +450,7 @@ public:
 	static void setKhakiTextColor(const uint8_t red, const uint8_t green, const uint8_t blue) { khakiTextRed = red; khakiTextGreen = green; khakiTextBlue = blue; }
 	static int watchTowerRange;
 	static int weaponBonusModifier;
+	static int armourBonusModifier;
 	static int maxBodyguardSize;
 	static int minBodyguardSize;
 	static int extraLeaderSoldiers;
@@ -457,6 +462,7 @@ public:
 	static bool fixHeroAbilityKillChance;
 	static bool ignoreOwnershipRecruitment;
 	static bool changeGeneralPosition;
+	static bool enableRangedWeaponUpg;
 	static uint8_t khakiTextRed;
 	static uint8_t khakiTextGreen;
 	static uint8_t khakiTextBlue;

@@ -108,6 +108,10 @@ public:
 	static void __fastcall posSpecAttackGet(formationGame* form, formationData* data, uint32_t index, vector2* outPos);
 	static uint32_t __fastcall onGetNormalPos(const formationData* data, uint32_t index);
 	static int __fastcall onGeneralSiegeBug(const generalAssault* assault);
+	static void __fastcall onCalculateUnitStats(unitStats* stats, uint32_t wpn, uint32_t armour);
+	static void __fastcall onCalculateUnitStatsSoldier(unitStats* stats, const soldierInBattle* soldier);
+	static void __fastcall onCalculateUnitStatsOfficer(generalInfo* officer);
+	static void __fastcall onInitAutoUnit(autoResolveUnit* autoUnit);
 	static void __fastcall onSetSettlementModel(settlementStruct* settlement);
 	static int __fastcall onGeneralAssaultAction(generalAssault* assault);
 	static int __fastcall onCalcBgSize(character* general, eduEntry* entry);
@@ -140,6 +144,7 @@ public:
 	static eduEntry* __fastcall onCustomBattleCost(int eduIndexOffset);
 	static int __fastcall onMarriageOption(const factionRecord* facRecord);
 	static int __fastcall onCalcUnitStatsWpn(int weapon);
+	static int __fastcall onCalcUnitValueArmour(int armour);
 	static int* __fastcall onGetSupportingArmies(armyStruct* defender, armyStruct* attacker);
 	static uint32_t __fastcall onDrawBanner(const trackedArmy* army);
 	static bannerData* __fastcall onGetRebelSymbol(const trackedArmy* army, bannerData* oldData);

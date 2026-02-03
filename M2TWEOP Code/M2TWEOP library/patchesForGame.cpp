@@ -938,6 +938,47 @@ int patchesForGame::onGeneralSiegeBug(const generalAssault* assault)
 	return 0;
 }
 
+void patchesForGame::onCalculateUnitStats(unitStats* stats, const uint32_t wpn, const uint32_t armour)
+{
+	stats->setBattleStats(wpn, armour);
+}
+
+void patchesForGame::onCalculateUnitStatsSoldier(unitStats* stats, const soldierInBattle* soldier)
+{
+	stats->setBattleStats(soldier->soldierOnStratMap.weapon, soldier->soldierOnStratMap.armour);
+}
+
+void patchesForGame::onCalculateUnitStatsOfficer(generalInfo* officer)
+{
+	officer->stats.setBattleStats(officer->soldierOnStratMap.weapon, officer->soldierOnStratMap.armour);
+}
+
+void patchesForGame::onInitAutoUnit(autoResolveUnit* autoUnit)
+{
+	const auto eduEn = autoUnit->unit->eduEntry;
+	if (eduEn->priStats.isMissile)
+	{
+		GAME_FUNC(void(__thiscall*)(statPri*, statPri*), priStatCopy)(&autoUnit->missileStats.priStats, &eduEn->priStats);
+		autoUnit->ammoRemaining = eduEn->priStats.ammo;
+		autoUnit->missileStats.chargeBonus = 0;
+		autoUnit->missileStats.setBattleStats(autoUnit->unit->avgWeaponUpg, autoUnit->unit->avgArmourUpg);
+		if (eduEn->secStats.isValid)
+		{
+			GAME_FUNC(void(__thiscall*)(statPri*, statPri*), priStatCopy)(&autoUnit->meleeStats.priStats, &eduEn->secStats);
+			autoUnit->meleeStats.chargeBonus = eduEn->secStats.charge;
+			autoUnit->meleeStats.setBattleStats(autoUnit->unit->avgWeaponUpg, autoUnit->unit->avgArmourUpg);
+		}
+	}
+	else
+	{
+		GAME_FUNC(void(__thiscall*)(statPri*, statPri*), priStatCopy)(&autoUnit->meleeStats.priStats, &eduEn->priStats);
+		autoUnit->meleeStats.chargeBonus = eduEn->priStats.charge;
+		autoUnit->meleeStats.setBattleStats(autoUnit->unit->avgWeaponUpg, autoUnit->unit->avgArmourUpg);
+		autoUnit->missileStats.priStats.isValid = false;
+		autoUnit->ammoRemaining = 0;
+	}
+}
+
 void patchesForGame::onSetSettlementModel(settlementStruct* settlement)
 {
 	bool changed = false;
@@ -1265,6 +1306,11 @@ int patchesForGame::onMarriageOption(const factionRecord* facRecord)
 int patchesForGame::onCalcUnitStatsWpn(const int weapon)
 {
 	return weapon * m2tweopOptions::weaponBonusModifier;
+}
+
+int patchesForGame::onCalcUnitValueArmour(const int armour)
+{
+	return armour * m2tweopOptions::armourBonusModifier * 4;
 }
 
 //Sally out fix, consider armies around settlement not defender
@@ -2197,6 +2243,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 		if (strcmp(str, "prebattle_scroll") == 0)
 		{
 			battleCreator::onBattleStratScreen();
+			campaignAi::setPlayerAssaulted();
 		}
 		else if (strcmp(str, "post_battle_scroll") == 0)
 		{

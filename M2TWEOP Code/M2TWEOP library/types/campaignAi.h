@@ -1155,4 +1155,5 @@ namespace campaignAi
 	militaryValuesLTGD* getAiFactionValues(const factionStruct* fac);
 	interFactionLTGD* getInterFactionLTGD(const factionStruct* fac, const factionStruct* targetFac);
 	void addToLua(sol::state& luaState);
+	void setPlayerAssaulted();
 }

@@ -1556,7 +1556,22 @@ namespace unitHelpers
 		}
 		return nullptr;
 	}
-	
+
+	bool modelExists(const std::string& model)
+	{
+		const auto found = findBattleModel(model.c_str());
+		return found != nullptr;
+	}
+}
+
+void unitStats::setBattleStats(const uint32_t wpn, const uint32_t armour)
+{
+	auto weaponBonus = wpn * m2tweopOptions::getWeaponBonusModifier();
+	if (this->priStats.isMissile && !m2tweopOptions::getEnableRangedWeaponUpg())
+		weaponBonus = 0;
+	const auto armourBonus = armour * m2tweopOptions::getArmourBonusModifier();
+	this->attackInBattle = static_cast<uint8_t>(this->priStats.attack + weaponBonus);
+	this->armourInBattle = static_cast<uint8_t>(this->armourStats.armour + armourBonus);
 }
 
 //void addToLua(sol::state& luaState)

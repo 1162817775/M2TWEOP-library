@@ -21,6 +21,7 @@ bool m2tweopOptions::enableFamilyEventsForTeutonic = true;
 bool m2tweopOptions::useEopFrontiers = true;
 int m2tweopOptions::watchTowerRange = 10;
 int m2tweopOptions::weaponBonusModifier = 3;
+int m2tweopOptions::armourBonusModifier = 2;
 uint8_t m2tweopOptions::khakiTextRed = 0x0;//0x80;
 uint8_t m2tweopOptions::khakiTextGreen = 0x0; //0x77;
 uint8_t m2tweopOptions::khakiTextBlue = 0x0; //0x61;
@@ -30,6 +31,7 @@ int m2tweopOptions::extraLeaderSoldiers = 6;
 int m2tweopOptions::extraHeirSoldiers = 4;
 bool m2tweopOptions::ignoreOwnershipRecruitment = false;
 bool m2tweopOptions::changeGeneralPosition = false;
+bool m2tweopOptions::enableRangedWeaponUpg = true;
 
 scriptCommand::scriptCommand(const char* name) : className(name)
 {

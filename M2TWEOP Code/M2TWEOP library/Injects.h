@@ -1136,12 +1136,60 @@ private:
 	LPVOID funcAddress;
 };
 
+class onCalcUnitStatsWpn2
+	:public AATemplate
+{
+public:
+	onCalcUnitStatsWpn2(MemWork* mem, LPVOID adr, int ver);
+	~onCalcUnitStatsWpn2() = default;
+
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onInitAutoUnit
+	:public AATemplate
+{
+public:
+	onInitAutoUnit(MemWork* mem, LPVOID adr, int ver);
+	~onInitAutoUnit() = default;
+
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onCalcUnitStatsOfficer
+	:public AATemplate
+{
+public:
+	onCalcUnitStatsOfficer(MemWork* mem, LPVOID adr, int ver);
+	~onCalcUnitStatsOfficer() = default;
+
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 class onCalcUnitValueWpn
 	:public AATemplate
 {
 public:
 	onCalcUnitValueWpn(MemWork* mem, LPVOID adr, int ver);
 	~onCalcUnitValueWpn() = default;
+
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onCalcUnitValueArmour
+	:public AATemplate
+{
+public:
+	onCalcUnitValueArmour(MemWork* mem, LPVOID adr, int ver);
+	~onCalcUnitValueArmour() = default;
 
 	void SetNewCode();
 private:
