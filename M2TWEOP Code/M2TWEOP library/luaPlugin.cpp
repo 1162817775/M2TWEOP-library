@@ -1114,7 +1114,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	/***
 	Set armour added for each level of armour upgrade. Default: 2.
 	@function M2TWEOP.setArmourUpgradeModifier
-	@tparam int modifier Default: 3
+	@tparam int modifier Default: 2
 	@usage
 		M2TWEOP.setArmourUpgradeModifier(1)
 	*/
