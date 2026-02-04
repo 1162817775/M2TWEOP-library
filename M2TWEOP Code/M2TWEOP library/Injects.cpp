@@ -7150,31 +7150,77 @@ onCalcUnitStatsWpn::onCalcUnitStatsWpn(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {
 	if (ver == 2)//steam
-		m_adress = 0x006234E1;
+		m_adress = 0x006234D0;
 
 	else if (ver == 1)//kingdoms
-		m_adress = 0x623121;
+		m_adress = 0x623110;
 }
 
 void onCalcUnitStatsWpn::SetNewCode()
 {
 	const auto a = new Assembler();
-	a->push(ebx);
-	a->push(ecx);
-	a->push(edx);
-	a->push(esi);
+	a->mov(edx, dword_ptr(esp, 0x4));
+	a->mov(eax, dword_ptr(esp, 0x8));
 	a->push(edi);
-	a->pushf();
-	a->mov(ecx, eax);
+	a->push(esi);
+	a->push(ebp);
+	a->push(ebx);
+	a->push(edx);
+	a->push(ecx);
+	a->push(eax);
 	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
 	a->call(eax);
-	a->and_(al, 0x3F);
-	a->popf();
+	a->pop(eax);
+	a->pop(ecx);
+	a->pop(edx);
+	a->pop(ebx);
+	a->pop(ebp);
+	a->pop(esi);
+	a->pop(edi);
+	if (m_adress == 0x006234D0)
+	{
+		a->mov(eax, 0x6234FD);
+	}
+	else
+	{
+		a->mov(eax, 0x062313D);
+	}
+	a->jmp(eax);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+onCalcUnitStatsWpn2::onCalcUnitStatsWpn2(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x7C0A65;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x7C0225;
+}
+
+void onCalcUnitStatsWpn2::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->push(esi);
+	a->push(edi);
+	a->mov(edx, esi);
+	a->mov(ecx, edi);
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
 	a->pop(edi);
 	a->pop(esi);
-	a->pop(edx);
-	a->pop(ecx);
-	a->pop(ebx);
+	if (m_adress == 0x7C0A65)
+	{
+		a->mov(eax, 0x7C0AA6);
+	}
+	else
+	{
+		a->mov(eax, 0x7C0266);
+	}
+	a->jmp(eax);
 	a->ret();
 	m_cheatBytes = static_cast<unsigned char*>(a->make());
 	delete a;
@@ -7184,10 +7230,10 @@ onCalcUnitValueWpn::onCalcUnitValueWpn(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {
 	if (ver == 2)//steam
-		m_adress = 0x45ACA7;
+		m_adress = 0x45AD6B;
 
 	else if (ver == 1)//kingdoms
-		m_adress = 0x45A8A3;
+		m_adress = 0x45A9EB;
 }
 
 void onCalcUnitValueWpn::SetNewCode()
@@ -7198,18 +7244,116 @@ void onCalcUnitValueWpn::SetNewCode()
 	a->push(ecx);
 	a->push(esi);
 	a->push(edi);
-	a->pushf();
 	a->mov(ecx, edx);
 	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
 	a->call(eax);
 	a->mov(edx, eax);
-	a->and_(edx, 0x3F);
-	a->popf();
+	a->test(edx, edx);
 	a->pop(edi);
 	a->pop(esi);
 	a->pop(ecx);
 	a->pop(ebx);
 	a->pop(eax);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+onCalcUnitValueArmour::onCalcUnitValueArmour(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x0045ADE1;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x45AA61;
+}
+
+void onCalcUnitValueArmour::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->push(eax);
+	a->push(ebx);
+	a->push(ecx);
+	a->push(esi);
+	a->push(edi);
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->mov(edx, eax);
+	a->test(edx, edx);
+	a->pop(edi);
+	a->pop(esi);
+	a->pop(ecx);
+	a->pop(ebx);
+	a->pop(eax);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+onInitAutoUnit::onInitAutoUnit(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x62626F;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x625ECF;
+}
+
+void onInitAutoUnit::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->push(esi);
+	a->push(edi);
+	a->mov(ecx, esi);
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->pop(edi);
+	a->pop(esi);
+	if (m_adress == 0x62626F)
+	{
+		a->mov(eax, 0x6263C5);
+	}
+	else
+	{
+		a->mov(eax, 0x626025);
+	}
+	a->jmp(eax);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+onCalcUnitStatsOfficer::onCalcUnitStatsOfficer(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x7BB8A9;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x7BB069;
+}
+
+void onCalcUnitStatsOfficer::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->push(esi);
+	a->push(edi);
+	a->mov(ecx, esi);
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->pop(edi);
+	a->pop(esi);
+	if (m_adress == 0x7BB8A9)
+	{
+		a->mov(eax, 0x7BB8D2);
+	}
+	else
+	{
+		a->mov(eax, 0x7BB092);
+	}
+	a->jmp(eax);
 	a->ret();
 	m_cheatBytes = static_cast<unsigned char*>(a->make());
 	delete a;

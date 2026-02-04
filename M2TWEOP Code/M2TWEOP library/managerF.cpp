@@ -407,16 +407,41 @@ void managerF::execPatches()
 	toCalcUnitStatsWpn->Enable();
 	f1 << "Done" << '\n';
 
+	f1 << "Start applying onCalcUnitStatsWpn2 patch" << '\n';
+	onCalcUnitStatsWpn2* toCalcUnitStatsWpn2 = new onCalcUnitStatsWpn2(mem, (LPVOID)patchesForGame::onCalculateUnitStatsSoldier, globals::dataS.gameVersion);
+	toCalcUnitStatsWpn2->SetNewCode();
+	toCalcUnitStatsWpn2->Enable();
+	f1 << "Done" << '\n';
+
 	f1 << "Start applying onCalcUnitValueWpn patch" << '\n';
 	onCalcUnitValueWpn* toCalcUnitValueWpn = new onCalcUnitValueWpn(mem, (LPVOID)patchesForGame::onCalcUnitStatsWpn, globals::dataS.gameVersion);
 	toCalcUnitValueWpn->SetNewCode();
 	toCalcUnitValueWpn->Enable();
 	f1 << "Done" << '\n';
 
+	f1 << "Start applying onCalcUnitValueArmour patch" << '\n';
+	onCalcUnitValueArmour* toCalcUnitValueArmour = new onCalcUnitValueArmour(mem, (LPVOID)patchesForGame::onCalcUnitValueArmour, globals::dataS.gameVersion);
+	toCalcUnitValueArmour->SetNewCode();
+	toCalcUnitValueArmour->Enable();
+	f1 << "Done" << '\n';
+
 	f1 << "Start applying onGetUnitStatsUi1 patch" << '\n';
 	onGetUnitStatsUi1* toGetUnitStatsUi1 = new onGetUnitStatsUi1(mem, (LPVOID)patchesForGame::onCalcUnitStatsWpn, globals::dataS.gameVersion);
 	toGetUnitStatsUi1->SetNewCode();
 	toGetUnitStatsUi1->Enable();
+	f1 << "Done" << '\n';
+
+	f1 << "Start applying onInitAutoUnit patch" << '\n';
+	onInitAutoUnit* toInitAutoUnit = new onInitAutoUnit(mem, (LPVOID)patchesForGame::onInitAutoUnit, globals::dataS.gameVersion);
+	toInitAutoUnit->SetNewCode();
+	toInitAutoUnit->Enable();
+	f1 << "Done" << '\n';
+
+
+	f1 << "Start applying onCalcUnitStatsOfficer patch" << '\n';
+	onCalcUnitStatsOfficer* toCalcUnitStatsOfficer = new onCalcUnitStatsOfficer(mem, (LPVOID)patchesForGame::onCalculateUnitStatsOfficer, globals::dataS.gameVersion);
+	toCalcUnitStatsOfficer->SetNewCode();
+	toCalcUnitStatsOfficer->Enable();
 	f1 << "Done" << '\n';
 
 	f1 << "Start applying onGetUnitStatsUi2 patch" << '\n';

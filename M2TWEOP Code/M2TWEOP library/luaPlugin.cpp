@@ -286,15 +286,18 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield changeGeneralPosition changeGeneralPosition
 	@tfield handleUnitCards handleUnitCards
 	@tfield setWeaponBonusModifier setWeaponBonusModifier
+	@tfield setArmourUpgradeModifier setArmourUpgradeModifier
 	@tfield setWatchTowerRange setWatchTowerRange
 	@tfield enableFamilyEventsWithoutTree enableFamilyEventsWithoutTree
 	@tfield useEopFrontiers useEopFrontiers
+	@tfield modelExists modelExists
 	@tfield ignoreOwnershipRecruitment ignoreOwnershipRecruitment
 	@tfield setKhakiTextColor setKhakiTextColor
 	@tfield getMinorSettlementBalance getMinorSettlementBalance
 	@tfield generateSprite generateSprite
 	@tfield setTextureCacheSize setTextureCacheSize
 	@tfield unlockWeaponLimit unlockWeaponLimit
+	@tfield enableRangedWeaponUpg enableRangedWeaponUpg
 	@tfield getGroundTypeMoveCost getGroundTypeMoveCost
 	@tfield setGroundTypeMoveCost setGroundTypeMoveCost
 	@table M2TWEOP
@@ -1081,6 +1084,16 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	tables.M2TWEOP.set_function("changeGeneralPosition", &m2tweopOptions::setChangeGeneralPosition);
 	
 	/***
+	Check if a model is a valid entry in the bmdb.
+	@function M2TWEOP.modelExists
+	@tparam string modelName
+	@treturn bool exists
+	@usage
+		local exists = M2TWEOP.modelExists("england_knight")
+	*/
+	tables.M2TWEOP.set_function("modelExists", &unitHelpers::modelExists);
+	
+	/***
 	Faction specific unit cards are always chosen if found. Enabled by default.
 	@function M2TWEOP.handleUnitCards
 	@tparam bool set
@@ -1097,6 +1110,24 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 		M2TWEOP.setWeaponBonusModifier(1)
 	*/
 	tables.M2TWEOP.set_function("setWeaponBonusModifier", &m2tweopOptions::setWeaponBonusModifier);
+	
+	/***
+	Set armour added for each level of armour upgrade. Default: 2.
+	@function M2TWEOP.setArmourUpgradeModifier
+	@tparam int modifier Default: 2
+	@usage
+		M2TWEOP.setArmourUpgradeModifier(1)
+	*/
+	tables.M2TWEOP.set_function("setArmourUpgradeModifier", &m2tweopOptions::setArmourBonusModifier);
+	
+	/***
+	Enable ranged attack bonus from weapon upgrades. Enabled by default in EOP.
+	@function M2TWEOP.enableRangedWeaponUpg
+	@tparam bool set
+	@usage
+		M2TWEOP.enableRangedWeaponUpg(true)
+	*/
+	tables.M2TWEOP.set_function("enableRangedWeaponUpg", &m2tweopOptions::setEnableRangedWeaponUpg);
 
 	/***
 	Set watchtower range. Default: 10.

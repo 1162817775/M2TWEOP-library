@@ -306,12 +306,14 @@ void eopFactionData::deserialize(const nlohmann::json& json)
 	//gameHelpers::logStringGame("deserialize: cultureID");
 	cultureID = json["cultureID"];
 
+	changedStratModels.clear();
 	for (const auto& modelJson : json["changedStratModels"])
 	{
 		facStratModel model(modelJson["model"], modelJson["characterType"], modelJson["level"]);
 		changedStratModels.push_back(model);
 	}
 
+	changedBattleModels.clear();
 	for (const auto& modelJson : json["changedBattleModels"])
 	{
 		facBattleModel model(modelJson["model"], modelJson["characterType"]);

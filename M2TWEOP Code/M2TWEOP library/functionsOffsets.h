@@ -307,6 +307,7 @@ public:
 		DWORD removeTrackedReference = NULL;
 		DWORD getZonePerimeter = NULL;
 		DWORD getZoneID = NULL;
+		DWORD priStatCopy = NULL;
 		DWORD settAttachFaction = NULL;
 		DWORD areaOfInfluence = NULL;
 		DWORD addToSettlementList = NULL;

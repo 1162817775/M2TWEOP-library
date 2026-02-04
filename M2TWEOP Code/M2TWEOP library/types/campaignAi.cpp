@@ -14,6 +14,7 @@
 #include "army.h"
 #include "campaign.h"
 #include "events.h"
+#include "fort.h"
 #include "luaPlugin.h"
 #include "strategyMap.h"
 #include "techFuncs.h"
@@ -240,6 +241,11 @@ namespace campaignAi
 			  facData:setAidReligionFactor(3, 1.5)
 		*/
 		typeAll.aiFactionData.set_function("setAidReligionFactor", &aiFactionData::setAidReligionFactor);
+	}
+
+	void setPlayerAssaulted()
+	{
+		PLAYER_ASSAULTED = true;
 	}
 }
 
@@ -617,6 +623,10 @@ void aiOrder::setTiles(const int x, const int y)
 				const auto tile = stratMapHelpers::getTile(checkX, checkY);
 				const auto army = tile->getArmy();
 				if (army && army->faction->isPlayerControlled == 1)
+					playerInvolved = true;
+				if (const auto settlement = tile->getSettlement(); settlement && settlement->faction->isPlayerControlled == 1)
+					playerInvolved = true;
+				if (const auto fort = tile->getFort(); fort && fort->faction->isPlayerControlled == 1)
 					playerInvolved = true;
 				if ((army && army->faction->factionID == globalEopAiConfig::getCurrentFaction()->factionID) || !army)
 				{

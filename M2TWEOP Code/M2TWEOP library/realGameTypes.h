@@ -843,6 +843,7 @@ public:
 	{
 		chargeDecay = newChargeDecay & 0x3;
 	}
+	void setBattleStats(uint32_t wpn, uint32_t armour);
 };
 
 struct eduOfficer

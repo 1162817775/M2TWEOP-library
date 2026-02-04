@@ -369,6 +369,7 @@ void codes::initCodes(int gameVer)
 		offsets.birthLog = 0x832F70;
 		offsets.marryCharacters = 0x5A7CB0;
 		offsets.getUnitSizeMultiplier = 0x467630;
+		offsets.priStatCopy = 0x623340;
 	}
 
 
@@ -741,5 +742,6 @@ void codes::initCodes(int gameVer)
 		offsets.birthLog = 0x8337E0;
 		offsets.marryCharacters = 0x5A8190;
 		offsets.getUnitSizeMultiplier = 0x004679B0;
+		offsets.priStatCopy = 0x00623700;
 	}
 }
