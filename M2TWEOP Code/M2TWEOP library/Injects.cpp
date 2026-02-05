@@ -6406,7 +6406,7 @@ onGetNormalPos::onGetNormalPos(MemWork* mem, LPVOID addr, int ver)
 		m_adress = 0x7B689C;
 
 	else if (ver == 1)//kingdoms
-		m_adress = 0x7B6050;
+		m_adress = 0x7B605C;
 }
 
 void onGetNormalPos::SetNewCode()
