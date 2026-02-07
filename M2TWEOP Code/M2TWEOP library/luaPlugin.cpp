@@ -287,7 +287,13 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield handleUnitCards handleUnitCards
 	@tfield setWeaponBonusModifier setWeaponBonusModifier
 	@tfield setArmourUpgradeModifier setArmourUpgradeModifier
+	@tfield setPhalanxMissileDefense setPhalanxMissileDefense
+	@tfield setSchiltromMissileDefense setSchiltromMissileDefense
+	@tfield setShieldWallMissileDefense setShieldWallMissileDefense
+	@tfield setElephantJavBonus setElephantJavBonus
+	@tfield setElephantHitpointDamage setElephantHitpointDamage
 	@tfield setWatchTowerRange setWatchTowerRange
+	@tfield drawUnitCardOutline drawUnitCardOutline
 	@tfield enableFamilyEventsWithoutTree enableFamilyEventsWithoutTree
 	@tfield useEopFrontiers useEopFrontiers
 	@tfield modelExists modelExists
@@ -403,7 +409,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	Get a trait by name.
 	@function M2TWEOP.getTrait
 	@tparam string name
-	@tparam traitEntry trait
+	@treturn traitEntry trait
 	@usage
 	    local trait = M2TWEOP.getTrait("trait_name");
 	*/
@@ -1121,6 +1127,51 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	tables.M2TWEOP.set_function("setArmourUpgradeModifier", &m2tweopOptions::setArmourBonusModifier);
 	
 	/***
+	Set amount of extra defense against missiles phalanx formation gives. Default: 4.
+	@function M2TWEOP.setPhalanxMissileDefense
+	@tparam int bonus Default: 4
+	@usage
+		M2TWEOP.setPhalanxMissileDefense(0)
+	*/
+	tables.M2TWEOP.set_function("setPhalanxMissileDefense", &m2tweopOptions::setPhalanxMissileDefense);
+	
+	/***
+	Set amount of extra defense against missiles schiltrom formation gives. Default: 1.
+	@function M2TWEOP.setSchiltromMissileDefense
+	@tparam int bonus Default: 1
+	@usage
+		M2TWEOP.setSchiltromMissileDefense(0)
+	*/
+	tables.M2TWEOP.set_function("setSchiltromMissileDefense", &m2tweopOptions::setSchiltromMissileDefense);
+	
+	/***
+	Set amount of extra defense against missiles shieldwall formation gives. Default: 0.
+	@function M2TWEOP.setShieldWallMissileDefense
+	@tparam int bonus Default: 0
+	@usage
+		M2TWEOP.setShieldWallMissileDefense(2)
+	*/
+	tables.M2TWEOP.set_function("setShieldWallMissileDefense", &m2tweopOptions::setShieldWallMissileDefense);
+	
+	/***
+	Set amount of hitpoint damage javelins do to elephants. Default: 4.
+	@function M2TWEOP.setElephantHitpointDamage
+	@tparam int damage Default: 4
+	@usage
+		M2TWEOP.setElephantHitpointDamage(0)
+	*/
+	tables.M2TWEOP.set_function("setElephantHitpointDamage", &m2tweopOptions::setElephantHitpointDamage);
+	
+	/***
+	Set amount of bonus attack thrown attribute gives against elephants. Default: 10.
+	@function M2TWEOP.setElephantJavBonus
+	@tparam int bonus Default: 10
+	@usage
+		M2TWEOP.setElephantJavBonus(2)
+	*/
+	tables.M2TWEOP.set_function("setElephantJavBonus", &m2tweopOptions::setElephantJavBonus);
+	
+	/***
 	Enable ranged attack bonus from weapon upgrades. Enabled by default in EOP.
 	@function M2TWEOP.enableRangedWeaponUpg
 	@tparam bool set
@@ -1128,6 +1179,15 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 		M2TWEOP.enableRangedWeaponUpg(true)
 	*/
 	tables.M2TWEOP.set_function("enableRangedWeaponUpg", &m2tweopOptions::setEnableRangedWeaponUpg);
+	
+	/***
+	Draw white outline around soldier numbers on the unit card. Enabled by default in EOP.
+	@function M2TWEOP.drawUnitCardOutline 
+	@tparam bool set
+	@usage
+		M2TWEOP.drawUnitCardOutline(true)
+	*/
+	tables.M2TWEOP.set_function("drawUnitCardOutline", &m2tweopOptions::setDrawUnitCardOutline);
 
 	/***
 	Set watchtower range. Default: 10.

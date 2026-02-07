@@ -239,6 +239,8 @@ int eopDu::getEopEntryNum()
 
 char* eopDu::getEopNameOfEduEntry(const eduEntry* entryAddress)
 {
+	if (!entryAddress)
+		return nullptr;
 	if (eopUnitIndexLookup.find(entryAddress->index) != eopUnitIndexLookup.end())
 		return const_cast<char*>(eopUnitIndexLookup[entryAddress->index]->eopTypeName.c_str());
 	return nullptr;
@@ -246,6 +248,8 @@ char* eopDu::getEopNameOfEduEntry(const eduEntry* entryAddress)
 
 eduEntry* eopDu::getEopEduEntryByName(const char* entryName)
 {
+	if (!entryName)
+		return nullptr;
 	if (eopUnitLookup.find(entryName) != eopUnitLookup.end())
 		return &eopUnitLookup[entryName]->data.edu;
 	return nullptr;

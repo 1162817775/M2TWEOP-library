@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <string>
 #include "realGameTypes.h"
 #include "settlement.h"
@@ -446,6 +447,21 @@ public:
 	static void setIgnoreOwnershipRecruitment(const bool value) { ignoreOwnershipRecruitment = value; }
 	static bool getIgnoreOwnershipRecruitment() { return ignoreOwnershipRecruitment; }
 	static void setWeaponBonusModifier(const int value) { weaponBonusModifier = value & 0xFF; }
+	static void setPhalanxMissileDefense(const int value) { phalanxMissileDefense = value; }
+	static int getPhalanxMissileDefense() { return phalanxMissileDefense; }
+	static void setSchiltromMissileDefense(const int value) { schiltromMissileDefense = value; }
+	static int getSchiltromMissileDefense() { return schiltromMissileDefense; }
+	static void setElephantJavBonus(const int value) { elephantJavBonus = value; }
+	static int getElephantJavBonus() { return elephantJavBonus; }
+	static void setElephantHitpointDamage(const int value)
+	{
+		elephantHitpointDamage = max(value, 0);
+	}
+	static void setDrawUnitCardOutline(const bool set) { drawUnitCardOutline = set; }
+	static bool getDrawUnitCardOutline() { return drawUnitCardOutline; }
+	static int getElephantHitpointDamage() { return elephantHitpointDamage; }
+	static void setShieldWallMissileDefense(const int value) { shieldWallMissileDefense = value; }
+	static int getShieldWallMissileDefense() { return shieldWallMissileDefense; }
 	static DWORD getColor() { return (static_cast<uint32_t>(0xFF) << 24) | (khakiTextRed << 16) | (khakiTextGreen << 8) | khakiTextBlue; }
 	static void setKhakiTextColor(const uint8_t red, const uint8_t green, const uint8_t blue) { khakiTextRed = red; khakiTextGreen = green; khakiTextBlue = blue; }
 	static int watchTowerRange;
@@ -455,6 +471,11 @@ public:
 	static int minBodyguardSize;
 	static int extraLeaderSoldiers;
 	static int extraHeirSoldiers;
+	static int phalanxMissileDefense;
+	static int schiltromMissileDefense;
+	static int shieldWallMissileDefense;
+	static int elephantJavBonus;
+	static int elephantHitpointDamage;
 	static bool hideUnknownUnitTooltips;
 	static bool eopHandleUnitCards;
 	static bool enableFamilyEventsForTeutonic;
@@ -463,6 +484,7 @@ public:
 	static bool ignoreOwnershipRecruitment;
 	static bool changeGeneralPosition;
 	static bool enableRangedWeaponUpg;
+	static bool drawUnitCardOutline;
 	static uint8_t khakiTextRed;
 	static uint8_t khakiTextGreen;
 	static uint8_t khakiTextBlue;
@@ -614,6 +636,7 @@ namespace gameHelpers
 	void setMaxBgSize(unsigned char size);
 	void setMinBgSize(unsigned char size);
 	void fixReligionTrigger();
+	void fixRemoveSiegeLoop();
 	void unlockConsoleCommands();
 	void toggleUnitHighlight();
 	void setReligionsLimit(unsigned char limit);

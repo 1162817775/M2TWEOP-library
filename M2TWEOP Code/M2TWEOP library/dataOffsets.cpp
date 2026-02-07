@@ -131,6 +131,7 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.weaponLimit7 = 0x00475B64;
 		offsets.weaponLimit8 = 0x00632B12;
 		offsets.weaponLimit9 = 0x00632B05;
+		offsets.removeSiegeBug = 0x59B084;
 	}
 	else if (gameVer == 2) //steam
 	{
@@ -258,5 +259,6 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.weaponLimit7 = 0x00475F54;
 		offsets.weaponLimit8 = 0x00632EB2;
 		offsets.weaponLimit9 = 0x00632EA5;
+		offsets.removeSiegeBug = 0x59B574;
 	}
 }

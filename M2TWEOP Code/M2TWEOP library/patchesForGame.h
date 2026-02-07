@@ -123,9 +123,12 @@ public:
 	static mountedEngine* __fastcall onGetMountedEngine(const stringWithHash* name);
 	static bool __fastcall onParseMountedEngines(mountedEngineDb* db, descrParser* parser);
 	static bool __fastcall onParseEdu(unitDb* db, descrParser* parser);
+	static int __fastcall onElephantHitpointDamage();
+	static int __fastcall onRenderUnitCardNumbers(unit* un);
 	static int __fastcall onAddSettlementToDiplomacyScroll(const settlementStruct* settlement);
 	static settlementStruct* __fastcall onDecideMissionTarget(settlementStruct* settlement, factionStruct* faction);
 	static int __fastcall onCanWithdrawPreBattle(const settlementStruct* settlement);
+	static int __cdecl onCalcArrowKillChance(unitStats* stats, soldierInBattle* defender, int16_t angle, int* dir, float heightDiff, int bonus);
 	static int __fastcall onCalculateCommand(const characterRecord* general);
 	static void __fastcall onRemoveFromUnitQueue(const unitRQ* queue, int index);
 	static void __fastcall onLoadModelRigid(model_Rigid* model);

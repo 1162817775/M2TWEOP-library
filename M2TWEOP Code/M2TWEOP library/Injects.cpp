@@ -7259,6 +7259,103 @@ void onCalcUnitValueWpn::SetNewCode()
 	delete a;
 }
 
+onCalcArrowKillChance::onCalcArrowKillChance(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x45A1C0;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x459E40;
+}
+
+void onCalcArrowKillChance::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->push(dword_ptr(esp, 0x18));
+	a->push(dword_ptr(esp, 0x18));
+	a->push(dword_ptr(esp, 0x18));
+	a->push(dword_ptr(esp, 0x18));
+	a->push(dword_ptr(esp, 0x18));
+	a->push(dword_ptr(esp, 0x18));
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->add(esp, 0x18);
+	if (m_adress == 0x45A1C0)
+	{
+		a->mov(ecx, 0x45A429);
+	}
+	else
+	{
+		a->mov(ecx, 0x45A039);
+	}
+	a->jmp(ecx);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+onElephantHitpointDamage::onElephantHitpointDamage(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x455885;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x455545;
+}
+
+void onElephantHitpointDamage::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->push(eax);
+	a->push(ecx);
+	a->push(edx);
+	a->push(esi);
+	a->push(edi);
+	a->push(esp);
+	a->push(ebp);
+	a->pushf();
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->mov(ebx, eax);
+	a->popf();
+	a->pop(ebp);
+	a->pop(esp);
+	a->pop(edi);
+	a->pop(esi);
+	a->pop(edx);
+	a->pop(ecx);
+	a->pop(eax);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+onRenderUnitCardNumbers::onRenderUnitCardNumbers(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0xB57002;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0xB5CC92;
+}
+
+void onRenderUnitCardNumbers::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->pushad();
+	a->mov(ecx, ebp);
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->cmp(eax, 0);
+	a->popad();
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
 onCalcUnitValueArmour::onCalcUnitValueArmour(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {

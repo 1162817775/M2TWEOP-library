@@ -407,6 +407,24 @@ void managerF::execPatches()
 	toCalcUnitStatsWpn->Enable();
 	f1 << "Done" << '\n';
 
+	f1 << "Start applying onCalcArrowKillChance patch" << '\n';
+	onCalcArrowKillChance* toCalcArrowKillChance = new onCalcArrowKillChance(mem, (LPVOID)patchesForGame::onCalcArrowKillChance, globals::dataS.gameVersion);
+	toCalcArrowKillChance->SetNewCode();
+	toCalcArrowKillChance->Enable();
+	f1 << "Done" << '\n';
+
+	f1 << "Start applying onElephantHitpointDamage patch" << '\n';
+	onElephantHitpointDamage* toElephantHitpointDamage = new onElephantHitpointDamage(mem, (LPVOID)patchesForGame::onElephantHitpointDamage, globals::dataS.gameVersion);
+	toElephantHitpointDamage->SetNewCode();
+	toElephantHitpointDamage->Enable();
+	f1 << "Done" << '\n';
+
+	f1 << "Start applying onRenderUnitCardNumbers patch" << '\n';
+	onRenderUnitCardNumbers* toRenderUnitCardNumbers = new onRenderUnitCardNumbers(mem, (LPVOID)patchesForGame::onRenderUnitCardNumbers, globals::dataS.gameVersion);
+	toRenderUnitCardNumbers->SetNewCode();
+	toRenderUnitCardNumbers->Enable();
+	f1 << "Done" << '\n';
+
 	f1 << "Start applying onCalcUnitStatsWpn2 patch" << '\n';
 	onCalcUnitStatsWpn2* toCalcUnitStatsWpn2 = new onCalcUnitStatsWpn2(mem, (LPVOID)patchesForGame::onCalculateUnitStatsSoldier, globals::dataS.gameVersion);
 	toCalcUnitStatsWpn2->SetNewCode();

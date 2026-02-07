@@ -32,6 +32,64 @@ inline bool operator !=(int a, unitCategory b)
 {
 	return static_cast<unitCategory>(a) != b;
 }
+
+enum class weaponTechType
+{
+	melee_simple = 0x0,
+	melee_blade = 0x1,
+	missile_mechanical = 0x2,
+	missile_gunpowder = 0x3,
+	artillery_mechanical = 0x4,
+	artillery_gunpowder = 0x5,
+	naval_gunpowder = 0x6,
+};
+
+inline bool operator ==(int a, weaponTechType b)
+{
+	return static_cast<weaponTechType>(a) == b;
+}
+
+inline bool operator !=(int a, weaponTechType b)
+{
+	return static_cast<weaponTechType>(a) != b;
+}
+
+enum class weaponType
+{
+	melee = 0x0,
+	siegeMelee = 0x1,
+	thrown = 0x2,
+	missile = 0x3,
+	siegeMissile = 0x4
+};
+
+inline bool operator ==(int a, weaponType b)
+{
+	return static_cast<weaponType>(a) == b;
+}
+
+inline bool operator !=(int a, weaponType b)
+{
+	return static_cast<weaponType>(a) != b;
+}
+
+enum class mountClass
+{
+	horse = 0x0,
+	camel = 0x1,
+	elephant = 0x2,
+	infantry = 0x3
+};
+
+inline bool operator ==(int a, mountClass b)
+{
+	return static_cast<mountClass>(a) == b;
+}
+
+inline bool operator !=(int a, mountClass b)
+{
+	return static_cast<mountClass>(a) != b;
+}
 /* 2190 */
 struct unitVerificationElement
 {
@@ -771,7 +829,7 @@ struct soldierInBattle {
 	void *spear;
 	float attackTimeStamp;
 	unit *thisUnit;
-	void *mount;
+	struct soldierInBattle *mount;
 	int soldierPresentation;
 	unsigned __int32 alliance : 3;
 	unsigned __int32 morale : 4;

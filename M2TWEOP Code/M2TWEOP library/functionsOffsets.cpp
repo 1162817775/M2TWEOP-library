@@ -370,6 +370,9 @@ void codes::initCodes(int gameVer)
 		offsets.marryCharacters = 0x5A7CB0;
 		offsets.getUnitSizeMultiplier = 0x467630;
 		offsets.priStatCopy = 0x623340;
+		offsets.createUnitRQVector = 0x475160;
+		offsets.getRainLevelArrowEffect = 0x4588C0;
+		offsets.missileBalancingAdjustment = 0x459610;
 	}
 
 
@@ -743,5 +746,8 @@ void codes::initCodes(int gameVer)
 		offsets.marryCharacters = 0x5A8190;
 		offsets.getUnitSizeMultiplier = 0x004679B0;
 		offsets.priStatCopy = 0x00623700;
+		offsets.createUnitRQVector = 0x475550;
+		offsets.getRainLevelArrowEffect = 0x458C40;
+		offsets.missileBalancingAdjustment = 0x459990;
 	}
 }

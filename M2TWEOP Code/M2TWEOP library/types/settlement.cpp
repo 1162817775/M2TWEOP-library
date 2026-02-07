@@ -921,6 +921,7 @@ namespace settlementHelpers
 				hash += inQueue->edbEntry->buildingID * ((i + 1) * 2);
 			}
 		}
+		hash += sett->faction->factionID * 10000;
 		return hash;
 	}
 	
@@ -952,7 +953,12 @@ namespace settlementHelpers
 	
 	buildingInQueue* getBuildingOptionFromDb(const settlementBuildingOptions* list, const int index)
 	{
-		return list->constructionOptions[index].get();
+		if (!list || (index < 0 || index >= list->count || index >= static_cast<int>(list->constructionOptions.size())))
+            return nullptr;
+		const auto option = list->constructionOptions.at(index);
+		if (!option)
+			return nullptr;
+		return option.get();
 	}
 	
 	std::string getType(building* build)
@@ -1016,18 +1022,32 @@ namespace settlementHelpers
 		return reinterpret_cast<recruitmentOptions*>(dataOffsets::offsets.recruitmentItems);
 	}
 	
+	namespace
+	{
+		recruitmentOptions* RETRAINING_OPTIONS = nullptr;
+		recruitmentOptions* RECRUITMENT_OPTIONS = nullptr;
+	}
+	
 	recruitmentOptions* getAvailableUnits(settlementStruct* sett)
 	{
-		const auto mem = getAvailableUnitsMem();
-		GAME_FUNC(void(__thiscall*)(settlementStruct*, recruitmentOptions*), getRecruitmentOptions)(sett, mem);
-		return mem;
+		if (!RECRUITMENT_OPTIONS)
+		{
+			RECRUITMENT_OPTIONS = techFuncs::createGameClass<recruitmentOptions>();
+		}
+		GAME_FUNC(void (__thiscall*)(recruitmentOptions*, int), createUnitRQVector)(RECRUITMENT_OPTIONS, 0);
+		GAME_FUNC(void(__thiscall*)(settlementStruct*, recruitmentOptions*), getRecruitmentOptions)(sett, RECRUITMENT_OPTIONS);
+		return RECRUITMENT_OPTIONS;
 	}
-
+	
 	recruitmentOptions* getAvailableRetrainingUnits(settlementStruct* sett)
 	{
-		const auto mem = getAvailableUnitsMem();
-		GAME_FUNC(void(__thiscall*)(settlementStruct*, recruitmentOptions*), getRetrainingOptions)(sett, mem);
-		return mem;
+		if (!RETRAINING_OPTIONS)
+		{
+			RETRAINING_OPTIONS = techFuncs::createGameClass<recruitmentOptions>();
+		}
+		GAME_FUNC(void (__thiscall*)(recruitmentOptions*, int), createUnitRQVector)(RETRAINING_OPTIONS, 0);
+		GAME_FUNC(void(__thiscall*)(settlementStruct*, recruitmentOptions*), getRetrainingOptions)(sett, RETRAINING_OPTIONS);
+		return RETRAINING_OPTIONS;
 	}
 
 	int makeRecruitOptionsHash(const settlementStruct* sett)
@@ -1038,6 +1058,7 @@ namespace settlementHelpers
 			hash += sett->recruitmentPools[i].eduIndex;
 			hash += static_cast<int>(sett->recruitmentPools[i].availablePool * 100);
 		}
+		hash += sett->faction->factionID * 10000;
 		return hash;
 	}
 	
@@ -1058,29 +1079,37 @@ namespace settlementHelpers
 		auto available = getAvailableUnits(sett);
 		const int trainCount = available->size();
 		options->count = trainCount;
-		for (int i = 0; i < options->count; i++)
+		int optionsIndex = 0;
+		for (int i = 0; i < trainCount; i++)
 		{
 			options->recruitOptions.push_back(std::make_shared<unitRQ>());
-			*options->recruitOptions[i] = (*available)[i];
-			options->totalCost += options->recruitOptions[i]->cost;
-			options->totalTime += options->recruitOptions[i]->turnsToTrain;
+			*options->recruitOptions[optionsIndex] = (*available)[i];
+			options->totalCost += options->recruitOptions[optionsIndex]->cost;
+			options->totalTime += options->recruitOptions[optionsIndex]->turnsToTrain;
+			optionsIndex++;
 		}
 		available = getAvailableRetrainingUnits(sett);
 		const int retrainCount = available->size();
 		options->count += retrainCount;
-		for (int i = trainCount; i < options->count; i++)
+		for (int i = 0; i < retrainCount; i++)
 		{
 			options->recruitOptions.push_back(std::make_shared<unitRQ>());
-			*options->recruitOptions[i] = (*available)[i];
-			options->recruitOptions[i]->recruitType = 3;
-			options->totalCost += options->recruitOptions[i]->cost;
-			options->totalTime += options->recruitOptions[i]->turnsToTrain;
+			*options->recruitOptions[optionsIndex] = (*available)[i];
+			options->recruitOptions[optionsIndex]->recruitType = 3;
+			options->totalCost += options->recruitOptions[optionsIndex]->cost;
+			options->totalTime += options->recruitOptions[optionsIndex]->turnsToTrain;
+			optionsIndex++;
 		}
 		return options.get();
 	}
 	unitRQ* getRecruitOptionFromDb(const settlementRecruitmentOptions* list, const int index)
 	{
-		return list->recruitOptions[index].get();
+		if (!list || index < 0 || index >= list->count || index >= static_cast<int>(list->recruitOptions.size()))
+            return nullptr;
+		const auto option = list->recruitOptions.at(index);
+		if (!option)
+			return nullptr;
+		return option.get();
 	}
 
 #pragma endregion Recruitment items
