@@ -7,6 +7,7 @@ namespace eopVideos
 	void* createEOPVideo(const char* path);
 	void deleteEOPVideo(void* video);
 	void playEOPVideo(void* video);
+    void stopEOPVideo(void* video);
 };
 
 

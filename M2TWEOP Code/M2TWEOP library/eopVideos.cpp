@@ -70,6 +70,18 @@ void eopVideos::addToLua(sol::state& luaState)
     ImGui.End()
     */
     tables.M2TWEOPVideosTable.set_function("playEOPVideo", &eopVideos::playEOPVideo);
+    /***
+    Stop a playing video.
+    @function M2TWEOPVideos.stopEOPVideo
+    @tparam int videoID ID of the video that you want to stop.
+
+    @usage
+    local ourNewVideo=M2TWEOPVideos.createEOPVideo(M2TWEOP.getModPath().."/eopData/testvideo.mp4");
+    M2TWEOPVideos.playEOPVideo(ourNewVideo);
+    -- later
+    M2TWEOPVideos.stopEOPVideo(ourNewVideo);
+    */
+    tables.M2TWEOPVideosTable.set_function("stopEOPVideo", &eopVideos::stopEOPVideo);
 }
 void* eopVideos::createEOPVideo(const char* path)
 {
@@ -105,4 +117,14 @@ void eopVideos::playEOPVideo(void* video)
     const auto device = graphicsExport::GetDevice();
     eopVideo* vid = reinterpret_cast<eopVideo*>(video);
     vid->PlayFrame();
+}
+
+void eopVideos::stopEOPVideo(void* video)
+{
+    if (video == nullptr)
+    {
+        return;
+    }
+    eopVideo* vid = reinterpret_cast<eopVideo*>(video);
+    vid->stopVideo();
 }

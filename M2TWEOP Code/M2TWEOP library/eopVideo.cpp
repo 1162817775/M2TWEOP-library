@@ -2,6 +2,8 @@
 #include "eopVideo.h"
 
 #include "imgui/imgui.h"
+#include <SFML/Audio.hpp>
+#include <libswresample/swresample.h>
 
 eopVideo::eopVideo(char* path, IDirect3DDevice9* d3dDevice)
 {
@@ -29,10 +31,21 @@ eopVideo::~eopVideo()
 	avcodec_free_context(&codecContext);
 	avformat_close_input(&formatContext);
 	sws_freeContext(swsContext);
+	if (audioFrame) av_frame_free(&audioFrame);
+	if (audioCodecContext) avcodec_free_context(&audioCodecContext);
+	if (swrContext) swr_free(&swrContext);
+	if (sound) { delete reinterpret_cast<sf::Sound*>(sound); sound = nullptr; }
+	if (soundBuffer) { delete reinterpret_cast<sf::SoundBuffer*>(soundBuffer); soundBuffer = nullptr; }
 }
 
 void eopVideo::PlayFrame()
 {
+	if (IsPlayEnded)
+	{
+		ImGui::Image((void*)videoTexture, ImVec2(ImageX, ImageY));
+		return;
+	}
+
 	auto now = std::chrono::steady_clock::now();
 	auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastFrameTime).count();
 
@@ -44,13 +57,34 @@ void eopVideo::PlayFrame()
 		}
 		else
 		{
-			IsPlayEnded = true;
+			// video ended - stop playback and audio
+			stopVideo();
 		}
 		lastFrameTime = now;
 	}
 
 
 	ImGui::Image((void*)videoTexture, ImVec2(ImageX, ImageY));
+
+	// start audio playback once when the first frame is displayed
+	if (!audioStarted && sound) {
+		sf::Sound* s = reinterpret_cast<sf::Sound*>(sound);
+		s->play();
+		audioStarted = true;
+	}
+}
+
+void eopVideo::stopVideo()
+{
+	IsPlayEnded = true;
+	// stop audio if playing
+	if (sound) {
+		sf::Sound* s = reinterpret_cast<sf::Sound*>(sound);
+		if (s->getStatus() == sf::Sound::Playing) {
+			s->stop();
+		}
+	}
+	audioStarted = false;
 }
 
 void eopVideo::restartVideo()
@@ -64,6 +98,14 @@ void eopVideo::restartVideo()
 	}
 	else {
 		avcodec_flush_buffers(codecContext);
+	}
+
+	// reset audio playback state
+	audioStarted = false;
+	if (sound) {
+		sf::Sound* s = reinterpret_cast<sf::Sound*>(sound);
+		s->stop();
+		s->setPlayingOffset(sf::Time::Zero);
 	}
 }
 
@@ -111,45 +153,68 @@ bool eopVideo::loadVideo(const char* path)
 		return false;
 	}
 
-	int  videoStreamIndex = -1;
+	// find video and audio streams
+	videoStreamIndex = -1;
+	audioStreamIndex = -1;
 	for (unsigned int i = 0; i < formatContext->nb_streams; ++i) {
 		if (formatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
 			videoStreamIndex = i;
-			break;
+		}
+		if (formatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+			audioStreamIndex = i;
 		}
 	}
 
 	if (videoStreamIndex == -1) {
 		ErrorOnLoading = "Failed to find video stream in file.";
-
 		return false;
 	}
 
+	// open video codec
 	AVCodecParameters* codecParams = formatContext->streams[videoStreamIndex]->codecpar;
 	const AVCodec* codec = avcodec_find_decoder(codecParams->codec_id);
 	if (!codec) {
 		ErrorOnLoading = "Failed to find video codec.";
-
 		return false;
 	}
 
 	codecContext = avcodec_alloc_context3(codec);
 	if (!codecContext) {
 		ErrorOnLoading = "Failed to allocate video codec context.";
-
 		return false;
 	}
 
 	if (avcodec_parameters_to_context(codecContext, codecParams) < 0) {
 		ErrorOnLoading = "Failed to copy video codec parameters to codec context.";
-
 		return false;
 	}
 
 	if (avcodec_open2(codecContext, codec, nullptr) < 0) {
 		ErrorOnLoading = "Failed to open video codec.";
-
 		return false;
+	}
+
+	// if audio exists, open audio codec and decode full audio into buffer
+	if (audioStreamIndex != -1) {
+		AVCodecParameters* aParams = formatContext->streams[audioStreamIndex]->codecpar;
+		const AVCodec* aCodec = avcodec_find_decoder(aParams->codec_id);
+		if (aCodec) {
+			audioCodecContext = avcodec_alloc_context3(aCodec);
+			if (avcodec_parameters_to_context(audioCodecContext, aParams) >= 0) {
+				if (avcodec_open2(audioCodecContext, aCodec, nullptr) == 0) {
+					// prepare resampler to S16 interleaved using swr_alloc_set_opts2
+					AVChannelLayout outLayout = AV_CHANNEL_LAYOUT_STEREO;
+					if (swr_alloc_set_opts2(&swrContext,
+						&outLayout, AV_SAMPLE_FMT_S16, audioCodecContext->sample_rate,
+						&aParams->ch_layout, audioCodecContext->sample_fmt, audioCodecContext->sample_rate,
+						0, nullptr) >= 0) {
+						if (swr_init(swrContext) < 0) {
+							swr_free(&swrContext);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	videoWidth = codecContext->width;
@@ -170,10 +235,73 @@ bool eopVideo::loadVideo(const char* path)
 		return false;
 	}
 
-	swsContext = sws_getContext(videoWidth, videoHeight, codecContext->pix_fmt, videoWidth, videoHeight, AV_PIX_FMT_RGBA, SWS_BILINEAR, nullptr, nullptr, nullptr);
+	// allocate audio frame if needed
+	if (audioStreamIndex != -1) {
+		audioFrame = av_frame_alloc();
+		if (!audioFrame) {
+			// continue without audio
+			audioStreamIndex = -1;
+		}
+	}
+
+	// use BGRA to match D3D9 D3DFMT_X8R8G8B8 memory layout (BGR byte order)
+	swsContext = sws_getContext(videoWidth, videoHeight, codecContext->pix_fmt, videoWidth, videoHeight, AV_PIX_FMT_BGRA, SWS_BILINEAR, nullptr, nullptr, nullptr);
 	if (!swsContext) {
 		ErrorOnLoading = "Failed to initialize SwsContext for frame scaling.";
 		return false;
+	}
+
+	// If audio is available, decode audio packets now into memory buffer (simple approach)
+	if (audioStreamIndex != -1 && audioCodecContext && audioFrame && swrContext) {
+		// read through file and decode audio
+		while (av_read_frame(formatContext, packet) >= 0) {
+			if (packet->stream_index == audioStreamIndex) {
+				if (avcodec_send_packet(audioCodecContext, packet) == 0) {
+					while (avcodec_receive_frame(audioCodecContext, audioFrame) == 0) {
+						// convert samples to S16 stereo
+						const int out_channels = 2;
+						const int out_sample_rate = audioCodecContext->sample_rate;
+						int out_nb_samples = av_rescale_rnd(swr_get_delay(swrContext, audioCodecContext->sample_rate) + audioFrame->nb_samples, out_sample_rate, audioCodecContext->sample_rate, AV_ROUND_UP);
+						std::vector<uint8_t> outbuf(out_nb_samples * out_channels * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16));
+						uint8_t* outptr[2] = { outbuf.data(), nullptr };
+						int converted = swr_convert(swrContext, outptr, out_nb_samples, (const uint8_t**)audioFrame->extended_data, audioFrame->nb_samples);
+						if (converted > 0) {
+							int samples = converted * out_channels;
+							int16_t* samples16 = reinterpret_cast<int16_t*>(outbuf.data());
+							audioSamples.insert(audioSamples.end(), samples16, samples16 + samples);
+						}
+					}
+				}
+			}
+			av_packet_unref(packet);
+		}
+
+		// remember audio format info
+		audioChannels = 2;
+		audioSampleRate = audioCodecContext->sample_rate;
+
+		// create SFML sound buffer if we have samples
+		if (!audioSamples.empty()) {
+			try {
+				sf::SoundBuffer* sb = new sf::SoundBuffer();
+				if (sb->loadFromSamples(reinterpret_cast<const sf::Int16*>(audioSamples.data()), (sf::Uint64)audioSamples.size(), audioChannels, audioSampleRate)) {
+					sf::Sound* s = new sf::Sound();
+					s->setBuffer(*sb);
+					soundBuffer = sb;
+					sound = s;
+				} else {
+					delete sb;
+				}
+			} catch (...) {
+				// ignore audio creation failures
+			}
+		}
+
+		// seek back to start for video decoding
+		if (av_seek_frame(formatContext, videoStreamIndex, 0, AVSEEK_FLAG_BACKWARD) < 0) {
+			//error seeking
+		}
+		avcodec_flush_buffers(codecContext);
 	}
 
 	return true;

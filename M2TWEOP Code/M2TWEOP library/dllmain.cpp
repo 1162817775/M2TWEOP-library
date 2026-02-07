@@ -25,6 +25,8 @@
 #pragma comment(lib,"avcodec.lib")
 #pragma comment(lib,"avformat.lib")
 #pragma comment(lib,"swscale.lib")
+// libswresample for audio resampling
+#pragma comment(lib,"swresample.lib")
 
 #if _DEBUG
 
