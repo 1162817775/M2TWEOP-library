@@ -29,6 +29,36 @@ inline bool operator != (int a, battleType b)
 	return a == static_cast<int>(b);
 }
 
+enum class battleGroundType
+{
+	grassShort,
+	grassLong,
+	sand,
+	rock,
+	forestDense,
+	scrubDense,
+	swamp,
+	mud,
+	mudRoad,
+	stoneRoad,
+	water,
+	ice,
+	snow,
+	wood,
+	dirt,
+	unknown
+};
+
+inline bool operator == (int a, battleGroundType b)
+{
+	return a == static_cast<int>(b);
+}
+
+inline bool operator != (int a, battleGroundType b)
+{
+	return a == static_cast<int>(b);
+}
+
 struct action
 {
 	DWORD vtable /*VFT*/;

@@ -1184,6 +1184,42 @@ private:
 	LPVOID funcAddress;
 };
 
+class onCalcArrowKillChance
+	:public AATemplate
+{
+public:
+	onCalcArrowKillChance(MemWork* mem, LPVOID adr, int ver);
+	~onCalcArrowKillChance() = default;
+
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onElephantHitpointDamage
+	:public AATemplate
+{
+public:
+	onElephantHitpointDamage(MemWork* mem, LPVOID adr, int ver);
+	~onElephantHitpointDamage() = default;
+
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+class onRenderUnitCardNumbers
+	:public AATemplate
+{
+public:
+	onRenderUnitCardNumbers(MemWork* mem, LPVOID adr, int ver);
+	~onRenderUnitCardNumbers() = default;
+
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 class onCalcUnitValueArmour
 	:public AATemplate
 {

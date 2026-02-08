@@ -42,6 +42,7 @@ public:
 		DWORD scriptCounters = NULL;
 		DWORD scriptCountersSet = NULL;
 		DWORD buildingChainLimit = NULL;
+		DWORD removeSiegeBug = NULL;
 		DWORD guildCooldown = NULL;
 		DWORD isDLC = NULL;
 		DWORD modelRigidCounts = NULL;

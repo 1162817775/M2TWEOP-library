@@ -270,6 +270,9 @@ public:
 		DWORD resetBuildingsMem = NULL;
 		DWORD getConstructionOptions = NULL;
 		DWORD makeWatchTower = NULL;
+		DWORD createUnitRQVector = NULL;
+		DWORD getRainLevelArrowEffect = NULL;
+		DWORD missileBalancingAdjustment = NULL;
 		DWORD addToWatchtowerList = NULL;
 		DWORD updateBlockades = NULL;
 		DWORD createCadDisembark = NULL;

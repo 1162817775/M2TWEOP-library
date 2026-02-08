@@ -8,6 +8,8 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
+#include <libavutil/channel_layout.h>
+#include <libswresample/swresample.h>
 #include <libavutil/opt.h>
 #include <libavutil/imgutils.h>
 }
@@ -20,6 +22,7 @@ public:
 	~eopVideo();
 	void PlayFrame();
     void restartVideo();
+    void stopVideo();
 
     int GetXSize();
     void SetXSize(int size);
@@ -44,6 +47,10 @@ private:
 
     AVFormatContext* formatContext = nullptr;
     AVCodecContext* codecContext = nullptr;
+    // audio
+    AVCodecContext* audioCodecContext = nullptr;
+    SwrContext* swrContext = nullptr;
+    AVFrame* audioFrame = nullptr;
 
     AVFrame* frame = nullptr;
     AVPacket* packet = nullptr;
@@ -56,6 +63,14 @@ private:
     int videoWidth = 0;
     int videoHeight = 0;
     int frameDelay = 0;
+
+    // audio playback data
+    std::vector<int16_t> audioSamples;
+    int audioChannels = 0;
+    int audioSampleRate = 0;
+    void* soundBuffer = nullptr; // opaque pointer to SFML objects (created in cpp)
+    void* sound = nullptr;
+    bool audioStarted = false;
 
 
     std::chrono::steady_clock::time_point lastFrameTime = std::chrono::steady_clock::now();

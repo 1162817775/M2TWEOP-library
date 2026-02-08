@@ -1072,6 +1072,18 @@ bool patchesForGame::onParseEdu(unitDb* db, descrParser* parser)
 	return db->parse(parser);
 }
 
+int patchesForGame::onElephantHitpointDamage()
+{
+	return m2tweopOptions::getElephantHitpointDamage();
+}
+
+int patchesForGame::onRenderUnitCardNumbers(unit* un)
+{
+	if (m2tweopOptions::getDrawUnitCardOutline())
+		return 1;
+	return un->general ? 1 : 0;
+}
+
 int patchesForGame::onAddSettlementToDiplomacyScroll(const settlementStruct* settlement)
 {
 	if (settlement->isMinorSettlement)
@@ -1098,6 +1110,124 @@ int patchesForGame::onCanWithdrawPreBattle(const settlementStruct* settlement)
 		return 1;
 	}
 	return 0;
+}
+
+namespace
+{
+	constexpr int piDiv2 = 0x4000;
+	struct flank
+	{
+		int16_t start;
+		int16_t end;
+	};
+	flank FLANK_LEFT {-piDiv2 + (piDiv2 / 4), -piDiv2 - (piDiv2 / 4)};
+	flank FLANK_RIGHT { piDiv2 - (piDiv2 / 4), piDiv2 + (piDiv2 / 4)};
+}
+
+int patchesForGame::onCalcArrowKillChance(unitStats* stats, soldierInBattle* defender, int16_t angle, int* dir,
+	float heightDiff, int bonus)
+{
+	int attack = static_cast<int>(heightDiff * 0.2);
+	attack = clamp(attack, -4, 4);
+
+	if (defender->isInFormation)
+	{
+		if (const auto formationType = callClassFunc<void*, int>(defender->thisUnit->formationsArray, 0x4);
+			formationType == formation::phalanx)
+		{
+			attack -= m2tweopOptions::getPhalanxMissileDefense();
+		}
+		else if (formationType == formation::schiltrom)
+		{
+			attack -= m2tweopOptions::getSchiltromMissileDefense();
+		}
+		else if (formationType == formation::shieldWall)
+		{
+			attack -= m2tweopOptions::getShieldWallMissileDefense();
+		}
+	}
+	attack += GAME_FUNC(int (__cdecl*)(unitStats*), getRainLevelArrowEffect)(stats);
+
+	auto tile = defender->thisObject.battleTile;
+	if (defender->mount)
+		tile = defender->mount->thisObject.battleTile;
+	if (const auto groundType = tile->physicalGroundType;
+		groundType == battleGroundType::forestDense || groundType == battleGroundType::wood)
+	{
+		attack -= 6;
+	}
+
+	auto armour = defender->stats.armourInBattle;
+	attack += stats->priStats.attack;
+
+	if (stats->priStats.isAP)
+	{
+		armour >>= 1;
+		if (stats->priStats.weaponTecType == weaponTechType::missile_gunpowder)
+			armour >>= 1;
+	}
+
+	attack -= armour;
+	
+	const auto attackAngle = angle - defender->thisObject.rotation + 0x7FFF;
+	int attackDir = 0;
+	if (attackAngle <= 0)
+	{
+		if ( attackAngle >= FLANK_LEFT.end )
+			attackDir = attackAngle < FLANK_LEFT.start;
+		else
+			attackDir = 2;
+	}
+	else if ( attackAngle <= FLANK_RIGHT.end )
+	{
+		attackDir = attackAngle <= FLANK_RIGHT.start ? 0 : 3;
+	}
+	else
+	{
+		attackDir = 2;
+	}
+
+	auto shield = defender->stats.armourStats.shield;
+	if (stats->priStats.isAP)
+		shield >>= 1;
+	if (stats->priStats.weaponTecType == weaponTechType::missile_gunpowder)
+		shield >>= 1;
+
+	if (attackDir)
+	{
+		if ( attackDir == 1 || attackDir == 3 || attackDir == 5 )
+			attack += shield / -2;
+	}
+	else
+	{
+		attack -= shield;
+	}
+
+	if (stats->priStats.isThrown)
+	{
+		const auto elephant = callClassFunc<soldierInBattle*, soldierInBattle*>(defender, 0x24);
+		if (const auto mountType = callClassFunc<soldierInBattle*, int>(elephant, 0x128); mountType == mountClass::elephant)
+			attack += m2tweopOptions::getElephantJavBonus();
+	}
+	
+	attack += bonus;
+	if (attack < -6)
+	{
+		if ( attack < -12 )
+			attack = 4 * attack + 68;
+		else
+			attack = 2 * (5 * attack + 70);
+	}
+	else
+	{
+		attack = 4 * (5 * attack + 50);
+	}
+	attack = clamp(attack, 1, 990);
+
+	if (stats->priStats.weaponType != weaponType::siegeMissile)
+		attack = GAME_FUNC(int(__cdecl*)(int, soldierInBattle*), missileBalancingAdjustment)(attack, defender);
+
+	return attack;
 }
 
 int patchesForGame::onCalculateCommand(const characterRecord* general)
@@ -2023,6 +2153,7 @@ void __stdcall patchesForGame::onNewGameStart()
 void __stdcall patchesForGame::onEduParsed()
 {
 	gameHelpers::fixReligionTrigger();
+	gameHelpers::fixRemoveSiegeLoop();
 	*reinterpret_cast<bool*>(dataOffsets::offsets.bugReport) = true;
 	unitHelpers::initBaseUnitsLookup();
 	gameEvents::onReadGameDbsAtStart();

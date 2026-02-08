@@ -29,6 +29,12 @@ int m2tweopOptions::maxBodyguardSize = 31;
 int m2tweopOptions::minBodyguardSize = 4;
 int m2tweopOptions::extraLeaderSoldiers = 6;
 int m2tweopOptions::extraHeirSoldiers = 4;
+int m2tweopOptions::phalanxMissileDefense = 4;
+int m2tweopOptions::schiltromMissileDefense = 1;
+int m2tweopOptions::shieldWallMissileDefense = 0;
+int m2tweopOptions::elephantJavBonus = 10;
+int m2tweopOptions::elephantHitpointDamage = 4;
+bool m2tweopOptions::drawUnitCardOutline = true;
 bool m2tweopOptions::ignoreOwnershipRecruitment = false;
 bool m2tweopOptions::changeGeneralPosition = false;
 bool m2tweopOptions::enableRangedWeaponUpg = true;
@@ -3619,6 +3625,13 @@ namespace gameHelpers
 		limit++;
 		const DWORD codeAdr = dataOffsets::offsets.buildingChainLimit;
 		MemWork::WriteData(&limit, codeAdr, 4);
+	}
+	
+	void fixRemoveSiegeLoop()
+	{
+		uint8_t fix = 0;
+		const DWORD codeAdr = dataOffsets::offsets.removeSiegeBug;
+		MemWork::WriteData(&fix, codeAdr, 1);
 	}
 
 	void setGuildCooldown(unsigned char turns)
