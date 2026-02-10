@@ -1151,10 +1151,14 @@ int patchesForGame::onCalcArrowKillChance(unitStats* stats, soldierInBattle* def
 	auto tile = defender->thisObject.battleTile;
 	if (defender->mount)
 		tile = defender->mount->thisObject.battleTile;
-	if (const auto groundType = tile->physicalGroundType;
-		groundType == battleGroundType::forestDense || groundType == battleGroundType::wood)
+	
+	if (tile)
 	{
-		attack -= 6;
+		if (const auto groundType = tile->physicalGroundType;
+			groundType == battleGroundType::forestDense || groundType == battleGroundType::wood)
+		{
+			attack -= 6;
+		}
 	}
 
 	auto armour = defender->stats.armourInBattle;
@@ -1206,8 +1210,11 @@ int patchesForGame::onCalcArrowKillChance(unitStats* stats, soldierInBattle* def
 	if (stats->priStats.isThrown)
 	{
 		const auto elephant = callClassFunc<soldierInBattle*, soldierInBattle*>(defender, 0x24);
-		if (const auto mountType = callClassFunc<soldierInBattle*, int>(elephant, 0x128); mountType == mountClass::elephant)
-			attack += m2tweopOptions::getElephantJavBonus();
+		if (elephant)
+		{
+			if (const auto mountType = callClassFunc<soldierInBattle*, int>(elephant, 0x128); mountType == mountClass::elephant)
+				attack += m2tweopOptions::getElephantJavBonus();
+		}
 	}
 	
 	attack += bonus;

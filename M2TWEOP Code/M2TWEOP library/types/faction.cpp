@@ -384,7 +384,10 @@ void eopFactionDataDb::checkInitialized()
 void eopFactionDataDb::restoreOriginalData()
 {
 	if (!m_Initialized)
+	{
+		getOriginalData();
 		return;
+	}
 	m_Restoring = true;
 	const auto factionRecordNum = factionHelpers::getFactionRecordNum();
 	for (int f = 0; f < factionRecordNum; f++)
