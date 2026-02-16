@@ -1533,6 +1533,7 @@ void patchesForGame::balanceMinorSettStats(settlementStats* stats, const settlem
 		}
 		stats->TradeIncome = static_cast<int>(round(stats->TradeIncome * modifierIncome));
 		stats->FarmsIncome = static_cast<int>(round(stats->FarmsIncome * modifierIncome));
+		stats->DevastationExpense = static_cast<int>(round(stats->DevastationExpense * modifierIncome));
 		stats->MiningIncome = static_cast<int>(round(stats->MiningIncome * modifierIncome));
 		stats->PopGrowthFarms = static_cast<int>(round(stats->PopGrowthFarms * modifierGrowth));
 		stats->PopGrowthBaseFarm = static_cast<int>(round(stats->PopGrowthBaseFarm * modifierGrowth));
@@ -1542,6 +1543,7 @@ void patchesForGame::balanceMinorSettStats(settlementStats* stats, const settlem
 	{
 		stats->TradeIncome = static_cast<int>(round(stats->TradeIncome * modifiers->incomeModifierOwnFaction));
 		stats->FarmsIncome = static_cast<int>(round(stats->FarmsIncome * modifiers->incomeModifierOwnFaction));
+		stats->DevastationExpense = static_cast<int>(round(stats->DevastationExpense * modifiers->incomeModifierOwnFaction));
 		stats->MiningIncome = static_cast<int>(round(stats->MiningIncome * modifiers->incomeModifierOwnFaction));
 		stats->PopGrowthFarms = static_cast<int>(round(stats->PopGrowthFarms * modifiers->growthModifierOwnFaction));
 		stats->PopGrowthBaseFarm = static_cast<int>(round(stats->PopGrowthBaseFarm * modifiers->growthModifierOwnFaction));
