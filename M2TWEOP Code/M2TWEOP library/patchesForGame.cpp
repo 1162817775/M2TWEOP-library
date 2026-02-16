@@ -1192,7 +1192,7 @@ int patchesForGame::onCalcArrowKillChance(unitStats* stats, soldierInBattle* def
 	}
 
 	auto shield = defender->stats.armourStats.shield;
-	if (stats->priStats.isAP)
+	if (stats->priStats.isAP && m2tweopOptions::getApIsShieldPiercing())
 		shield >>= 1;
 	if (stats->priStats.weaponTecType == weaponTechType::missile_gunpowder)
 		shield >>= 1;

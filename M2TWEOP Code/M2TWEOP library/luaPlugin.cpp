@@ -292,6 +292,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield setShieldWallMissileDefense setShieldWallMissileDefense
 	@tfield setElephantJavBonus setElephantJavBonus
 	@tfield setElephantHitpointDamage setElephantHitpointDamage
+	@tfield setApIsShieldPiercing setApIsShieldPiercing
 	@tfield setWatchTowerRange setWatchTowerRange
 	@tfield drawUnitCardOutline drawUnitCardOutline
 	@tfield enableFamilyEventsWithoutTree enableFamilyEventsWithoutTree
@@ -1098,6 +1099,15 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 		local exists = M2TWEOP.modelExists("england_knight")
 	*/
 	tables.M2TWEOP.set_function("modelExists", &unitHelpers::modelExists);
+	
+	/***
+	Set if armour piercing missile attacks also halve shield stat. Default: true
+	@function M2TWEOP.setApIsShieldPiercing
+	@tparam bool set Default: true
+	@usage
+		M2TWEOP.setApIsShieldPiercing(false)
+	*/
+	tables.M2TWEOP.set_function("setApIsShieldPiercing", &m2tweopOptions::setApIsShieldPiercing);
 	
 	/***
 	Faction specific unit cards are always chosen if found. Enabled by default.
