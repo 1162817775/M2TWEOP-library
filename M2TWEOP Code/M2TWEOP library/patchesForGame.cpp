@@ -1030,6 +1030,7 @@ void patchesForGame::onExitToMenu()
 	gameHelpers::logStringGame("GAME EXIT TO MENU - CLEAR DATA");
 	minorSettlementDb::clear();
 	eopSettlementDataDb::get()->clearData();
+	settlementHelpers::clearOptionsDb();
 	plugData::data.luaAll.clearHashMapsCampaign();
 	gameHelpers::logStringGame("DATA CLEARED");
 	gameEvents::onExitToMenu();
@@ -2155,6 +2156,7 @@ void __stdcall patchesForGame::onNewGameStart()
 	eopSettlementDataDb::get()->clearData();
 	gameStringDataDb::getInstance()->restoreOriginal();
 	gameEvents::onNewGameStart();
+	settlementHelpers::clearOptionsDb();
 	plannedRetreatRoute::onNewGameStart();
 }
 
@@ -2595,6 +2597,7 @@ void __fastcall patchesForGame::onLoadSaveFile(UNICODE_STRING**& savePath)
 	}
 	files = techFuncs::loadGameLoadArchive(files, savePath);
 	minorSettlementDb::clear();
+	settlementHelpers::clearOptionsDb();
 	eopSettlementDataDb::get()->onGameLoad(files);
 	eopFortDataDb::get()->onGameLoad(files);
 	eopCharacterDataDb::get()->onGameLoad(files);

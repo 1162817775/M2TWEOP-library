@@ -859,6 +859,7 @@ namespace settlementHelpers
 	void addBuildingPool(edbEntry* entry, int level, int eduIndex, float initialSize, float gainPerTurn, float maxSize, int32_t exp, std::string condition);
 	bool addUnitToQueue(unitRQ* unit);
 	recruitmentOptions* getAvailableUnitsMem();
+	void clearOptionsDb();
 	recruitmentOptions* getAvailableUnits(settlementStruct* sett);
 	recruitmentOptions* getAvailableRetrainingUnits(settlementStruct* sett);
 	int makeRecruitOptionsHash(const settlementStruct* sett);
