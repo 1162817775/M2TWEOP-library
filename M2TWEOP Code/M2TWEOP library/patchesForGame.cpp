@@ -1030,6 +1030,7 @@ void patchesForGame::onExitToMenu()
 	gameHelpers::logStringGame("GAME EXIT TO MENU - CLEAR DATA");
 	minorSettlementDb::clear();
 	eopSettlementDataDb::get()->clearData();
+	settlementHelpers::clearOptionsDb();
 	plugData::data.luaAll.clearHashMapsCampaign();
 	gameHelpers::logStringGame("DATA CLEARED");
 	gameEvents::onExitToMenu();
@@ -1192,7 +1193,7 @@ int patchesForGame::onCalcArrowKillChance(unitStats* stats, soldierInBattle* def
 	}
 
 	auto shield = defender->stats.armourStats.shield;
-	if (stats->priStats.isAP)
+	if (stats->priStats.isAP && m2tweopOptions::getApIsShieldPiercing())
 		shield >>= 1;
 	if (stats->priStats.weaponTecType == weaponTechType::missile_gunpowder)
 		shield >>= 1;
@@ -1533,6 +1534,7 @@ void patchesForGame::balanceMinorSettStats(settlementStats* stats, const settlem
 		}
 		stats->TradeIncome = static_cast<int>(round(stats->TradeIncome * modifierIncome));
 		stats->FarmsIncome = static_cast<int>(round(stats->FarmsIncome * modifierIncome));
+		stats->DevastationExpense = static_cast<int>(round(stats->DevastationExpense * modifierIncome));
 		stats->MiningIncome = static_cast<int>(round(stats->MiningIncome * modifierIncome));
 		stats->PopGrowthFarms = static_cast<int>(round(stats->PopGrowthFarms * modifierGrowth));
 		stats->PopGrowthBaseFarm = static_cast<int>(round(stats->PopGrowthBaseFarm * modifierGrowth));
@@ -1542,6 +1544,7 @@ void patchesForGame::balanceMinorSettStats(settlementStats* stats, const settlem
 	{
 		stats->TradeIncome = static_cast<int>(round(stats->TradeIncome * modifiers->incomeModifierOwnFaction));
 		stats->FarmsIncome = static_cast<int>(round(stats->FarmsIncome * modifiers->incomeModifierOwnFaction));
+		stats->DevastationExpense = static_cast<int>(round(stats->DevastationExpense * modifiers->incomeModifierOwnFaction));
 		stats->MiningIncome = static_cast<int>(round(stats->MiningIncome * modifiers->incomeModifierOwnFaction));
 		stats->PopGrowthFarms = static_cast<int>(round(stats->PopGrowthFarms * modifiers->growthModifierOwnFaction));
 		stats->PopGrowthBaseFarm = static_cast<int>(round(stats->PopGrowthBaseFarm * modifiers->growthModifierOwnFaction));
@@ -2153,6 +2156,7 @@ void __stdcall patchesForGame::onNewGameStart()
 	eopSettlementDataDb::get()->clearData();
 	gameStringDataDb::getInstance()->restoreOriginal();
 	gameEvents::onNewGameStart();
+	settlementHelpers::clearOptionsDb();
 	plannedRetreatRoute::onNewGameStart();
 }
 
@@ -2593,6 +2597,7 @@ void __fastcall patchesForGame::onLoadSaveFile(UNICODE_STRING**& savePath)
 	}
 	files = techFuncs::loadGameLoadArchive(files, savePath);
 	minorSettlementDb::clear();
+	settlementHelpers::clearOptionsDb();
 	eopSettlementDataDb::get()->onGameLoad(files);
 	eopFortDataDb::get()->onGameLoad(files);
 	eopCharacterDataDb::get()->onGameLoad(files);

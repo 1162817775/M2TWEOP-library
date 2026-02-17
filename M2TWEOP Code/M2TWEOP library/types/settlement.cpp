@@ -998,6 +998,7 @@ namespace settlementHelpers
 		std::array<std::shared_ptr<settlementRecruitmentOptions>, 200> settRecruitOptions{};
 	};
 	std::shared_ptr<recruitOptionsDb> recruitOptionsDbPtr = std::make_shared<recruitOptionsDb>();
+
 	
 	bool addUnitToQueue(unitRQ* unit)
 	{
@@ -1113,6 +1114,15 @@ namespace settlementHelpers
 	}
 
 #pragma endregion Recruitment items
+	
+	void clearOptionsDb()
+	{
+		for (int i = 0; i < 200; i++)
+		{
+			recruitOptionsDbPtr->settRecruitOptions[i] = nullptr;
+			buildingOptionsDbPtr->settOptions[i] = nullptr;
+		}
+	}
 	
 	std::array<sol::table*, 200> settlementData;
 	

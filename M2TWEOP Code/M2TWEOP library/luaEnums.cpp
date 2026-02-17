@@ -476,6 +476,51 @@ void luaPlugin::initLuaEnums()
 
 	
 	/***
+	Enum of weapon tech types
+
+	@tfield int melee_simple
+	@tfield int melee_blade
+	@tfield int missile_mechanical
+	@tfield int missile_gunpowder
+	@tfield int artillery_mechanical
+	@tfield int artillery_gunpowder
+	@tfield int naval_gunpowder
+
+	@table weaponTechType
+	*/
+	luaState.new_enum(
+		"weaponTechType",
+		"melee_simple", 0,
+		"melee_blade", 1,
+		"missile_mechanical", 2,
+		"missile_gunpowder", 3,
+		"artillery_mechanical", 4,
+		"artillery_gunpowder", 5,
+		"naval_gunpowder", 6
+	);
+	
+	/***
+	Enum of weapon types
+
+	@tfield int melee
+	@tfield int siegeMelee
+	@tfield int thrown
+	@tfield int missile
+	@tfield int siegeMissile
+
+	@table weaponType
+	*/
+	luaState.new_enum(
+		"weaponType",
+		"melee", 0,
+		"siegeMelee", 1,
+		"thrown", 2,
+		"missile", 3,
+		"siegeMissile", 4
+	);
+
+	
+	/***
 	Enum of unit discipline.
 
 	@tfield int berserker
