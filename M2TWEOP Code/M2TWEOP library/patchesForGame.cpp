@@ -2787,6 +2787,8 @@ void __fastcall patchesForGame::onEndSiege(settlementStruct* sett)
 
 void __fastcall patchesForGame::onStartSiege(settlementStruct* sett)
 {
+	if (const auto campaign = campaignHelpers::getCampaignData(); campaign and campaign->isOpen)
+		campaign->ignoreSpeedUp = false;
 	if (sett->siegeNum == 0)
 	{
 		return;
