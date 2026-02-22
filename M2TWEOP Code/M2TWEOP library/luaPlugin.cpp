@@ -69,7 +69,7 @@ int initLuaPlugin(bool isReload)
 
 void luaPlugin::loadLuaScript(std::string& luaFilePath)
 {
-	UINT defaultFlags = MB_ABORTRETRYIGNORE | MB_ICONEXCLAMATION;  // Default type with exclamation icon
+	UINT defaultFlags = getLuaExceptionMessageBoxFlags();
 	// This checks the syntax of the script, but does not execute it
 	sol::load_result fileRes = luaState.load_file(luaFilePath);
 	if (!fileRes.valid())
@@ -191,7 +191,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	std::string f = "\\";
 	std::string r = "/";
 	replaceAll2(packagePS, f, r);
-	UINT defaultFlags = MB_ABORTRETRYIGNORE | MB_ICONEXCLAMATION;  // Default type with exclamation icon
+	UINT defaultFlags = getLuaExceptionMessageBoxFlags();
 
 	luaState["print"] = &ourP;
 	if (auto funcResult = luaState.script(packagePS); !funcResult.valid())

@@ -1611,9 +1611,9 @@ void managerF::loadJsonSettings()
 	std::string fPath = globals::dataS.modPath;
 	fPath += R"(\eopData\config\gameCfg.json)";
 	jsn::json json = jsonManager::loadJsonFromFile(fPath);
+	bool jsonBoolValue;
 	try
 	{
-		bool jsonBoolValue;
 		if (json.contains("isContextMenuNeeded"))
 		{
 			getJson(jsonBoolValue, "isContextMenuNeeded")
@@ -1662,6 +1662,11 @@ void managerF::loadJsonSettings()
 		if (json.contains("modVersion"))
 		{
 			getJson(globals::dataS.gameCfg.modVersion, "modVersion")
+		}
+		if (json.contains("showLuaRetryIgnore"))
+		{
+			getJson(jsonBoolValue, "showLuaRetryIgnore")
+			globals::dataS.gameCfg.showLuaRetryIgnore = jsonBoolValue;
 		}
 	}
 	catch (jsn::json::type_error& e)

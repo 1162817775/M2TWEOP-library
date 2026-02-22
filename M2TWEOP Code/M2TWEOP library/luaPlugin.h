@@ -11,10 +11,18 @@
 #include "lua/sol.hpp"
 #include <string>
 #include "gameHelpers.h"
+#include "globals.h"
+
+inline UINT getLuaExceptionMessageBoxFlags()
+{
+	return globals::dataS.gameCfg.showLuaRetryIgnore
+		? (MB_ABORTRETRYIGNORE | MB_ICONEXCLAMATION)
+		: (MB_OK | MB_ICONEXCLAMATION);
+}
 
 #define tryLua(luaFunc)  \
 auto funcResult = luaFunc;\
-UINT defaultFlags = MB_ABORTRETRYIGNORE | MB_ICONEXCLAMATION;\
+UINT defaultFlags = getLuaExceptionMessageBoxFlags();\
 if (!funcResult.valid())\
 {\
 	sol::error luaError = funcResult;\
@@ -30,7 +38,7 @@ if (!funcResult.valid())\
 
 #define tryLuaGetRes(luaFunc,result)  \
 auto funcResult = luaFunc;\
-UINT defaultFlags = MB_ABORTRETRYIGNORE | MB_ICONEXCLAMATION;\
+UINT defaultFlags = getLuaExceptionMessageBoxFlags();\
 if (!funcResult.valid())\
 {\
 	sol::error luaError = funcResult;\
