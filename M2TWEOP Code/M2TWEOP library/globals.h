@@ -23,6 +23,7 @@ public:
 			string launcherTheme = "default";
 			string modVersion = "";
 			bool isSaveBackupEnabled = true;
+			bool showLuaRetryIgnore = false;
 		}gameCfg;
 		struct modulesS
 		{

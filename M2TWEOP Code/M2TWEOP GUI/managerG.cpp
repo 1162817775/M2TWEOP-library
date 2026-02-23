@@ -176,6 +176,11 @@ namespace managerG
 			{
 				getJson(dataG::data.gameData.modVersion, "modVersion");
 			}
+			if (json.contains("showLuaRetryIgnore"))
+			{
+				getJson(jsonBoolValue, "showLuaRetryIgnore");
+				dataG::data.gameData.showLuaRetryIgnore = jsonBoolValue;
+			}
 			if (json.contains("runButtonColor"))
 			{
 				getJson(dataG::data.gameData.buttonColorString, "runButtonColor");
@@ -267,6 +272,7 @@ namespace managerG
 		setJson("discordServerLink", dataG::data.gameData.discordServerLink);
 		setJson("modTitle", dataG::data.gameData.modTitle);
 		setJson("modVersion", dataG::data.gameData.modVersion);
+		setJson("showLuaRetryIgnore", dataG::data.gameData.showLuaRetryIgnore);
 		setJson("runButtonColor", dataG::data.gameData.buttonColorString);
 		setJson("runButtonHoverColor", dataG::data.gameData.buttonHoverColorString);
 		setJson("launcherTheme", dataG::data.modData.themeName);
