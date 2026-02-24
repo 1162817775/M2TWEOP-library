@@ -51,6 +51,10 @@ It has been over 2 years since EOP V3.3.1 released. In that time, the entire pro
 ### **Documentation**
 - Updated Erken's ImGUI PDF tutorial to V5 (Thanks Erken!) - *Medik*
 
+### **Examples**
+What mods have been made using EOP V4 so far?
+  - [Divide and Conquer: AGO V3](https://www.divide-and-conquer-ago.com/features/#battle-ai)
+
 ### **Links**
 - [Known Bugs](https://github.com/youneuoy/M2TWEOP-library/issues/71)
 - [Website](https://youneuoy.github.io/M2TWEOP-library/)
