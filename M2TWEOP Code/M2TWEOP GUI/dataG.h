@@ -77,7 +77,6 @@ public:
 
 			bool isSaveBackupEnabled = false;
 			bool isBlockLaunchWithoutEop = false;
-			bool IsOverrideBattleCamera = false;
 			bool showLuaRetryIgnore = false;
 		}gameData;
 
