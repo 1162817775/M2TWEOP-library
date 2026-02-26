@@ -982,6 +982,30 @@ void onFactionSymbolSelect(int factionID)
 	}
 }
 
+void onCharacterDied(character* character)
+{
+	if (plugData::data.luaAll.onCharacterDied != nullptr)
+	{
+		tryLua((*plugData::data.luaAll.onCharacterDied)(character))
+	}
+}
+
+void onFactionDied(factionStruct* faction)
+{
+	if (plugData::data.luaAll.onFactionDied != nullptr)
+	{
+		tryLua((*plugData::data.luaAll.onFactionDied)(faction))
+	}
+}
+
+void onCharacterSwitchFaction(character* character)
+{
+	if (plugData::data.luaAll.onCharacterSwitchFaction != nullptr)
+	{
+		tryLua((*plugData::data.luaAll.onCharacterSwitchFaction)(character))
+	}
+}
+
 void onLoadGamePl(const std::vector<std::string>* saveFiles)
 {
 	if (plugData::data.luaAll.onLoadSaveFile != nullptr)
@@ -1428,6 +1452,9 @@ void luaPlugin::onPluginLoadF()
 	@tfield onNewGameLoaded onNewGameLoaded
 	@tfield onRemoveFromUnitQueue onRemoveFromUnitQueue
 	@tfield onFactionSymbolSelect onFactionSymbolSelect
+	@tfield onCharacterDied onCharacterDied
+	@tfield onFactionDied onFactionDied
+	@tfield onCharacterSwitchFaction onCharacterSwitchFaction
 
 	@table EventsFunctionsList
 	*/
@@ -4584,7 +4611,6 @@ void luaPlugin::onPluginLoadF()
 	onStartSiege = new sol::function(luaState["onStartSiege"]);
 	checkLuaFunc(&onStartSiege);
 
-
 	/***
 	Called when clicking on a faction symbol in the faction selection menu.
 
@@ -4598,6 +4624,48 @@ void luaPlugin::onPluginLoadF()
 	*/
 	onFactionSymbolSelect = new sol::function(luaState["onFactionSymbolSelect"]);
 	checkLuaFunc(&onFactionSymbolSelect);
+
+	/***
+	Called when a character dies.
+
+	@function onCharacterDied
+	@tparam character character
+
+	@usage
+	function onCharacterDied(character)
+	--something here
+	end
+	*/
+	onCharacterDied = new sol::function(luaState["onCharacterDied"]);
+	checkLuaFunc(&onCharacterDied);
+
+	/***
+	Called when a faction dies.
+
+	@function onFactionDied
+	@tparam faction faction
+
+	@usage
+	function onFactionDied(faction)
+	--something here
+	end
+	*/
+	onFactionDied = new sol::function(luaState["onFactionDied"]);
+	checkLuaFunc(&onFactionDied);
+
+	///***
+	//Called when a character switch faction.
+	//
+	//@function onCharacterSwitchFaction
+	//@tparam character character
+	//
+	//@usage
+	//function onCharacterSwitchFaction(faction)
+	//--something here
+	//end
+	//*/
+	//onCharacterSwitchFaction = new sol::function(luaState["onCharacterSwitchFaction"]);
+	//checkLuaFunc(&onCharacterSwitchFaction);
 
 
 	if (onPluginLoad != nullptr)

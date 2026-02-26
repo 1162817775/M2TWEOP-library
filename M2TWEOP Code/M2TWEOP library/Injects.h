@@ -3407,6 +3407,50 @@ private:
 	LPVOID funcAdress;
 };
 
+//Character Died
+class toCharacterDied
+	:public AATemplate
+{
+public:
+	toCharacterDied(MemWork* mem, LPVOID adr, int ver);
+	~toCharacterDied();
+
+	void SetOriginalCharacterDied();
+	void SetNewCharacterDied();
+private:
+	LPVOID funcAddress;
+};
+
+//Faction Died
+class toFactionDied
+	:public AATemplate
+{
+public:
+	toFactionDied(MemWork* mem, LPVOID adr, int ver);
+	~toFactionDied();
+
+	void SetOriginalFactionDied();
+	void SetNewFactionDied();
+private:
+	LPVOID funcAddress;
+};
+
+//Character Switch Faction
+class toCharacterSwitchFaction
+	:public AATemplate
+{
+public:
+	toCharacterSwitchFaction(MemWork* mem, LPVOID adr, int ver);
+	~toCharacterSwitchFaction();
+
+	void SetOriginalCharacterSwitchFaction();
+	void SetNewCharacterSwitchFaction();
+private:
+	LPVOID funcAddress;
+};
+
+
+
 
 
 

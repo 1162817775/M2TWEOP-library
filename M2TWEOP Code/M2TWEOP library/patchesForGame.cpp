@@ -2826,6 +2826,21 @@ void __thiscall patchesForGame::onFactionSymbolSelect()
 	gameEvents::onFactionSymbolSelect(factionID);
 }
 
+void __thiscall patchesForGame::onCharacterDied(character* character)
+{
+	gameEvents::onCharacterDied(character);
+}
+
+void __thiscall patchesForGame::onFactionDied(factionStruct* faction)
+{
+	gameEvents::onFactionDied(faction);
+}
+
+void __thiscall patchesForGame::onCharacterSwitchFaction(character* character)
+{
+	gameEvents::onCharacterSwitchFaction(character);
+}
+
 struct
 {
 	bool isComingFromConsole = false;
