@@ -92,7 +92,7 @@ namespace m2tweopStarter
 			
 			// Common error explanations
 			switch (error) {
-				case 126: errmsg += "Missing dependencies or invalid DLL"; break;
+				case 126: errmsg += "Missing dependencies or invalid DLL. Try installing all versions of Microsoft VS C++ redistributable from 2005 to the current one"; break;
 				case 127: errmsg += "Procedure not found"; break;
 				case 193: errmsg += "Not a valid Win32 application (architecture mismatch)"; break;
 				case 2: errmsg += "File not found"; break;

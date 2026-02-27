@@ -256,6 +256,9 @@ namespace gameEvents
 	std::vector<std::string>*onSaveGamePl(UNICODE_STRING * *&savePath);
 	void onEventWrapper(DWORD eventAddr, DWORD** vTab);
 	void onFactionSymbolSelect(int factionID);
+	void onCharacterDied(character* c);
+	void onFactionDied(factionStruct* faction);
+	void onCharacterSwitchFaction(character* character);
 	
 	template<EventType EvType> class Event :public EventBase
 	{

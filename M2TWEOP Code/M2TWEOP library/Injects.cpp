@@ -10537,6 +10537,7 @@ void toRetreat::SetNewCode()
 	delete a;
 }
 
+///
 toFactionSymbolSelect::toFactionSymbolSelect(MemWork* mem, LPVOID adr, int ver)
 	:AATemplate(mem), funcAdress(adr)
 {
@@ -10585,4 +10586,162 @@ void toFactionSymbolSelect::SetNewFactionSymbolSelect()
 
 	delete a;
 }
+
+///
+toCharacterDied::toCharacterDied(MemWork* mem, LPVOID adr, int ver)
+	:AATemplate(mem), funcAddress(adr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x00592e00;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x00592900;
+}
+
+toCharacterDied::~toCharacterDied()
+{
+}
+
+void toCharacterDied::SetOriginalCharacterDied()
+{
+	Assembler* a = new Assembler();
+
+	a->push(ebx);
+	a->mov(bl, dword_ptr(esp, 0x4));
+
+	a->ret();
+	m_originalBytes = (unsigned char*)a->make();
+	m_originalSize = m_memory->GetASMSize(m_originalBytes);
+
+	delete a;
+}
+
+void toCharacterDied::SetNewCharacterDied()
+{
+	Assembler* a = new Assembler();
+
+	a->push(ebx);
+	a->mov(bl, dword_ptr(esp, 0x4));
+
+	a->pushad();
+	a->pushf();
+
+	a->mov(eax, (DWORD)funcAddress);
+	a->call(eax);
+
+	a->popf();
+	a->popad();
+
+	a->ret();
+	m_cheatBytes = (unsigned char*)a->make();
+
+	delete a;
+}
+
+///
+toFactionDied::toFactionDied(MemWork* mem, LPVOID adr, int ver)
+	:AATemplate(mem), funcAddress(adr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x004fcda0;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x004fc830;
+}
+
+toFactionDied::~toFactionDied()
+{
+}
+
+void toFactionDied::SetOriginalFactionDied()
+{
+	Assembler* a = new Assembler();
+
+	a->sub(esp, 0x8);
+	a->push(ebx);
+	a->push(ebp);
+
+	a->ret();
+	m_originalBytes = (unsigned char*)a->make();
+	m_originalSize = m_memory->GetASMSize(m_originalBytes);
+
+	delete a;
+}
+
+void toFactionDied::SetNewFactionDied()
+{
+	Assembler* a = new Assembler();
+
+	a->sub(esp, 0x8);
+	a->push(ebx);
+	a->push(ebp);
+
+	a->pushad();
+	a->pushf();
+
+	a->mov(eax, (DWORD)funcAddress);
+	a->call(eax);
+
+	a->popf();
+	a->popad();
+
+	a->ret();
+	m_cheatBytes = (unsigned char*)a->make();
+
+	delete a;
+}
+
+///
+toCharacterSwitchFaction::toCharacterSwitchFaction(MemWork* mem, LPVOID adr, int ver)
+	:AATemplate(mem), funcAddress(adr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x005A2100;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x005A1C20;
+}
+
+toCharacterSwitchFaction::~toCharacterSwitchFaction()
+{
+}
+
+void toCharacterSwitchFaction::SetOriginalCharacterSwitchFaction()
+{
+	Assembler* a = new Assembler();
+
+	a->push(ebp);
+//	a->mov(ebp, dword_ptr(esp, 0x4));
+
+	a->ret();
+	m_originalBytes = (unsigned char*)a->make();
+	m_originalSize = m_memory->GetASMSize(m_originalBytes);
+
+	delete a;
+}
+
+void toCharacterSwitchFaction::SetNewCharacterSwitchFaction()
+{
+	Assembler* a = new Assembler();
+
+	a->push(ebp);
+//	a->mov(ebp, dword_ptr(esp, 0x4));
+
+	a->pushad();
+	a->pushf();
+
+	a->mov(eax, (DWORD)funcAddress);
+	a->call(eax);
+
+	a->popf();
+	a->popad();
+
+	a->ret();
+	m_cheatBytes = (unsigned char*)a->make();
+
+	delete a;
+}
+
+
+
 

@@ -305,6 +305,9 @@ public:
 	static void WINAPI onBattleStateChange();
 
 	static void __thiscall onFactionSymbolSelect();
+	static void __thiscall onCharacterDied(character* character);
+	static void __thiscall onFactionDied(factionStruct* faction);
+	static void __thiscall onCharacterSwitchFaction(character* character);
 };
 
 class consolePatches

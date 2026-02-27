@@ -1588,21 +1588,40 @@ void managerF::execPatches()
 		blockLaunch->Enable();
 		f1 << "Done" << '\n';
 	}
-	f1 << "End." << '\n';
-	f1.close();
-
-	//DWORD instruction = 0x191468;
-	//MemWork::WriteData(&instruction, 0x008B963E, 3);
-	//MemWork::WriteData(&instruction, 0x004BD9C0, 3);
 
 
 	f1 << "Start applying onFactionSymbolSelect patch" << '\n';
 	toFactionSymbolSelect* newFacSymSelect = new toFactionSymbolSelect(mem, (LPVOID)patchesForGame::onFactionSymbolSelect, globals::dataS.gameVersion);
 	newFacSymSelect->SetNewFactionSymbolSelect();
 	newFacSymSelect->Enable();
-
 	f1 << "Done" << '\n';
 
+	f1 << "Start applying onCharacterDied patch" << '\n';
+	toCharacterDied* newCharacterDied = new toCharacterDied(mem, (LPVOID)patchesForGame::onCharacterDied, globals::dataS.gameVersion);
+	newCharacterDied->SetNewCharacterDied();
+	newCharacterDied->Enable();
+	f1 << "Done" << '\n';
+
+	f1 << "Start applying onFactionDied patch" << '\n';
+	toFactionDied* newFactionDied = new toFactionDied(mem, (LPVOID)patchesForGame::onFactionDied, globals::dataS.gameVersion);
+	newFactionDied->SetNewFactionDied();
+	newFactionDied->Enable();
+	f1 << "Done" << '\n';
+
+	//f1 << "Start applying onCharacterSwitchFaction patch" << '\n';
+	//toCharacterSwitchFaction* newCharacterSwitchFaction = new toCharacterSwitchFaction(mem, (LPVOID)patchesForGame::onCharacterSwitchFaction, globals::dataS.gameVersion);
+	//newCharacterSwitchFaction->SetNewCharacterSwitchFaction();
+	//newCharacterSwitchFaction->Enable();
+	//f1 << "Done" << '\n';
+
+
+
+	f1 << "End." << '\n';
+	f1.close();
+
+	//DWORD instruction = 0x191468;
+	//MemWork::WriteData(&instruction, 0x008B963E, 3);
+	//MemWork::WriteData(&instruction, 0x004BD9C0, 3);
 }
 
 
