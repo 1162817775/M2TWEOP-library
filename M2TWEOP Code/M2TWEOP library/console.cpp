@@ -55,6 +55,7 @@ namespace console
 				break;
 			default:
 				// Handle unexpected return values
+				exit(0);
 				break;
 		}
 	}
