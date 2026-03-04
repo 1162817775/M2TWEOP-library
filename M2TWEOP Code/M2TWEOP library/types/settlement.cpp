@@ -1258,6 +1258,9 @@ namespace settlementHelpers
 		@tfield getCharacter getCharacter
 		@tfield canConstructBuilding canConstructBuilding
 		@tfield getFortificationLevel getFortificationLevel
+		@tfield float bannerPosX
+		@tfield float bannerPosZ
+		@tfield float bannerPosY
 
 		@table settlementStruct
 		*/
@@ -1350,6 +1353,9 @@ namespace settlementHelpers
 		types.settlementStruct.set("characterCount", sol::property(&settlementStruct::characterCount));
 		types.settlementStruct.set("settlementStatsLastTurn", sol::property(&settlementStruct::getSettlementStatsLastTurn));
 		types.settlementStruct.set("turmoil", sol::property(&settlementStruct::getTurmoil, &settlementStruct::setTurmoil));
+		types.settlementStruct.set("bannerPosX", &settlementStruct::stratPosX);
+		types.settlementStruct.set("bannerPosZ", &settlementStruct::stratPosZ);
+		types.settlementStruct.set("bannerPosY", &settlementStruct::stratPosY);
 		/***
 		Get the settlement's specific regligion's value
 		@function settlementStruct:getReligion
