@@ -2772,10 +2772,10 @@ void __fastcall patchesForGame::recruitEopMercUnit(DWORD pad, DWORD pad2, region
 
 void WINAPI patchesForGame::onMoveRecruitQueue()
 {
-	if (const auto campaign = campaignHelpers::getCampaignData(); campaign->humanPlayers < 2)
-		return;
-	MessageBoxA(nullptr, "Moving queue disabled in hotseat mode. EXIT NOW!!!!!", "ATTENTION!", NULL);
-	std::terminate();
+	// if (const auto campaign = campaignHelpers::getCampaignData(); campaign->humanPlayers < 2)
+	// 	return;
+	// MessageBoxA(nullptr, "Moving queue disabled in hotseat mode. EXIT NOW!!!!!", "ATTENTION!", NULL);
+	// std::terminate();
 }
 
 void __fastcall patchesForGame::onEndSiege(settlementStruct* sett)
