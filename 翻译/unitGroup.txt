@@ -1,0 +1,37 @@
+unitGroup = {
+    unitsInFormationNum = int, -- 处于阵型中的单位数量
+    unitsNotInFormationNum = int, -- 未处于阵型中的单位数量
+    unitNumTotal = int, -- 单位总数
+    xCoord = float, -- 组X坐标
+    yCoord = float, -- 组Y坐标
+    angle = int, -- 组朝向角度
+    automationType = int, -- 自动化类型，1=防守，2=攻击
+    defendXCoord = float, -- 自动化防守时的防守点X坐标（当automationType=1时）
+    defendYCoord = float, -- 自动化防守时的防守点Y坐标（当automationType=1时）
+    defendRadius = float, -- 自动化防守时的防守半径（当automationType=1时）
+    targetUnit = unit, -- 自动化攻击时的目标单位（当automationType=2时）
+    newAutomationType = int, -- 新的自动化类型，1=防守，2=攻击（设置此字段会将新字段的值传递到活动字段）
+    newDefendXCoord = float, -- 新的自动化防守点X坐标（当newAutomationType=1时）
+    newDefendYCoord = float, -- 新的自动化防守点Y坐标（当newAutomationType=1时）
+    newDefendRadius = float, -- 新的自动化防守半径（当newAutomationType=1时）
+    newTargetUnit = unit, -- 新的自动化攻击目标单位（当newAutomationType=2时）
+    getUnitInFormation = getUnitInFormation, -- 获取阵型中的单位
+    getUnitNotInFormation = getUnitNotInFormation, -- 获取非阵型中的单位
+    addUnit = addUnit, -- 添加单位到组
+    removeUnit = removeUnit, -- 从组中移除单位
+    undefine = undefine, -- 取消定义组
+    automate = automate, -- 自动执行（根据当前自动化设置）
+    automateAttack = automateAttack, -- 设置为自动攻击模式
+    automateDefense = automateDefense, -- 设置为自动防守模式
+    changeUnitFormation = changeUnitFormation, -- 改变单位在阵型中的位置
+    moveToMissileRangeOfGroup = moveToMissileRangeOfGroup, -- 移动到整个组的远程射程内
+    moveToMissileRangeOfUnit = moveToMissileRangeOfUnit, -- 移动到指定单位的远程射程内
+    attackGroup = attackGroup, -- 攻击另一个组
+    halt = halt, -- 停止移动
+    place = place, -- 放置组到指定位置
+    moveFormed = moveFormed, -- 保持阵型移动到指定点
+    moveUnformed = moveUnformed, -- 无阵型移动到指定点
+    moveRelativeFormed = moveRelativeFormed, -- 保持阵型相对移动
+    moveRelativeUnformed = moveRelativeUnformed, -- 无阵型相对移动
+    turn = turn -- 转向指定方向
+}
