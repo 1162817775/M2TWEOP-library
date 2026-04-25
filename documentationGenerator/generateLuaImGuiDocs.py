@@ -124,8 +124,8 @@ filenames = ["imgui\\sol_ImGui.cpp", "imgui\\sol_ImGui_enums.cpp", "imgui\\sol_I
 cwd = os.getcwd()
 eopPath = re.findall(r'(.+)documentationGenerator', cwd)[0]
 luaPluginPath = eopPath + "M2TWEOP Code\\M2TWEOP library\\"
-outputfile = open(eopPath + "M2TWEOP DataFiles\\eopData\\eopScripts\\LuaImGuiDocs.lua", 'w')
-outputfile_globals = open(eopPath + "M2TWEOP DataFiles\\eopData\\eopScripts\\globals_imgui.txt", 'w')
+outputfile = open(eopPath + "M2TWEOP DataFiles\\eopData\\eopScripts\\LuaImGuiDocs.lua", 'w', encoding="utf-8")
+outputfile_globals = open(eopPath + "M2TWEOP DataFiles\\eopData\\eopScripts\\globals_imgui.txt", 'w', encoding="utf-8")
 outputfile.write("---@diagnostic disable: missing-return, lowercase-global\n")
 
 for name in filenames:
@@ -135,7 +135,7 @@ for name in filenames:
     nextLineComment = False
     newSection = False
     countEnum = False
-    file = open(luaPluginPath + name, 'r')
+    file = open(luaPluginPath + name, 'r', encoding='utf-8')
     for line in file:
         #print(line)
         if re.search(r'@section', line) is not None:

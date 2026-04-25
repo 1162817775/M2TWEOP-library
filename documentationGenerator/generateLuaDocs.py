@@ -134,8 +134,8 @@ for file in os.listdir(typesPath):
     if file.endswith(".cpp"):
         filenames.append("types/" + file)
 luaPluginPath = eopPath + "M2TWEOP Code\\M2TWEOP library\\"
-outputfile = open(eopPath + "M2TWEOP DataFiles\\eopData\\eopScripts\\LuaDocs.lua", 'w')
-outputfile_globals = open(eopPath + "M2TWEOP DataFiles\\eopData\\eopScripts\\globals.txt", 'w')
+outputfile = open(eopPath + "M2TWEOP DataFiles\\eopData\\eopScripts\\LuaDocs.lua", 'w', encoding="utf-8")
+outputfile_globals = open(eopPath + "M2TWEOP DataFiles\\eopData\\eopScripts\\globals.txt", 'w', encoding="utf-8")
 outputfile.write("---@diagnostic disable: missing-return, lowercase-global\n")
 legacyNames = ["getTileRegionID",
                 "getRegionOwner", 
@@ -207,7 +207,7 @@ for name in filenames:
     newUserType = False
     countEnum = False
     enumCount = 0
-    file = open(luaPluginPath + name, 'r')
+    file = open(luaPluginPath + name, 'r', encoding='utf-8')
     for line in file:
         try:
 
