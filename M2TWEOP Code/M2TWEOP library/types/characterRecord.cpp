@@ -647,7 +647,7 @@ namespace characterRecordHelpers
 		@tfield int portraitIndex
 		@tfield string savedDisplayName
 		@tfield string savedDisplayLastName
-		@tfield string savedDisplayEpithet
+		@tfield string savedDisplayEpithet Use removeEpithet() if you need to clear this
 		@tfield int[10] combatVsReligion Maximum 10. EVEN IF YOU SET RELIGION LIMIT.
 		@tfield int[31] combatVsFaction Maximum 31.
 		@tfield getEopSetModel getEopSetModel
@@ -665,6 +665,7 @@ namespace characterRecordHelpers
 		@tfield hasAncType hasAncType
 		@tfield birthChild birthChild
 		@tfield marryWife marryWife
+		@tfield removeEpithet removeEpithet
 
 		@table characterRecord
 		*/
@@ -902,6 +903,15 @@ namespace characterRecordHelpers
 		*/
 		types.characterRecord.set_function("giveRandomPortrait", &characterRecord::giveRandomPortrait);
 		/***
+		Remove a characters epithet
+		@function characterRecord:removeEpithet
+		@usage
+		      print(record.localizedDisplayName)
+		      record:removeEpithet()
+		      print(record.localizedDisplayName)
+		*/
+		types.characterRecord.set_function("removeEpithet", &characterRecord::removeEpithet);
+				/***
 		Create a new child for the character. You need to select the father for this.
 		@function characterRecord:birthChild
 		@tparam string name random_name for random

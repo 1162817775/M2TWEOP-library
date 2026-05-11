@@ -101,7 +101,7 @@ For a full list of EOP Events, see [here](https://EOP-Labs.github.io/M2TWEOP-lib
 ### M2TWEOP Library and GUI
 **Requirements**
 
-* [Microsoft Visual Studio 2022](https://community.chocolatey.org/packages/visualstudio2022community)
+* [Microsoft Visual Studio 2022 with C++ Development Kit](https://aka.ms/vs/17/release/vs_community.exe)
 * [DirectX SDK 2009](https://community.chocolatey.org/packages/directx-sdk)
 
 Use [Choco](https://chocolatey.org/install) for easy installation of the DirectX SDK.
