@@ -1696,7 +1696,7 @@ namespace settlementHelpers
 		types.settlementStats.set("EntertainmentExpense", &settlementStats::EntertainmentExpense);
 		types.settlementStats.set("DevastationExpense", &settlementStats::DevastationExpense);
 		types.settlementStats.set("TotalIncomeWithoutAdmin", &settlementStats::TotalIncomeWithoutAdmin);
-		types.settlementStats.set("majorityReligionID", &settlementStats::TotalIncomeWithoutAdmin);
+		types.settlementStats.set("majorityReligionID", &settlementStats::majorityReligionID);
 
 		/***
 		Basic settlementCapability table
