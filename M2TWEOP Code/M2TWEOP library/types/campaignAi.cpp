@@ -3719,7 +3719,7 @@ void aiPersonalityValues::initValues()
 	clearBuildingBias();
 	clearRecruitmentBias();
 	constexpr int policyLevels[4] = { 32, 16, 8, 0 };
-	constexpr int troopStatus[4] = { 64, 32, 16, 0 };
+	constexpr int troopStatus[4] = { 128, 64, 32, 16 };
 	int boost = policyLevels[this->aiFaction->ltgd->longTermPolicy];
 	const int troopBoost = troopStatus[this->aiFaction->ltgd->longTermTroopStatus];
 	if (boost)
@@ -3738,7 +3738,6 @@ void aiPersonalityValues::initValues()
 	}
 	if (troopBoost)
 	{
-		boost += troopBoost;
 		for (int i = 1; i < 8; i++)
 		{
 			incConstructionUnitValue(i, boost);

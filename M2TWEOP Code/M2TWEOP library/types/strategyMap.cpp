@@ -211,22 +211,32 @@ void regionStruct::changeRebelsName(const char* newName)
 void regionStruct::fixReligionLevels()
 {
 	const auto religionCount = gameHelpers::getReligionCount();
-	auto biggestReligionIndex = 0;
-	auto biggestReligionValue = 0.0f;
+	if (this->isSea)
+		return;
 	auto totalReligionValue = 0.0f;
+	std::vector<float> religions;
+	religions.reserve(religionCount);
 	for (int r = 0; r < religionCount; r++)
 	{
-		totalReligionValue += this->religionsARR[r];
-		if (this->religionsARR[r] > biggestReligionValue)
-		{
-			biggestReligionValue = this->religionsARR[r];
-			biggestReligionIndex = r;
-		}
+		auto value = this->religionsARR[r];
+		if (value < 0)
+			value = 0;
+		else if (value > 1.0f)
+			value = 1.0f;
+		religions[r] = value;
+		totalReligionValue += value;
 	}
-	if (!FLOAT_EQUAL(1.0f, totalReligionValue))
+	if (FLOAT_EQUAL(totalReligionValue, 0.0f))
 	{
-		const auto diff = 1.0f - totalReligionValue;
-		this->religionsARR[biggestReligionIndex] += diff;
+		religions[0] = 1.0f;
+		totalReligionValue = 1.0f;
+	}
+	if (!FLOAT_EQUAL(totalReligionValue, 1.0f))
+		gameHelpers::logStringGame("region " + std::string(this->regionName) + " had a non standard religion value of " + std::to_string(totalReligionValue)); 
+	for (int r = 0; r < religionCount; r++)
+	{
+		const auto normalized = religions[r] / totalReligionValue;
+		this->religionsARR[r] = normalized;
 	}
 }
 
