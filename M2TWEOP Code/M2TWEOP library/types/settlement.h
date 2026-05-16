@@ -843,7 +843,7 @@ namespace settlementHelpers
 	std::string getSettlementName(settlementStruct* sett);
 	settlementStruct* getSettlementByRegionID(int index);
 	void changeSettlementName(settlementStruct* sett, const char* newName);
-	float getReligion(settlementStruct* sett, int index);
+	float getReligion(const settlementStruct* sett, int index);
 	void setReligion(settlementStruct* sett, int index, float value);
 	void addToLua(sol::state& luaState);
 	building* createBuilding(settlementStruct* sett, const std::string& buildingLevelId);

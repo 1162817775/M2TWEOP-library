@@ -796,7 +796,7 @@ namespace settlementHelpers
 			
 	}
 	
-	float getReligion(settlementStruct* sett, int index)
+	float getReligion(const settlementStruct* sett, const int index)
 	{
 		const regionStruct* currRegion = &stratMapHelpers::getStratMap()->regions[sett->regionID];
 		if (currRegion == nullptr)
@@ -804,8 +804,11 @@ namespace settlementHelpers
 		return currRegion->religionsARR[index];
 	}
 	
-	void setReligion(settlementStruct* sett, int index, float value)
+	void setReligion(settlementStruct* sett, const int index, const float value)
 	{
+		gameHelpers::logStringGame("settlementStruct.setReligion sett: " + std::string(getSettlementName(sett)));
+		gameHelpers::logStringGame("settlementStruct.setReligion index: " + std::to_string(index));
+		gameHelpers::logStringGame("settlementStruct.setReligion value: " + std::to_string(value));
 		regionStruct* currRegion = &stratMapHelpers::getStratMap()->regions[sett->regionID];
 		currRegion->religionsARR[index] = value;
 		currRegion->fixReligionLevels();

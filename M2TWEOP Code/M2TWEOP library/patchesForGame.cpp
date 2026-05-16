@@ -1415,7 +1415,7 @@ int patchesForGame::onGetTrueBuildingCapabilities(const int counter, const stack
 	if (counter < 32)
 		return 0;
 	if (cap->settlement && cap->settlement->name)
-		gameHelpers::logStringGame("Settlement: " + std::string(cap->settlement->name) + " has too many true building capabilities!");
+		gameHelpers::logStringGame("ERROR: Settlement: " + std::string(cap->settlement->name) + " has too many true building capabilities!");
 	else
 		gameHelpers::logStringGame("A settlement has too many true building capabilities!");
 	return 1;
@@ -2555,6 +2555,12 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 		{
 			sett->aiProductionController->isAutoManagedTaxes = false;
 		}
+	}
+	else if (eventCode == settlementTurnEnd)
+	{
+		const auto sett = reinterpret_cast<settlementStruct*>(vTab[1]);
+		const auto region = stratMapHelpers::getRegion(sett->regionID);
+		region->fixReligionLevels();
 	}
 	else if (eventCode == postBattle || eventCode == preBattleWithdrawal || eventCode == generalAssaultsResidence)
 	{
