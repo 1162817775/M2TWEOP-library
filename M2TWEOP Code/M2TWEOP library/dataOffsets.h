@@ -58,6 +58,10 @@ public:
 		DWORD weaponLimit7 = NULL;
 		DWORD weaponLimit8 = NULL;
 		DWORD weaponLimit9 = NULL;
+		DWORD weaponLimit10 = NULL;
+		DWORD onUnitCreate = NULL;
+		DWORD onMaybeWillSpyOpenGates = NULL;
+		DWORD onCharacterSwitchFaction = NULL;
 
 
 		DWORD unitTypesStart = NULL;

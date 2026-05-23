@@ -307,6 +307,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield enableRangedWeaponUpg enableRangedWeaponUpg
 	@tfield getGroundTypeMoveCost getGroundTypeMoveCost
 	@tfield setGroundTypeMoveCost setGroundTypeMoveCost
+	@tfield openGateOnStratMap openGateOnStratMap
 	@table M2TWEOP
 	*/
 	
@@ -652,6 +653,17 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	M2TWEOP.unlockWeaponLimit();
 	*/
 	tables.M2TWEOP.set_function("unlockWeaponLimit", &gameHelpers::unlockWeaponLimit);
+
+	/***
+	Opens or closes settlement and fort gates for the current siege on both the strategic and tactical maps, regardless of the presence of spies. The "Assault" button will be active.   
+	@function M2TWEOP.openGateOnStratMap
+	@tparam bool set
+	@usage
+	function onStartSiege(x,y)
+		M2TWEOP.openGateOnStratMap(true);
+	end
+	*/
+	tables.M2TWEOP.set_function("openGateOnStratMap", &m2tweopOptions::openGateOnStratMap);
 
 	/***
 	Gets a struct containing color information about the settlement info scroll.

@@ -3435,19 +3435,7 @@ private:
 	LPVOID funcAddress;
 };
 
-//Character Switch Faction
-class toCharacterSwitchFaction
-	:public AATemplate
-{
-public:
-	toCharacterSwitchFaction(MemWork* mem, LPVOID adr, int ver);
-	~toCharacterSwitchFaction();
 
-	void SetOriginalCharacterSwitchFaction();
-	void SetNewCharacterSwitchFaction();
-private:
-	LPVOID funcAddress;
-};
 
 
 

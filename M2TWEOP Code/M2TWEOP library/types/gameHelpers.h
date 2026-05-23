@@ -426,6 +426,7 @@ public:
 	static void setHandleUnitCards(const bool value) { eopHandleUnitCards = value; }
 	static bool getHandleUnitCards() { return eopHandleUnitCards; }
 	static void setWatchTowerRange(const int value) { watchTowerRange = value; }
+	static void openGateOnStratMap(const bool value) { isOpenGateOnStratMap = value; isOpenGateOnStratMapActive = 2; }
 	static int getWatchTowerRange() { return watchTowerRange; }
 	static void setUseEopFrontiers(const bool value) { useEopFrontiers = value; }
 	static int getUseEopFrontiers() { return useEopFrontiers; }
@@ -491,6 +492,8 @@ public:
 	static uint8_t khakiTextRed;
 	static uint8_t khakiTextGreen;
 	static uint8_t khakiTextBlue;
+	static bool isOpenGateOnStratMap;
+	static int isOpenGateOnStratMapActive;
 };
 
 struct boostLightMutex

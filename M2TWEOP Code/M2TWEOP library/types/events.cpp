@@ -998,11 +998,11 @@ void onFactionDied(factionStruct* faction)
 	}
 }
 
-void onCharacterSwitchFaction(character* character)
+void onCharacterSwitchFaction(character* character, factionStruct* faction)
 {
 	if (plugData::data.luaAll.onCharacterSwitchFaction != nullptr)
 	{
-		tryLua((*plugData::data.luaAll.onCharacterSwitchFaction)(character))
+		tryLua((*plugData::data.luaAll.onCharacterSwitchFaction)(character, faction))
 	}
 }
 
@@ -4653,19 +4653,20 @@ void luaPlugin::onPluginLoadF()
 	onFactionDied = new sol::function(luaState["onFactionDied"]);
 	checkLuaFunc(&onFactionDied);
 
-	///***
-	//Called when a character switch faction.
-	//
-	//@function onCharacterSwitchFaction
-	//@tparam character character
-	//
-	//@usage
-	//function onCharacterSwitchFaction(faction)
-	//--something here
-	//end
-	//*/
-	//onCharacterSwitchFaction = new sol::function(luaState["onCharacterSwitchFaction"]);
-	//checkLuaFunc(&onCharacterSwitchFaction);
+	/***
+	Called when a character switch faction.
+	
+	@function onCharacterSwitchFaction
+	@tparam character character
+	@tparam factionStruct faction
+	
+	@usage
+	function onCharacterSwitchFaction(character, faction)
+	--something here
+	end
+	*/
+	onCharacterSwitchFaction = new sol::function(luaState["onCharacterSwitchFaction"]);
+	checkLuaFunc(&onCharacterSwitchFaction);
 
 
 	if (onPluginLoad != nullptr)
