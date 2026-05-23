@@ -2842,11 +2842,6 @@ void __thiscall patchesForGame::onFactionDied(factionStruct* faction)
 	gameEvents::onFactionDied(faction);
 }
 
-void __thiscall patchesForGame::onCharacterSwitchFaction(character* character)
-{
-	gameEvents::onCharacterSwitchFaction(character);
-}
-
 struct
 {
 	bool isComingFromConsole = false;
@@ -2869,3 +2864,96 @@ int __fastcall consolePatches::onReadLogonOrLogoff(int isLogonNow)
 	}
 	return true;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////// DETOUR FUNCTIONS ///////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include <Windows.h>
+#include <detours.h>
+#include <memWork.h>
+
+
+detourFunctions::t_onUnitCreate             detourFunctions::o_onUnitCreate = nullptr;
+detourFunctions::t_onMaybeWillSpyOpenGates  detourFunctions::o_onMaybeWillSpyOpenGates = nullptr;
+detourFunctions::t_onCharacterSwitchFaction detourFunctions::o_onCharacterSwitchFaction = nullptr;
+
+
+void detourFunctions::init()
+{
+	DetourTransactionBegin();
+	DetourUpdateThread(GetCurrentThread());
+
+
+	o_onUnitCreate = (t_onUnitCreate)dataOffsets::offsets.onUnitCreate;
+	DetourAttach(&(PVOID&)o_onUnitCreate, onUnitCreate);
+
+	o_onMaybeWillSpyOpenGates = (t_onMaybeWillSpyOpenGates)dataOffsets::offsets.onMaybeWillSpyOpenGates;
+	DetourAttach(&(PVOID&)o_onMaybeWillSpyOpenGates, onMaybeWillSpyOpenGates);
+
+	o_onCharacterSwitchFaction = (t_onCharacterSwitchFaction)dataOffsets::offsets.onCharacterSwitchFaction;
+	DetourAttach(&(PVOID&)o_onCharacterSwitchFaction, onCharacterSwitchFaction);
+
+
+	DetourTransactionCommit();
+}
+
+void detourFunctions::deInit()
+{
+	DetourTransactionBegin();
+	DetourUpdateThread(GetCurrentThread());
+
+
+	DetourDetach(&(PVOID&)o_onUnitCreate, onUnitCreate);
+	DetourDetach(&(PVOID&)o_onMaybeWillSpyOpenGates, onMaybeWillSpyOpenGates);
+	DetourDetach(&(PVOID&)o_onCharacterSwitchFaction, onCharacterSwitchFaction);
+
+
+	DetourTransactionCommit();
+}
+
+unit* __thiscall detourFunctions::onUnitCreate(unitDb* _this, regionStruct* region, stringWithHash* id, int factionID, int combat_ability, int soldiers, int armour_lvl, int weapon_lvl)
+{
+	if (weapon_lvl < 0)
+	{
+		weapon_lvl = 0;
+	}
+	else if (weapon_lvl > 3)
+	{
+		weapon_lvl = 3;
+	}
+
+	MemWork::WriteData(&weapon_lvl, dataOffsets::offsets.weaponLimit10, 4);
+
+	return o_onUnitCreate(_this, region, id, factionID,combat_ability, soldiers, armour_lvl, weapon_lvl);
+}
+
+bool __thiscall detourFunctions::onMaybeWillSpyOpenGates(void* _this, character* general)
+{
+	bool result = o_onMaybeWillSpyOpenGates(_this, general);
+
+	if (m2tweopOptions::isOpenGateOnStratMapActive != 0)
+	{
+		result = m2tweopOptions::isOpenGateOnStratMap;
+		m2tweopOptions::isOpenGateOnStratMapActive--;
+		if (m2tweopOptions::isOpenGateOnStratMapActive < 0)
+		{
+			m2tweopOptions::isOpenGateOnStratMapActive = 0;
+		}
+	}
+
+	return result;
+}
+
+void __thiscall detourFunctions::onCharacterSwitchFaction(character* _this, factionStruct* faction, int param_2, int param_3)
+{
+	gameEvents::onCharacterSwitchFaction(_this, faction);
+
+	o_onCharacterSwitchFaction(_this, faction, param_2, param_3);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////

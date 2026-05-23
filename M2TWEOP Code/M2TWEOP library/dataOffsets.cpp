@@ -131,7 +131,12 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.weaponLimit7 = 0x00475B64;
 		offsets.weaponLimit8 = 0x00632B12;
 		offsets.weaponLimit9 = 0x00632B05;
+		offsets.weaponLimit10 = 0x008EE174;
 		offsets.removeSiegeBug = 0x59B084;
+
+		offsets.onUnitCreate = 0x008edfc0;
+		offsets.onMaybeWillSpyOpenGates = 0x004c0bf0;
+		offsets.onCharacterSwitchFaction = 0x005A1C20;
 	}
 	else if (gameVer == 2) //steam
 	{
@@ -259,6 +264,11 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.weaponLimit7 = 0x00475F54;
 		offsets.weaponLimit8 = 0x00632EB2;
 		offsets.weaponLimit9 = 0x00632EA5;
+		offsets.weaponLimit10 = 0x008EEBF4;
 		offsets.removeSiegeBug = 0x59B574;
+
+		offsets.onUnitCreate = 0x008eea40;
+		offsets.onMaybeWillSpyOpenGates = 0x004c1180;
+		offsets.onCharacterSwitchFaction = 0x005A2100;
 	}
 }

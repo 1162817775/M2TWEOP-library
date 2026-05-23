@@ -10691,56 +10691,6 @@ void toFactionDied::SetNewFactionDied()
 	delete a;
 }
 
-///
-toCharacterSwitchFaction::toCharacterSwitchFaction(MemWork* mem, LPVOID adr, int ver)
-	:AATemplate(mem), funcAddress(adr)
-{
-	if (ver == 2)//steam
-		m_adress = 0x005A2100;
-
-	else if (ver == 1)//kingdoms
-		m_adress = 0x005A1C20;
-}
-
-toCharacterSwitchFaction::~toCharacterSwitchFaction()
-{
-}
-
-void toCharacterSwitchFaction::SetOriginalCharacterSwitchFaction()
-{
-	Assembler* a = new Assembler();
-
-	a->push(ebp);
-//	a->mov(ebp, dword_ptr(esp, 0x4));
-
-	a->ret();
-	m_originalBytes = (unsigned char*)a->make();
-	m_originalSize = m_memory->GetASMSize(m_originalBytes);
-
-	delete a;
-}
-
-void toCharacterSwitchFaction::SetNewCharacterSwitchFaction()
-{
-	Assembler* a = new Assembler();
-
-	a->push(ebp);
-//	a->mov(ebp, dword_ptr(esp, 0x4));
-
-	a->pushad();
-	a->pushf();
-
-	a->mov(eax, (DWORD)funcAddress);
-	a->call(eax);
-
-	a->popf();
-	a->popad();
-
-	a->ret();
-	m_cheatBytes = (unsigned char*)a->make();
-
-	delete a;
-}
 
 
 

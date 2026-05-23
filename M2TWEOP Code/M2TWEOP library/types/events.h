@@ -258,7 +258,7 @@ namespace gameEvents
 	void onFactionSymbolSelect(int factionID);
 	void onCharacterDied(character* c);
 	void onFactionDied(factionStruct* faction);
-	void onCharacterSwitchFaction(character* character);
+	void onCharacterSwitchFaction(character* character, factionStruct* faction);
 	
 	template<EventType EvType> class Event :public EventBase
 	{

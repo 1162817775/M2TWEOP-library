@@ -26,6 +26,8 @@ struct aiFaction;
 struct buildingLevel;
 struct edbEntry;
 struct settlementStruct;
+struct stringWithHash;
+struct unitDb;
 
 struct trackedArmy
 {
@@ -318,3 +320,41 @@ public:
 
 	static int __fastcall onReadLogonOrLogoff(int isLogonNow);
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////// DETOUR FUNCTIONS ///////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+class detourFunctions
+{
+public:
+	static void init();
+	static void deInit();
+
+	using t_onUnitCreate = unit*(__thiscall*)(unitDb* _this, regionStruct* region, stringWithHash* id, int factionID, int combat_ability, int soldiers, int armour_lvl, int weapon_lvl);
+	static t_onUnitCreate o_onUnitCreate;
+	static unit* __thiscall onUnitCreate(unitDb* _this, regionStruct* region, stringWithHash* id, int factionID, int combat_ability, int soldiers, int armour_lvl, int weapon_lvl);
+
+	using t_onMaybeWillSpyOpenGates = bool(__thiscall*)(void* _this, character* general);
+	static t_onMaybeWillSpyOpenGates o_onMaybeWillSpyOpenGates;
+	static bool __thiscall onMaybeWillSpyOpenGates(void* _this, character* general);
+
+	using t_onCharacterSwitchFaction = void(__thiscall*)(character* _this, factionStruct* faction, int param_2, int param_3);
+	static t_onCharacterSwitchFaction o_onCharacterSwitchFaction;
+	static void __thiscall onCharacterSwitchFaction(character* _this, factionStruct* faction, int param_2, int param_3);
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

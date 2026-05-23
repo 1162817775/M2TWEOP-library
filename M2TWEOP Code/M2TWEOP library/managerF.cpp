@@ -1608,13 +1608,6 @@ void managerF::execPatches()
 	newFactionDied->Enable();
 	f1 << "Done" << '\n';
 
-	//f1 << "Start applying onCharacterSwitchFaction patch" << '\n';
-	//toCharacterSwitchFaction* newCharacterSwitchFaction = new toCharacterSwitchFaction(mem, (LPVOID)patchesForGame::onCharacterSwitchFaction, globals::dataS.gameVersion);
-	//newCharacterSwitchFaction->SetNewCharacterSwitchFaction();
-	//newCharacterSwitchFaction->Enable();
-	//f1 << "Done" << '\n';
-
-
 
 	f1 << "End." << '\n';
 	f1.close();
@@ -1704,6 +1697,7 @@ void managerF::initThread()
 	execPatches();
 	initLuaPlugin(false);
 	globals::dataS.Modules.tacticalMapViewer.init(globals::dataS.gameVersion);
+	detourFunctions::init();
 }
 
 // void waitForDebugger() {
