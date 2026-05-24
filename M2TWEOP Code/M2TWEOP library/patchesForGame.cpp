@@ -24,6 +24,7 @@
 #include "campaign.h"
 #include "gameUi.h"
 #include "rebelFactions.h"
+#include <memWork.h>
 
 
 worldRecord* __fastcall patchesForGame::selectWorldpkgdesc(char* database, worldRecord* selectedRecord)
@@ -2867,52 +2868,42 @@ int __fastcall consolePatches::onReadLogonOrLogoff(int isLogonNow)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////// DETOUR FUNCTIONS ///////////////////////////////////////////////
+///////////////////////////////////////////// MIN HOOK FUNCTIONS //////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include <Windows.h>
-#include <detours.h>
-#include <memWork.h>
+
+minHookFunctions::t_onUnitCreate             minHookFunctions::o_onUnitCreate = nullptr;
+minHookFunctions::t_onMaybeWillSpyOpenGates  minHookFunctions::o_onMaybeWillSpyOpenGates = nullptr;
+minHookFunctions::t_onCharacterSwitchFaction minHookFunctions::o_onCharacterSwitchFaction = nullptr;
+minHookFunctions::t_onPlayGameSound          minHookFunctions::o_onPlayGameSound = nullptr;
 
 
-detourFunctions::t_onUnitCreate             detourFunctions::o_onUnitCreate = nullptr;
-detourFunctions::t_onMaybeWillSpyOpenGates  detourFunctions::o_onMaybeWillSpyOpenGates = nullptr;
-detourFunctions::t_onCharacterSwitchFaction detourFunctions::o_onCharacterSwitchFaction = nullptr;
-
-
-void detourFunctions::init()
+static string pointerToString(LPVOID ppPointer)
 {
-	DetourTransactionBegin();
-	DetourUpdateThread(GetCurrentThread());
-
-
-	o_onUnitCreate = (t_onUnitCreate)dataOffsets::offsets.onUnitCreate;
-	DetourAttach(&(PVOID&)o_onUnitCreate, onUnitCreate);
-
-	o_onMaybeWillSpyOpenGates = (t_onMaybeWillSpyOpenGates)dataOffsets::offsets.onMaybeWillSpyOpenGates;
-	DetourAttach(&(PVOID&)o_onMaybeWillSpyOpenGates, onMaybeWillSpyOpenGates);
-
-	o_onCharacterSwitchFaction = (t_onCharacterSwitchFaction)dataOffsets::offsets.onCharacterSwitchFaction;
-	DetourAttach(&(PVOID&)o_onCharacterSwitchFaction, onCharacterSwitchFaction);
-
-
-	DetourTransactionCommit();
+	stringstream ss;
+	ss << ppPointer;
+	return ss.str();
 }
 
-void detourFunctions::deInit()
+MH_STATUS minHookFunctions::hook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal, std::string function)
 {
-	DetourTransactionBegin();
-	DetourUpdateThread(GetCurrentThread());
+	MH_CreateHook(pTarget, pDetour, ppOriginal);
+	MH_STATUS result = MH_EnableHook((char*)pTarget);
 
+	gameHelpers::logStringGame("MIN_HOOK(" + function + " --> " + pointerToString(pTarget) + ")");
 
-	DetourDetach(&(PVOID&)o_onUnitCreate, onUnitCreate);
-	DetourDetach(&(PVOID&)o_onMaybeWillSpyOpenGates, onMaybeWillSpyOpenGates);
-	DetourDetach(&(PVOID&)o_onCharacterSwitchFaction, onCharacterSwitchFaction);
-
-
-	DetourTransactionCommit();
+	return result;
 }
 
-unit* __thiscall detourFunctions::onUnitCreate(unitDb* _this, regionStruct* region, stringWithHash* id, int factionID, int combat_ability, int soldiers, int armour_lvl, int weapon_lvl)
+void minHookFunctions::init()
+{
+	MIN_HOOK((LPVOID)dataOffsets::offsets.onUnitCreate,             onUnitCreate,             reinterpret_cast<void**>(&o_onUnitCreate));
+	MIN_HOOK((LPVOID)dataOffsets::offsets.onMaybeWillSpyOpenGates,  onMaybeWillSpyOpenGates,  reinterpret_cast<void**>(&o_onMaybeWillSpyOpenGates));
+	MIN_HOOK((LPVOID)dataOffsets::offsets.onCharacterSwitchFaction, onCharacterSwitchFaction, reinterpret_cast<void**>(&o_onCharacterSwitchFaction));
+	MIN_HOOK((LPVOID)dataOffsets::offsets.playGameSoundAdd,         onPlayGameSound,          reinterpret_cast<void**>(&o_onPlayGameSound));
+}
+
+// Called when uploading files descr_strat.txt and descr_battle.txt , as well as when creating rebel units.   
+unit* __thiscall minHookFunctions::onUnitCreate(unitDb* _this, regionStruct* region, stringWithHash* id, int factionID, int combat_ability, int soldiers, int armour_lvl, int weapon_lvl)
 {
 	if (weapon_lvl < 0)
 	{
@@ -2925,10 +2916,14 @@ unit* __thiscall detourFunctions::onUnitCreate(unitDb* _this, regionStruct* regi
 
 	MemWork::WriteData(&weapon_lvl, dataOffsets::offsets.weaponLimit10, 4);
 
-	return o_onUnitCreate(_this, region, id, factionID,combat_ability, soldiers, armour_lvl, weapon_lvl);
+	unit* result = o_onUnitCreate(_this, region, id, factionID, combat_ability, soldiers, armour_lvl, weapon_lvl);
+
+//	gameHelpers::logStringGame("onUnitCreate(" + std::string(result->eduEntry->eduType) + ")");
+
+	return result;
 }
 
-bool __thiscall detourFunctions::onMaybeWillSpyOpenGates(void* _this, character* general)
+bool __thiscall minHookFunctions::onMaybeWillSpyOpenGates(void* _this, character* general)
 {
 	bool result = o_onMaybeWillSpyOpenGates(_this, general);
 
@@ -2945,16 +2940,41 @@ bool __thiscall detourFunctions::onMaybeWillSpyOpenGates(void* _this, character*
 	return result;
 }
 
-void __thiscall detourFunctions::onCharacterSwitchFaction(character* _this, factionStruct* faction, int param_2, int param_3)
+void __thiscall minHookFunctions::onCharacterSwitchFaction(character* _this, factionStruct* faction, int param_2, int param_3)
 {
 	gameEvents::onCharacterSwitchFaction(_this, faction);
 
 	o_onCharacterSwitchFaction(_this, faction, param_2, param_3);
 }
 
+DWORD minHookFunctions::lastSoundClass = NULL;
+int minHookFunctions::nextSoundEvent = -1;
+void __stdcall minHookFunctions::onPlayGameSound(DWORD _this, int sound)
+{
+	if (!_this) return;
+
+	lastSoundClass = _this;
+
+	o_onPlayGameSound(_this, sound);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

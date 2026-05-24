@@ -9,6 +9,7 @@
 #include "imgui/imgui_stdlib.h"
 #include "imgui/imgui_internal.h"
 #include <m2tweopConstData.h>
+#include <patchesForGame.h>
 
 namespace console
 {
@@ -62,6 +63,13 @@ namespace console
 
 	void draw()
 	{
+		// it seems that this should work exactly in the rendering cycle.   
+		if (minHookFunctions::nextSoundEvent > -1 && minHookFunctions::nextSoundEvent < 313)
+		{
+			minHookFunctions::onPlayGameSound(minHookFunctions::lastSoundClass, minHookFunctions::nextSoundEvent);
+			minHookFunctions::nextSoundEvent = -1;
+		}
+
 		if (consoleData.isDraw == false)
 		{
 			if (consoleData.controlsDisabled == true)

@@ -322,15 +322,14 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////// DETOUR FUNCTIONS ///////////////////////////////////////////////
+///////////////////////////////////////////// MIN HOOK FUNCTIONS //////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-class detourFunctions
+class minHookFunctions
 {
 public:
 	static void init();
-	static void deInit();
+	static MH_STATUS hook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal, std::string function);
 
 	using t_onUnitCreate = unit*(__thiscall*)(unitDb* _this, regionStruct* region, stringWithHash* id, int factionID, int combat_ability, int soldiers, int armour_lvl, int weapon_lvl);
 	static t_onUnitCreate o_onUnitCreate;
@@ -344,13 +343,20 @@ public:
 	static t_onCharacterSwitchFaction o_onCharacterSwitchFaction;
 	static void __thiscall onCharacterSwitchFaction(character* _this, factionStruct* faction, int param_2, int param_3);
 
+	using t_onPlayGameSound = void(__stdcall*)(DWORD _this, int sound);
+	static t_onPlayGameSound o_onPlayGameSound;
+	static void __stdcall onPlayGameSound(DWORD _this, int sound);
+	static DWORD lastSoundClass;
+	static int nextSoundEvent;
+
 };
 
+#define GET_VARIABLE_NAME(Variable) (#Variable)
+#define MIN_HOOK(pTarget, pDetour, ppOriginal) minHookFunctions::hook(pTarget, pDetour, ppOriginal, GET_VARIABLE_NAME(pDetour))
 
-
-
-
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 

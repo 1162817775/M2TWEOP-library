@@ -358,5 +358,5 @@ documentationGenerator/EOPDocs/source/_static/LuaLib/
 LuaDocs.lua
 *.pem
 
-!M2TWEOP Code/M2TWEOP library/Detours/**/
+
 

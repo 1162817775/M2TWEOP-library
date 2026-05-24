@@ -62,6 +62,7 @@ public:
 		DWORD onUnitCreate = NULL;
 		DWORD onMaybeWillSpyOpenGates = NULL;
 		DWORD onCharacterSwitchFaction = NULL;
+		DWORD playGameSoundAdd = NULL;
 
 
 		DWORD unitTypesStart = NULL;

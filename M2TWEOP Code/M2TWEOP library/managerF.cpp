@@ -1697,7 +1697,7 @@ void managerF::initThread()
 	execPatches();
 	initLuaPlugin(false);
 	globals::dataS.Modules.tacticalMapViewer.init(globals::dataS.gameVersion);
-	detourFunctions::init();
+	minHookFunctions::init();
 }
 
 // void waitForDebugger() {

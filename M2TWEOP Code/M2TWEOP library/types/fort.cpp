@@ -274,7 +274,9 @@ namespace fortHelpers
 		luaType.fortStruct.set("creatorCultureID", &fortStruct::creatorCultureID);
 		luaType.fortStruct.set("rebelEntry", &fortStruct::descrRebel);
 		luaType.fortStruct.set("fortFortificationLevel", &fortStruct::fortFortificationLevel);
-
+		luaType.fortStruct.set("bannerPosX", &fortStruct::stratPosX);
+		luaType.fortStruct.set("bannerPosZ", &fortStruct::stratPosZ);
+		luaType.fortStruct.set("bannerPosY", &fortStruct::stratPosY);
 		/***
 		Get a specific siege by it's index
 		@function fortStruct:getSiege

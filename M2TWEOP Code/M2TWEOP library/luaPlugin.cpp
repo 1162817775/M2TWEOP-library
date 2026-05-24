@@ -308,6 +308,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield getGroundTypeMoveCost getGroundTypeMoveCost
 	@tfield setGroundTypeMoveCost setGroundTypeMoveCost
 	@tfield openGateOnStratMap openGateOnStratMap
+	@tfield playGameSound playGameSound
 	@table M2TWEOP
 	*/
 	
@@ -664,6 +665,15 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	end
 	*/
 	tables.M2TWEOP.set_function("openGateOnStratMap", &m2tweopOptions::openGateOnStratMap);
+
+	/***
+	Enables the specified game sound event (see soundEvents.lua).   
+	@function M2TWEOP.playGameSound
+	@tparam int sound event
+	@usage
+	M2TWEOP.playGameSound(196);
+	*/
+	tables.M2TWEOP.set_function("playGameSound", &gameHelpers::playGameSound);
 
 	/***
 	Gets a struct containing color information about the settlement info scroll.

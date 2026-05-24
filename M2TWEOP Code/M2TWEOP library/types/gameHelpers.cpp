@@ -14,6 +14,7 @@
 #include "MemWork.h"
 #include "techFuncs.h"
 #include "unit.h"
+#include <patchesForGame.h>
 
 bool m2tweopOptions::hideUnknownUnitTooltips = false;
 bool m2tweopOptions::eopHandleUnitCards = true;
@@ -3569,6 +3570,11 @@ namespace gameHelpers
 		soldiers = min(soldiers, m2tweopOptions::getMaxBodyguardSize());
 		soldiers = max(soldiers, m2tweopOptions::getMinBodyguardSize());
 		return soldiers;
+	}
+
+	void playGameSound(int value)
+	{
+		minHookFunctions::nextSoundEvent = value;
 	}
 
 	void fixReligionTrigger()
