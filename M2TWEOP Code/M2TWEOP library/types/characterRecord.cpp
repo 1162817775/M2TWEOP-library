@@ -18,6 +18,7 @@
 #include "stratModelsChange.h"
 #include "techFuncs.h"
 #include "unit.h"
+#include <patchesForGame.h>
 
 enum
 {
@@ -666,6 +667,7 @@ namespace characterRecordHelpers
 		@tfield birthChild birthChild
 		@tfield marryWife marryWife
 		@tfield removeEpithet removeEpithet
+		@tfield createMessageMarriageProposal createMessageMarriageProposal
 
 		@table characterRecord
 		*/
@@ -911,7 +913,7 @@ namespace characterRecordHelpers
 		      print(record.localizedDisplayName)
 		*/
 		types.characterRecord.set_function("removeEpithet", &characterRecord::removeEpithet);
-				/***
+		/***
 		Create a new child for the character. You need to select the father for this.
 		@function characterRecord:birthChild
 		@tparam string name random_name for random
@@ -934,6 +936,18 @@ namespace characterRecordHelpers
 		      local wife = record:marryWife("random_name", 30)
 		*/
 		types.characterRecord.set_function("marryWife", &characterRecord::marryWife);
+		/***
+		Create a message with a marriage proposal. For a daughter - a husband, for a son - a wife.   
+		@function characterRecord:createMessageMarriageProposal
+		@treturn characterRecord spouse
+		@usage
+			-- Creating a bride for our son
+			local new_spouse = record:createMessageMarriageProposal()
+
+			-- Creating a husband candidate for our daughter
+			local new_spouse = record.children[1]:createMessageMarriageProposal()
+		*/
+		types.characterRecord.set_function("createMessageMarriageProposal", &characterRecord::createMessageMarriageProposal);
 			
 		types.characterRecord.set("level", &characterRecord::level);
 		types.characterRecord.set("authority", &characterRecord::authority);
@@ -1642,6 +1656,20 @@ void characterRecord::addTraitPoints(const std::string& trait, const int points)
 	const int addPoints = points;
 	GAME_FUNC(void(__thiscall*)(characterRecord*, traitEntry*, int, bool),
 		addTraitPoints)(this, entry, addPoints, true);
+}
+
+characterRecord* characterRecord::createMessageMarriageProposal()
+{
+	characterRecord* new_spouse = nullptr;
+	if (this->isMale)
+	{
+		new_spouse = minHookFunctions::createWife(this);
+	}
+	else
+	{
+		new_spouse = minHookFunctions::createHusband(this);
+	}
+	return new_spouse;
 }
 
 void eopCharacterDataDb::reapplyPortraits()

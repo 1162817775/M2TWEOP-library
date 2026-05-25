@@ -137,6 +137,13 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.onUnitCreate = 0x008edfc0;
 		offsets.onMaybeWillSpyOpenGates = 0x004c0bf0;
 		offsets.onCharacterSwitchFaction = 0x005A1C20;
+		offsets.playGameSoundAdd = 0x00a68a10;
+
+		offsets.onCreateWife = 0x005a6480;
+		offsets.onCreateMessageAboutMarriage = 0x00c4ef40;
+		offsets.onCreateCandidateMarrying = 0x005a6370;
+		offsets.onDaughterReadyMarryHusband = 0x00c4ee00;
+		offsets.marriageOptionClassConstructor = 0x004e3db0;
 	}
 	else if (gameVer == 2) //steam
 	{
@@ -270,5 +277,12 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.onUnitCreate = 0x008eea40;
 		offsets.onMaybeWillSpyOpenGates = 0x004c1180;
 		offsets.onCharacterSwitchFaction = 0x005A2100;
+		offsets.playGameSoundAdd = 0x00a69a60;
+
+		offsets.onCreateWife = 0x005a6960;
+		offsets.onCreateMessageAboutMarriage = 0x00c49340;
+		offsets.onCreateCandidateMarrying = 0x005a6850;
+		offsets.onDaughterReadyMarryHusband = 0x00c49200;
+		offsets.marriageOptionClassConstructor = 0x004e43b0;
 	}
 }

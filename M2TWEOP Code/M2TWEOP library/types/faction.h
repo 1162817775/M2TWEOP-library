@@ -167,6 +167,16 @@ public:
 	float populationRanking; //0x0014
 }; //Size: 
 
+struct marriageOption
+{
+	void* yesNoClass;
+	bool madeChoice;
+	bool accepted;
+	bool stub_2[2];
+	struct characterRecord* possibleSpouse;
+	struct characterRecord* spouse;
+};
+
 //faction
 struct factionStruct {
 	DWORD* vfTable;

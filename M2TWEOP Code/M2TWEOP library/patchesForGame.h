@@ -322,15 +322,15 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////// DETOUR FUNCTIONS ///////////////////////////////////////////////
+///////////////////////////////////////////// MIN HOOK FUNCTIONS //////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-class detourFunctions
+class minHookFunctions
 {
 public:
 	static void init();
-	static void deInit();
+	static MH_STATUS hook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal, std::string function);
+	static void draw();
 
 	using t_onUnitCreate = unit*(__thiscall*)(unitDb* _this, regionStruct* region, stringWithHash* id, int factionID, int combat_ability, int soldiers, int armour_lvl, int weapon_lvl);
 	static t_onUnitCreate o_onUnitCreate;
@@ -344,16 +344,36 @@ public:
 	static t_onCharacterSwitchFaction o_onCharacterSwitchFaction;
 	static void __thiscall onCharacterSwitchFaction(character* _this, factionStruct* faction, int param_2, int param_3);
 
+	using t_onPlayGameSound = void(__cdecl*)(DWORD _this, int sound);
+	static t_onPlayGameSound o_onPlayGameSound;
+	static void __cdecl onPlayGameSound(DWORD _this, int sound);
+	static DWORD lastSoundClass;
+
+	using t_onCreateWife = characterRecord*(__thiscall*)(characterRecord* husband);
+	static t_onCreateWife o_onCreateWife;
+	static characterRecord* __thiscall onCreateWife(characterRecord* husband);
+
+	using t_onCreateMessageAboutMarriage = void(__cdecl*)(characterRecord* husband, characterRecord* new_wife, marriageOption* mo);
+	static t_onCreateMessageAboutMarriage o_onCreateMessageAboutMarriage;
+	static void __cdecl onCreateMessageAboutMarriage(characterRecord* husband, characterRecord* new_wife, marriageOption* mo);
+	static characterRecord* createWife(characterRecord* husband);
+
+	using t_onCreateCandidateMarrying = characterRecord*(__thiscall*)(characterRecord* husband);
+	static t_onCreateCandidateMarrying o_onCreateCandidateMarrying;
+	static characterRecord* __thiscall onCreateCandidateMarrying(characterRecord* daughter);
+
+	using t_onDaughterReadyMarryHusband = void(__cdecl*)(characterRecord* daughter, characterRecord* new_husband, marriageOption* mo);
+	static t_onDaughterReadyMarryHusband o_onDaughterReadyMarryHusband;
+	static void __cdecl onDaughterReadyMarryHusband(characterRecord* daughter, characterRecord* new_husband, marriageOption* mo);
+	static characterRecord* createHusband(characterRecord* husband);
 };
 
+#define GET_VARIABLE_NAME(Variable) (#Variable)
+#define MIN_HOOK(pTarget, pDetour, ppOriginal) minHookFunctions::hook(pTarget, pDetour, ppOriginal, GET_VARIABLE_NAME(pDetour))
 
-
-
-
-
-
-
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 

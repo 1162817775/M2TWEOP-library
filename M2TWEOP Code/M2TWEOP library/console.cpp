@@ -10,6 +10,11 @@
 #include "imgui/imgui_internal.h"
 #include <m2tweopConstData.h>
 
+//#define MIN_HOOK_TESTS
+#ifdef MIN_HOOK_TESTS
+	#include <patchesForGame.h>
+#endif // MIN_HOOK_TESTS
+
 namespace console
 {
 	void applyCommand()
@@ -110,6 +115,10 @@ namespace console
 
 		ImGui::SameLine();
 		ImGui::Checkbox("Clear Input", &consoleData.clearInput);
+
+#ifdef MIN_HOOK_TESTS
+		minHookFunctions::draw();
+#endif // MIN_HOOK_TESTS
 
 		// Ctrl + Enter Run Script
 		if (ImGui::IsKeyPressed(ImGuiKey_Enter) && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))

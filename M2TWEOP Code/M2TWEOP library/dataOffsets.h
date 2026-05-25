@@ -62,6 +62,13 @@ public:
 		DWORD onUnitCreate = NULL;
 		DWORD onMaybeWillSpyOpenGates = NULL;
 		DWORD onCharacterSwitchFaction = NULL;
+		DWORD playGameSoundAdd = NULL;
+
+		DWORD onCreateWife = NULL;
+		DWORD onCreateMessageAboutMarriage = NULL;
+		DWORD onCreateCandidateMarrying = NULL;
+		DWORD onDaughterReadyMarryHusband = NULL;
+		DWORD marriageOptionClassConstructor = NULL;
 
 
 		DWORD unitTypesStart = NULL;

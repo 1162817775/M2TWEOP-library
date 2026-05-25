@@ -653,6 +653,7 @@ namespace gameHelpers
 	void unlockWeaponLimit();
 	float getUnitSizeMultiplier();
 	int calculateMaxBodyguardSize(const character* general, const eduEntry* bgEntry);
+	void playGameSound(int value);
 
 	religionDatabase* getReligionDatabase();
 	gameDataAllStruct* getGameDataAll();
