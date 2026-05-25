@@ -399,6 +399,7 @@ public:
 	}
 	void setBattleModel(const std::string& model);
 	void addTraitPoints(const std::string& trait, int points);
+	characterRecord* createMessageMarriageProposal();
 };
 
 struct capturedCharacter

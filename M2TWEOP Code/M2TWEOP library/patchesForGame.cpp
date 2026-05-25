@@ -2871,10 +2871,14 @@ int __fastcall consolePatches::onReadLogonOrLogoff(int isLogonNow)
 ///////////////////////////////////////////// MIN HOOK FUNCTIONS //////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-minHookFunctions::t_onUnitCreate             minHookFunctions::o_onUnitCreate = nullptr;
-minHookFunctions::t_onMaybeWillSpyOpenGates  minHookFunctions::o_onMaybeWillSpyOpenGates = nullptr;
-minHookFunctions::t_onCharacterSwitchFaction minHookFunctions::o_onCharacterSwitchFaction = nullptr;
-minHookFunctions::t_onPlayGameSound          minHookFunctions::o_onPlayGameSound = nullptr;
+minHookFunctions::t_onUnitCreate                         minHookFunctions::o_onUnitCreate = nullptr;
+minHookFunctions::t_onMaybeWillSpyOpenGates              minHookFunctions::o_onMaybeWillSpyOpenGates = nullptr;
+minHookFunctions::t_onCharacterSwitchFaction             minHookFunctions::o_onCharacterSwitchFaction = nullptr;
+minHookFunctions::t_onPlayGameSound                      minHookFunctions::o_onPlayGameSound = nullptr;
+minHookFunctions::t_onCreateWife                         minHookFunctions::o_onCreateWife = nullptr;
+minHookFunctions::t_onCreateMessageAboutMarriage         minHookFunctions::o_onCreateMessageAboutMarriage = nullptr;
+minHookFunctions::t_onCreateCandidateMarrying            minHookFunctions::o_onCreateCandidateMarrying = nullptr;
+minHookFunctions::t_onDaughterReadyMarryHusband          minHookFunctions::o_onDaughterReadyMarryHusband = nullptr;
 
 
 static string pointerToString(LPVOID ppPointer)
@@ -2896,13 +2900,17 @@ MH_STATUS minHookFunctions::hook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOrigi
 
 void minHookFunctions::init()
 {
-	MIN_HOOK((LPVOID)dataOffsets::offsets.onUnitCreate,             onUnitCreate,             reinterpret_cast<void**>(&o_onUnitCreate));
-	MIN_HOOK((LPVOID)dataOffsets::offsets.onMaybeWillSpyOpenGates,  onMaybeWillSpyOpenGates,  reinterpret_cast<void**>(&o_onMaybeWillSpyOpenGates));
-	MIN_HOOK((LPVOID)dataOffsets::offsets.onCharacterSwitchFaction, onCharacterSwitchFaction, reinterpret_cast<void**>(&o_onCharacterSwitchFaction));
-	MIN_HOOK((LPVOID)dataOffsets::offsets.playGameSoundAdd,         onPlayGameSound,          reinterpret_cast<void**>(&o_onPlayGameSound));
+	MIN_HOOK((LPVOID)dataOffsets::offsets.onUnitCreate,                    onUnitCreate,                        reinterpret_cast<void**>(&o_onUnitCreate));
+	MIN_HOOK((LPVOID)dataOffsets::offsets.onMaybeWillSpyOpenGates,         onMaybeWillSpyOpenGates,             reinterpret_cast<void**>(&o_onMaybeWillSpyOpenGates));
+	MIN_HOOK((LPVOID)dataOffsets::offsets.onCharacterSwitchFaction,        onCharacterSwitchFaction,            reinterpret_cast<void**>(&o_onCharacterSwitchFaction));
+	MIN_HOOK((LPVOID)dataOffsets::offsets.playGameSoundAdd,                onPlayGameSound,                     reinterpret_cast<void**>(&o_onPlayGameSound));
+	MIN_HOOK((LPVOID)dataOffsets::offsets.onCreateWife,                    onCreateWife,                        reinterpret_cast<void**>(&o_onCreateWife));
+	MIN_HOOK((LPVOID)dataOffsets::offsets.onCreateMessageAboutMarriage,    onCreateMessageAboutMarriage,        reinterpret_cast<void**>(&o_onCreateMessageAboutMarriage));
+	MIN_HOOK((LPVOID)dataOffsets::offsets.onCreateCandidateMarrying,       onCreateCandidateMarrying,           reinterpret_cast<void**>(&o_onCreateCandidateMarrying));
+	MIN_HOOK((LPVOID)dataOffsets::offsets.onDaughterReadyMarryHusband,     onDaughterReadyMarryHusband,         reinterpret_cast<void**>(&o_onDaughterReadyMarryHusband));
 }
 
-// Called when uploading files descr_strat.txt and descr_battle.txt , as well as when creating rebel units.   
+// Called when uploading files descr_strat.txt and descr_battle.txt, as well as when creating rebel units.   
 unit* __thiscall minHookFunctions::onUnitCreate(unitDb* _this, regionStruct* region, stringWithHash* id, int factionID, int combat_ability, int soldiers, int armour_lvl, int weapon_lvl)
 {
 	if (weapon_lvl < 0)
@@ -2948,8 +2956,7 @@ void __thiscall minHookFunctions::onCharacterSwitchFaction(character* _this, fac
 }
 
 DWORD minHookFunctions::lastSoundClass = NULL;
-int minHookFunctions::nextSoundEvent = -1;
-void __stdcall minHookFunctions::onPlayGameSound(DWORD _this, int sound)
+void __cdecl minHookFunctions::onPlayGameSound(DWORD _this, int sound)
 {
 	if (!_this) return;
 
@@ -2958,9 +2965,92 @@ void __stdcall minHookFunctions::onPlayGameSound(DWORD _this, int sound)
 	o_onPlayGameSound(_this, sound);
 }
 
+characterRecord* __thiscall minHookFunctions::onCreateWife(characterRecord* husband)
+{
+	return o_onCreateWife(husband);
+}
+
+void __cdecl minHookFunctions::onCreateMessageAboutMarriage(characterRecord* husband, characterRecord* new_wife, marriageOption* mo)
+{
+	o_onCreateMessageAboutMarriage(husband, new_wife, mo);
+}
+
+characterRecord* __thiscall minHookFunctions::onCreateCandidateMarrying(characterRecord* daughter)
+{
+	return o_onCreateCandidateMarrying(daughter);
+}
+
+void __cdecl minHookFunctions::onDaughterReadyMarryHusband(characterRecord* daughter, characterRecord* new_husband, marriageOption* mo)
+{
+	o_onDaughterReadyMarryHusband(daughter, new_husband, mo);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////// CALL GAME FUNCTIONS /////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+characterRecord* minHookFunctions::createWife(characterRecord* husband)
+{
+	if (!husband->isMale || husband->spouse)
+	{
+		gameHelpers::logStringGame("characterRecord::createMessageMarriageProposal: your son is already married");
+		return nullptr;
+	}
+
+	characterRecord* new_wife = onCreateWife(husband);
+	marriageOption* mo = techFuncs::createGameClass<marriageOption>();
+	GAME_FUNC_RAW(void(__thiscall*)(marriageOption*, characterRecord*, characterRecord*), dataOffsets::offsets.marriageOptionClassConstructor)(mo, new_wife, husband);
+	onCreateMessageAboutMarriage(husband, new_wife, mo); 
+
+	return new_wife;
+}
+
+characterRecord* minHookFunctions::createHusband(characterRecord* daughter)
+{
+	if (daughter->isMale || daughter->spouse)
+	{
+		gameHelpers::logStringGame("characterRecord::createMessageMarriageProposal: the daughter is already married");
+		return nullptr;
+	}
+
+	characterRecord* new_husband = onCreateCandidateMarrying(daughter);
+	marriageOption* mo = techFuncs::createGameClass<marriageOption>();
+	GAME_FUNC_RAW(void(__thiscall*)(marriageOption*, characterRecord*, characterRecord*), dataOffsets::offsets.marriageOptionClassConstructor)(mo, new_husband, daughter);
+	onDaughterReadyMarryHusband(daughter, new_husband, mo);
+
+	return new_husband;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////// TESTS ////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void minHookFunctions::draw()
+{
+	if (ImGui::Button("createWife"))
+	{
+		if (auto character = gameHelpers::getGameDataAll()->selectInfo->selectedCharacter->selectedCharacter; character)
+		{
+			createWife(character->characterRecord);
+		}
+	}
+	if (ImGui::Button("createHusband"))
+	{
+		if (auto character = gameHelpers::getGameDataAll()->selectInfo->selectedCharacter->selectedCharacter; character)
+		{
+			characterRecord* daughter = character->characterRecord->childs[0];
+			if (daughter)
+			{
+				createHusband(daughter);
+			}
+		}
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 

@@ -9,7 +9,11 @@
 #include "imgui/imgui_stdlib.h"
 #include "imgui/imgui_internal.h"
 #include <m2tweopConstData.h>
-#include <patchesForGame.h>
+
+//#define MIN_HOOK_TESTS
+#ifdef MIN_HOOK_TESTS
+	#include <patchesForGame.h>
+#endif // MIN_HOOK_TESTS
 
 namespace console
 {
@@ -63,13 +67,6 @@ namespace console
 
 	void draw()
 	{
-		// it seems that this should work exactly in the rendering cycle.   
-		if (minHookFunctions::nextSoundEvent > -1 && minHookFunctions::nextSoundEvent < 313)
-		{
-			minHookFunctions::onPlayGameSound(minHookFunctions::lastSoundClass, minHookFunctions::nextSoundEvent);
-			minHookFunctions::nextSoundEvent = -1;
-		}
-
 		if (consoleData.isDraw == false)
 		{
 			if (consoleData.controlsDisabled == true)
@@ -118,6 +115,10 @@ namespace console
 
 		ImGui::SameLine();
 		ImGui::Checkbox("Clear Input", &consoleData.clearInput);
+
+#ifdef MIN_HOOK_TESTS
+		minHookFunctions::draw();
+#endif // MIN_HOOK_TESTS
 
 		// Ctrl + Enter Run Script
 		if (ImGui::IsKeyPressed(ImGuiKey_Enter) && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))

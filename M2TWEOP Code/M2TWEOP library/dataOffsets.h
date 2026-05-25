@@ -64,6 +64,12 @@ public:
 		DWORD onCharacterSwitchFaction = NULL;
 		DWORD playGameSoundAdd = NULL;
 
+		DWORD onCreateWife = NULL;
+		DWORD onCreateMessageAboutMarriage = NULL;
+		DWORD onCreateCandidateMarrying = NULL;
+		DWORD onDaughterReadyMarryHusband = NULL;
+		DWORD marriageOptionClassConstructor = NULL;
+
 
 		DWORD unitTypesStart = NULL;
 		//if on strat map then not 0

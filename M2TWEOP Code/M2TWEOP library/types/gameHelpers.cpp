@@ -3574,7 +3574,7 @@ namespace gameHelpers
 
 	void playGameSound(int value)
 	{
-		minHookFunctions::nextSoundEvent = value;
+		minHookFunctions::onPlayGameSound(minHookFunctions::lastSoundClass, value);
 	}
 
 	void fixReligionTrigger()
