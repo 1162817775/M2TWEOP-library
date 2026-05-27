@@ -373,6 +373,11 @@ void codes::initCodes(int gameVer)
 		offsets.createUnitRQVector = 0x475160;
 		offsets.getRainLevelArrowEffect = 0x4588C0;
 		offsets.missileBalancingAdjustment = 0x459610;
+
+		offsets.createPortAdd = 0x008b8cf0;
+		offsets.setDocks = 0x004c1f80;
+		offsets.initPortRallyPoint = 0x004c1c00;
+		offsets.addPortToCampaign = 0x004c3050;
 	}
 
 
@@ -749,5 +754,10 @@ void codes::initCodes(int gameVer)
 		offsets.createUnitRQVector = 0x475550;
 		offsets.getRainLevelArrowEffect = 0x458C40;
 		offsets.missileBalancingAdjustment = 0x459990;
+
+		offsets.createPortAdd = 0x008b96e0;
+		offsets.setDocks = 0x004c2510;
+		offsets.initPortRallyPoint = 0x004c2190;
+		offsets.addPortToCampaign = 0x004c35e0;
 	}
 }

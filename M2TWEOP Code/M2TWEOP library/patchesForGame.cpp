@@ -207,7 +207,7 @@ int __fastcall patchesForGame::onCheckConstructionItem(const buildingsQueue* que
 	const auto entry = constructionItem->edbEntry;
 	if (queue->settlement->isMinorSettlement)
 	{
-		if (entry->isFarm || entry->isPort  || entry->isTemple || (entry->isHinterland && !entry->isCoreBuilding))
+		if (entry->isFarm /*|| entry->isPort*/ || entry->isTemple || (entry->isHinterland && !entry->isCoreBuilding))
 			return 1; 
 	}
 	return queue->conversion > 0 ? 1 : 0;
@@ -2110,6 +2110,8 @@ void __fastcall patchesForGame::clickAtTile(coordPair* xy)
 		onCharacterClicked(character);
 	gameEvents::onClickAtTile(xy->xCoord, xy->yCoord);
 	plannedRetreatRoute::onClickAtTile(xy->xCoord, xy->yCoord);
+
+	minHookFunctions::selectTile = tile;
 }
 
 void __fastcall patchesForGame::onCharacterClicked(character* enemy)
@@ -2881,6 +2883,13 @@ minHookFunctions::t_onCreateCandidateMarrying            minHookFunctions::o_onC
 minHookFunctions::t_onDaughterReadyMarryHusband          minHookFunctions::o_onDaughterReadyMarryHusband = nullptr;
 
 
+DWORD minHookFunctions::lastSoundClass = NULL;
+bool minHookFunctions::isUnlockWeaponLimit = false;
+oneTile* minHookFunctions::selectTile = nullptr;
+bool minHookFunctions::openConsole = false;
+coordPair minHookFunctions::rememberCoords{ 0, 0 };
+
+
 static string pointerToString(LPVOID ppPointer)
 {
 	stringstream ss;
@@ -2888,7 +2897,7 @@ static string pointerToString(LPVOID ppPointer)
 	return ss.str();
 }
 
-MH_STATUS minHookFunctions::hook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal, std::string function)
+MH_STATUS minHookFunctions::hook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal, string function)
 {
 	MH_CreateHook(pTarget, pDetour, ppOriginal);
 	MH_STATUS result = MH_EnableHook((char*)pTarget);
@@ -2900,19 +2909,24 @@ MH_STATUS minHookFunctions::hook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOrigi
 
 void minHookFunctions::init()
 {
-	MIN_HOOK((LPVOID)dataOffsets::offsets.onUnitCreate,                    onUnitCreate,                        reinterpret_cast<void**>(&o_onUnitCreate));
-	MIN_HOOK((LPVOID)dataOffsets::offsets.onMaybeWillSpyOpenGates,         onMaybeWillSpyOpenGates,             reinterpret_cast<void**>(&o_onMaybeWillSpyOpenGates));
-	MIN_HOOK((LPVOID)dataOffsets::offsets.onCharacterSwitchFaction,        onCharacterSwitchFaction,            reinterpret_cast<void**>(&o_onCharacterSwitchFaction));
-	MIN_HOOK((LPVOID)dataOffsets::offsets.playGameSoundAdd,                onPlayGameSound,                     reinterpret_cast<void**>(&o_onPlayGameSound));
-	MIN_HOOK((LPVOID)dataOffsets::offsets.onCreateWife,                    onCreateWife,                        reinterpret_cast<void**>(&o_onCreateWife));
-	MIN_HOOK((LPVOID)dataOffsets::offsets.onCreateMessageAboutMarriage,    onCreateMessageAboutMarriage,        reinterpret_cast<void**>(&o_onCreateMessageAboutMarriage));
-	MIN_HOOK((LPVOID)dataOffsets::offsets.onCreateCandidateMarrying,       onCreateCandidateMarrying,           reinterpret_cast<void**>(&o_onCreateCandidateMarrying));
-	MIN_HOOK((LPVOID)dataOffsets::offsets.onDaughterReadyMarryHusband,     onDaughterReadyMarryHusband,         reinterpret_cast<void**>(&o_onDaughterReadyMarryHusband));
+	MIN_HOOK(dataOffsets::offsets.onUnitCreate,                      onUnitCreate,                       o_onUnitCreate);
+	MIN_HOOK(dataOffsets::offsets.onMaybeWillSpyOpenGates,           onMaybeWillSpyOpenGates,            o_onMaybeWillSpyOpenGates);
+	MIN_HOOK(dataOffsets::offsets.onCharacterSwitchFaction,          onCharacterSwitchFaction,           o_onCharacterSwitchFaction);
+	MIN_HOOK(dataOffsets::offsets.playGameSoundAdd,                  onPlayGameSound,                    o_onPlayGameSound);
+	MIN_HOOK(dataOffsets::offsets.onCreateWife,                      onCreateWife,                       o_onCreateWife);
+	MIN_HOOK(dataOffsets::offsets.onCreateMessageAboutMarriage,      onCreateMessageAboutMarriage,       o_onCreateMessageAboutMarriage);
+	MIN_HOOK(dataOffsets::offsets.onCreateCandidateMarrying,         onCreateCandidateMarrying,          o_onCreateCandidateMarrying);
+	MIN_HOOK(dataOffsets::offsets.onDaughterReadyMarryHusband,       onDaughterReadyMarryHusband,        o_onDaughterReadyMarryHusband);
 }
 
 // Called when uploading files descr_strat.txt and descr_battle.txt, as well as when creating rebel units.   
 unit* __thiscall minHookFunctions::onUnitCreate(unitDb* _this, regionStruct* region, stringWithHash* id, int factionID, int combat_ability, int soldiers, int armour_lvl, int weapon_lvl)
 {
+	if (!isUnlockWeaponLimit)
+	{
+		return o_onUnitCreate(_this, region, id, factionID, combat_ability, soldiers, armour_lvl, weapon_lvl);
+	}
+
 	if (weapon_lvl < 0)
 	{
 		weapon_lvl = 0;
@@ -2924,11 +2938,7 @@ unit* __thiscall minHookFunctions::onUnitCreate(unitDb* _this, regionStruct* reg
 
 	MemWork::WriteData(&weapon_lvl, dataOffsets::offsets.weaponLimit10, 4);
 
-	unit* result = o_onUnitCreate(_this, region, id, factionID, combat_ability, soldiers, armour_lvl, weapon_lvl);
-
-//	gameHelpers::logStringGame("onUnitCreate(" + std::string(result->eduEntry->eduType) + ")");
-
-	return result;
+	return o_onUnitCreate(_this, region, id, factionID, combat_ability, soldiers, armour_lvl, weapon_lvl);
 }
 
 bool __thiscall minHookFunctions::onMaybeWillSpyOpenGates(void* _this, character* general)
@@ -2955,7 +2965,7 @@ void __thiscall minHookFunctions::onCharacterSwitchFaction(character* _this, fac
 	o_onCharacterSwitchFaction(_this, faction, param_2, param_3);
 }
 
-DWORD minHookFunctions::lastSoundClass = NULL;
+//### Add a Lua event function, for example to override sound events? 
 void __cdecl minHookFunctions::onPlayGameSound(DWORD _this, int sound)
 {
 	if (!_this) return;
@@ -2965,6 +2975,7 @@ void __cdecl minHookFunctions::onPlayGameSound(DWORD _this, int sound)
 	o_onPlayGameSound(_this, sound);
 }
 
+//### Add a Lua event function, for example to override a spouse. 
 characterRecord* __thiscall minHookFunctions::onCreateWife(characterRecord* husband)
 {
 	return o_onCreateWife(husband);
@@ -2975,6 +2986,7 @@ void __cdecl minHookFunctions::onCreateMessageAboutMarriage(characterRecord* hus
 	o_onCreateMessageAboutMarriage(husband, new_wife, mo);
 }
 
+//### Add a Lua event function, for example to override a spouse. 
 characterRecord* __thiscall minHookFunctions::onCreateCandidateMarrying(characterRecord* daughter)
 {
 	return o_onCreateCandidateMarrying(daughter);
@@ -3025,8 +3037,51 @@ characterRecord* minHookFunctions::createHusband(characterRecord* daughter)
 //////////////////////////////////////////////////// TESTS ////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//### Don't pay attention to this mess, I'll finish some things and clean this up a bit later. (^_^)   
 void minHookFunctions::draw()
 {
+	if (!openConsole)
+		return;
+
+	/////////////////////////////////////////////////////////////////////////////////
+	ImGui::SetNextWindowSize(ImVec2(800, 400), ImGuiCond_Once);
+	ImGui::SetNextWindowPos(ImVec2(0.5f, 0.5f), ImGuiCond_Once, ImVec2(0.0f, 0.0f));
+	ImGui::Begin("consoleMinHook", nullptr, ImGuiWindowFlags_None);
+
+
+	if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && selectTile)
+	{
+		rememberCoords.xCoord = selectTile->getTileX();
+		rememberCoords.yCoord = selectTile->getTileY();
+	}
+	ImGui::Separator();
+	if (selectTile)
+	{
+		ImGui::Text(("selectCoords:   " + to_string(selectTile->getTileX()) + ", " + to_string(selectTile->getTileY())).c_str());
+		ImGui::Text(("rememberCoords: " + to_string(rememberCoords.xCoord) + ", " + to_string(rememberCoords.yCoord)).c_str());
+	}
+	ImGui::Separator();
+
+
+	/////////////////////////////////////////////////////////////////////////////////
+	if (ImGui::Button("createPort") && selectTile && selectTile->settlement)
+	{
+		settlementStruct* sett = selectTile->getSettlement();
+		if (sett)
+		{
+			string text = "createPort: " + string(sett->name);
+			portBuildingStruct* port = sett->createPort(rememberCoords.xCoord, rememberCoords.yCoord, true);
+			if (port)
+			{
+				ImGui::InsertNotification({ ImGuiToastType_Success, 5000, text.c_str() });
+			}
+			else
+			{
+				ImGui::InsertNotification({ ImGuiToastType_Error, 5000, text.c_str() });
+			}
+		}
+	}
+
 	if (ImGui::Button("createWife"))
 	{
 		if (auto character = gameHelpers::getGameDataAll()->selectInfo->selectedCharacter->selectedCharacter; character)
@@ -3045,12 +3100,167 @@ void minHookFunctions::draw()
 			}
 		}
 	}
+	if (ImGui::Button("moveWatchtower") && selectTile)
+	{
+		if (auto wt = selectTile->getWatchtower(); wt)
+		{
+			GAME_FUNC(void(__thiscall*)(watchTowerStruct*, bool, factionStruct*, int),
+				changeWatchTowerFaction)(wt, 0, gameHelpers::getGameDataAll()->campaignStruct->getSlaveFaction(), 0);
+
+			coordPair coords{ 448, 217 };
+			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*),
+				0x004cd440)(campaignHelpers::getStratPathFinding(), wt, &coords);
+
+			wt->regionID = stratMapHelpers::getTile(448, 217)->regionId;
+
+			wt->faction->tilesFac->updateFromObject(wt);
+		}
+	}
+//	if (ImGui::Button("removeWatchtower"))
+//	{
+//		campaign* camp = gameHelpers::getGameDataAll()->campaignStruct;
+//
+//		for (int w = 0; w < camp->watchtowersNum; w++)
+//		{
+//			watchTowerStruct* wt = camp->getWatchTower(w);
+//			if (wt->xCoord == xLocCoord && wt->yCoord == yLocCoord)
+//			{
+//				GAME_FUNC(void(__thiscall*)(watchTowerStruct*, bool, factionStruct*, int), 
+//					changeWatchTowerFaction)(wt, 0, camp->getSlaveFaction(), 0);
+//
+//				GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*),
+//					0x004c98a0)(campaignHelpers::getStratPathFinding(), wt);
+//			}
+//		}
+//	}
+	if (ImGui::Button("moveCharacter"))
+	{
+		if (auto character = gameHelpers::getGameDataAll()->selectInfo->selectedCharacter->selectedCharacter; character)
+		{
+			int xCoord = rememberCoords.xCoord;
+			int yCoord = rememberCoords.yCoord;
+
+			coordPair coords{ xCoord, yCoord };
+			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*),
+				0x004cd440)(campaignHelpers::getStratPathFinding(), character, &coords);
+
+			character->regionID = stratMapHelpers::getTile(xCoord, yCoord)->regionId;
+
+			character->characterRecord->faction->tilesFac->updateFromObject(character);
+		}
+	}
+	if (ImGui::Button("moveSettlement"))
+	{
+		if (auto sett = gameHelpers::getGameDataAll()->selectInfo->getSelectedSettlement(); sett)
+		{
+			int xCoord = rememberCoords.xCoord;
+			int yCoord = rememberCoords.yCoord;
+
+			coordPair coords{ xCoord, yCoord };
+			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*),
+				0x004cd440)(campaignHelpers::getStratPathFinding(), sett, &coords);
+
+			GAME_FUNC(void(__thiscall*)(stratPathFinding*, settlementStruct*),
+				areaOfInfluence)(campaignHelpers::getStratPathFinding(), sett);
+
+			GAME_FUNC(char(__thiscall*)(settlementStruct*), residenceTileCharacterCheck)(sett);
+
+			sett->recalculate(true);
+
+			sett->rallyPointX = xCoord;
+			sett->rallyPointY = yCoord;
+
+			sett->regionID = stratMapHelpers::getTile(xCoord, yCoord)->regionId;
+
+			sett->faction->tilesFac->updateFromObject(sett);
+		}
+	}
+	if (ImGui::Button("moveFort"))
+	{
+		if (auto fort = gameHelpers::getGameDataAll()->selectInfo->getSelectedFort(); fort)
+		{
+			int xCoord = rememberCoords.xCoord;
+			int yCoord = rememberCoords.yCoord;
+
+			coordPair coords{ xCoord, yCoord };
+			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*),
+				0x004cd440)(campaignHelpers::getStratPathFinding(), fort, &coords);
+
+			fort->regionID = stratMapHelpers::getTile(xCoord, yCoord)->regionId;
+
+			fort->faction->tilesFac->updateFromObject(fort);
+		}
+	}
+	if (ImGui::Button("movePort") && selectTile)
+	{
+		if (auto port = selectTile->getPort(); port)
+		{
+			//port
+			int xCoord = rememberCoords.xCoord;
+			int yCoord = rememberCoords.yCoord;
+
+			int portDockDifferenceX = port->xCoord - port->dockX;
+			int portDockDifferenceY = port->yCoord - port->dockY;
+
+			coordPair coords{ xCoord, yCoord };
+			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*), 0x004cd440)(campaignHelpers::getStratPathFinding(), port, &coords);
+
+			port->rallyCoordX = xCoord;
+			port->rallyCoordY = yCoord;
+
+			port->dockX = xCoord + portDockDifferenceX;
+			port->dockY = yCoord + portDockDifferenceY;
+
+		//	port->regionID = stratMapHelpers::getTile(xCoord, yCoord)->regionId;
+
+			port->fac->tilesFac->updateFromObject(port);
+
+
+			//dock
+			coordPair coordsD{ port->dockX, port->dockY };
+			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*), 0x004cd440)(campaignHelpers::getStratPathFinding(), port->portDock, &coordsD);
+		
+			port->portDock->rallyCoordX = port->dockX;
+			port->portDock->rallyCoordY = port->dockY;
+		
+			port->portDock->dockX = port->dockX;
+			port->portDock->dockY = port->dockY;
+		
+		//	port->portDock->regionID = stratMapHelpers::getTile(xCoord, yCoord)->regionId;
+		
+			port->portDock->fac->tilesFac->updateFromObject(port);
+		}
+	}
+	if (ImGui::Button("moveResource") && selectTile)
+	{
+		if (auto resource = selectTile->getResource(); resource)
+		{
+			int xCoord = rememberCoords.xCoord;
+			int yCoord = rememberCoords.yCoord;
+
+			coordPair coords{ xCoord, yCoord };
+			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*),
+				0x004cd440)(campaignHelpers::getStratPathFinding(), resource, &coords);
+
+			resource->regionID = stratMapHelpers::getTile(xCoord, yCoord)->regionId;
+		}
+	}
+	if (ImGui::Button("damageWall"))
+	{
+		if (auto sett = gameHelpers::getGameDataAll()->selectInfo->getSelectedSettlement(); sett)
+		{
+			GAME_FUNC_RAW(void(__thiscall*)(settlementStruct*, int /*breaches*/, bool /*gatehouse*/),
+				0x005edd00)(sett, 0, true);
+		}
+	}
+	/////////////////////////////////////////////////////////////////////////////////
+
+	ImGui::End();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 
 

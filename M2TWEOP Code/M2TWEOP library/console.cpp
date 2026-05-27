@@ -67,6 +67,10 @@ namespace console
 
 	void draw()
 	{
+#ifdef MIN_HOOK_TESTS
+		minHookFunctions::draw();
+#endif // MIN_HOOK_TESTS
+
 		if (consoleData.isDraw == false)
 		{
 			if (consoleData.controlsDisabled == true)
@@ -117,7 +121,10 @@ namespace console
 		ImGui::Checkbox("Clear Input", &consoleData.clearInput);
 
 #ifdef MIN_HOOK_TESTS
-		minHookFunctions::draw();
+		if (ImGui::Button("openMinHookConsole"))
+		{
+			minHookFunctions::openConsole = !minHookFunctions::openConsole;
+		}
 #endif // MIN_HOOK_TESTS
 
 		// Ctrl + Enter Run Script

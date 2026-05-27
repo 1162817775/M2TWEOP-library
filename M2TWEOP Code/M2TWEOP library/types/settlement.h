@@ -764,6 +764,7 @@ public:
 	character* getCharacter(int index);
 	building* buildingPresent(const std::string& buildingName);
 	bool buildingPresentMinLevel(const std::string& levelName, bool exact);
+	portBuildingStruct* createPort(int x, int y, bool recalculate);
 };
 
 struct eopSettlementData
