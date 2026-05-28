@@ -268,6 +268,58 @@ bool settlementStruct::buildingPresentMinLevel(const std::string& levelName, con
 	return building->level >= lvl;
 }
 
+portBuildingStruct* settlementStruct::createPort(int x, int y, bool recalculate)
+{
+	if (this->port)
+	{
+		gameHelpers::logStringGame("settlementStruct::createPort: settlement already has a port, settlement: " + string(this->name));
+		return nullptr;
+	}
+
+	auto tile = stratMapHelpers::getTile(x, y);
+	if (!tile)
+	{
+		gameHelpers::logStringGame("settlementStruct::createPort: incorrect coordinates, settlement: " + string(this->name));
+		return nullptr;
+	}
+
+	portBuildingStruct* port = GAME_FUNC(portBuildingStruct*(__thiscall*)(DWORD, settlementStruct*), createPortAdd)(dataOffsets::offsets.cultureDatabase, this);
+	if (!port)
+	{
+		gameHelpers::logStringGame("settlementStruct::createPort: failed to create port, settlement: " + string(this->name));
+		return nullptr;
+	}
+
+	coordPair coords{ x, y };
+	GAME_FUNC(void(__thiscall*)(stratPathFinding*, void*, coordPair*), spawnCreatedObject)(campaignHelpers::getStratPathFinding(), port, &coords);
+	tile->port = true;
+
+	bool result = GAME_FUNC(bool(__thiscall*)(portBuildingStruct*, portDockStrat*), setDocks)(port, port->portDock);  
+	if (!result)
+	{
+		string errs = "settlementStruct::createPort: failed to create docks, settlement: " + string(this->name);
+		gameHelpers::logStringGame(errs);
+		MessageBoxA(NULL, errs.c_str(), "ERROR!", NULL);
+		exit(0);
+		return nullptr;
+	}
+
+	coordPair coordsDock{ port->dockX, port->dockY };
+	GAME_FUNC(void(__thiscall*)(portBuildingStruct*, coordPair*), initPortRallyPoint)(port, &coordsDock);  
+
+	const auto campaign = campaignHelpers::getCampaignData();
+	GAME_FUNC(void(__thiscall*)(portBuildingStruct***, portBuildingStruct*), addPortToCampaign)(&campaign->portsBuildings, port);
+
+	if (recalculate)
+	{
+		this->recalculate(true);
+	}
+
+	gameHelpers::logStringGame("settlementStruct::createPort: settlement: " + string(this->name) + ", all ports number: " + to_string(campaign->portsBuildingsNum));
+
+	return port;
+}
+
 void eopSettlementDataDb::newGameLoaded()
 {
 	const auto map = stratMapHelpers::getStratMap();
@@ -1590,6 +1642,21 @@ namespace settlementHelpers
 		local lvl = sett:getFortificationLevel()
 		*/
 		types.settlementStruct.set_function("getFortificationLevel", &settlementStruct::getFortificationLevel);
+		/***
+		Add a port to a settlement. The port and settlement must be located in the same region.
+		@function settlementStruct:createPort
+		@tparam int xCoord
+		@tparam int yCoord
+		@tparam bool recalculate settlement (true, if the port is added during the campaign)
+		@treturn portStruct port
+		@usage
+		sett = fac:addSettlement(362,107,"sett_546",0,false);
+		sett.localizedName="Carpathus";
+		sett.settlementStats.population = 500;
+		sett.creatorFactionID = 21;
+		sett:createPort(362,108,false);
+		*/
+		types.settlementStruct.set_function("createPort", &settlementStruct::createPort);
 		
 		/***
 		Basic settlementStats table

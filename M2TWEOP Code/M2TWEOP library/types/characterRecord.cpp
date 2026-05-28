@@ -1658,6 +1658,7 @@ void characterRecord::addTraitPoints(const std::string& trait, const int points)
 		addTraitPoints)(this, entry, addPoints, true);
 }
 
+//### There are some things that need to be redone here, more correctly, later. ¯\_(ツ)_/¯   
 characterRecord* characterRecord::createMessageMarriageProposal()
 {
 	characterRecord* new_spouse = nullptr;

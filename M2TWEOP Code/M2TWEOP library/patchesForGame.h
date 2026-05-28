@@ -332,9 +332,16 @@ public:
 	static MH_STATUS hook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal, std::string function);
 	static void draw();
 
+
+	static bool openConsole;
+	static oneTile* selectTile;
+	static coordPair rememberCoords;
+
+  
 	using t_onUnitCreate = unit*(__thiscall*)(unitDb* _this, regionStruct* region, stringWithHash* id, int factionID, int combat_ability, int soldiers, int armour_lvl, int weapon_lvl);
 	static t_onUnitCreate o_onUnitCreate;
 	static unit* __thiscall onUnitCreate(unitDb* _this, regionStruct* region, stringWithHash* id, int factionID, int combat_ability, int soldiers, int armour_lvl, int weapon_lvl);
+	static bool isUnlockWeaponLimit;
 
 	using t_onMaybeWillSpyOpenGates = bool(__thiscall*)(void* _this, character* general);
 	static t_onMaybeWillSpyOpenGates o_onMaybeWillSpyOpenGates;
@@ -369,11 +376,14 @@ public:
 };
 
 #define GET_VARIABLE_NAME(Variable) (#Variable)
-#define MIN_HOOK(pTarget, pDetour, ppOriginal) minHookFunctions::hook(pTarget, pDetour, ppOriginal, GET_VARIABLE_NAME(pDetour))
+#define MIN_HOOK(pTarget, pDetour, ppOriginal) minHookFunctions::hook((LPVOID)pTarget, (LPVOID)pDetour, reinterpret_cast<void**>(&ppOriginal), GET_VARIABLE_NAME(pDetour))
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 
 
 

@@ -3699,7 +3699,8 @@ namespace gameHelpers
 		const DWORD limit9 = dataOffsets::offsets.weaponLimit9;
 		MemWork::WriteData(&fix2, limit9, 1);
 
-		//historic battle?
+		//historic battle
+		minHookFunctions::isUnlockWeaponLimit = true;
 	}
 
 	float getUnitSizeMultiplier()
