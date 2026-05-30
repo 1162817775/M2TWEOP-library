@@ -99,6 +99,7 @@
 "moveDataFort",
 "moveDataTile",
 "eopAiConfig",
+"eopProductionHelper",
 "aiFactionData",
 "campaignDbRecruitment",
 "campaignDbReligion",

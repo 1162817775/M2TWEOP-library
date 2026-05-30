@@ -2544,6 +2544,10 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 	else if (eventCode == factionTurnEnd)
 	{
 		const auto fac = reinterpret_cast<factionStruct*>(vTab[1]);
+		if (globalEopAiConfig::getInstance()->getProductionHelper()->enabled)
+		{
+			globalEopAiConfig::getInstance()->getProductionHelper()->unitProducer(fac);
+		}
 		globalEopAiConfig::getInstance()->turnStartMove(fac, true);
 		//if (globalEopAiConfig::getInstance()->enableLogging && !fac->isPlayerControlled)
 		//	fac->aiFaction->aiGlobalStrategyDirector->militaryDirector.logData();

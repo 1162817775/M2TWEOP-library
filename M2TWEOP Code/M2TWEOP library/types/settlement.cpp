@@ -320,6 +320,30 @@ portBuildingStruct* settlementStruct::createPort(int x, int y, bool recalculate)
 	return port;
 }
 
+bool settlementStruct::hasRecruitmentCapability(const int eduIndex)
+{
+	const auto poolNum = this->getRecruitmentCapabilityNum();
+	for (auto i = 0; i < poolNum; ++i)
+	{
+		const auto pool = this->getRecruitmentCapability(i);
+		if (pool && pool->eduIndex == eduIndex)
+		{
+			return pool->maxSize >= 1.0;
+		}
+	}
+	return false;
+}
+
+int settlementStruct::getFreeRecruitmentSlots()
+{
+	if (this->getUnitQueueSize() >= 9)
+		return 0;
+
+	const auto slots = this->getSettlementCapabilityEnum(buildingCapabilities::recruitment_slots);
+	const auto slotNum = slots->value + slots->bonus;
+	return slotNum - this->getUnitQueueSize();
+}
+
 void eopSettlementDataDb::newGameLoaded()
 {
 	const auto map = stratMapHelpers::getStratMap();
