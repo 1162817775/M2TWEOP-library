@@ -53,10 +53,18 @@ namespace console
 				break;
 			case IDRETRY:
 				// Handle retry (e.g., try the operation again)
+				if (m2tweopOptions::alwaysAbortLua)
+				{
+					exit(0);
+				}	
 				restartLua();
 				break;
 			case IDIGNORE:
 				// Handle ignore (e.g., continue execution)
+				if (m2tweopOptions::alwaysAbortLua)
+				{
+					exit(0);
+				}
 				break;
 			default:
 				// Handle unexpected return values

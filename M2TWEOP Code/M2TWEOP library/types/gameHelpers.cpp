@@ -35,13 +35,14 @@ int m2tweopOptions::schiltromMissileDefense = 1;
 int m2tweopOptions::shieldWallMissileDefense = 0;
 int m2tweopOptions::elephantJavBonus = 10;
 int m2tweopOptions::elephantHitpointDamage = 4;
+int m2tweopOptions::isOpenGateOnStratMapActive = 0;
 bool m2tweopOptions::drawUnitCardOutline = true;
 bool m2tweopOptions::apIsShieldPiercing = true;
 bool m2tweopOptions::ignoreOwnershipRecruitment = false;
 bool m2tweopOptions::changeGeneralPosition = false;
 bool m2tweopOptions::enableRangedWeaponUpg = true;
 bool m2tweopOptions::isOpenGateOnStratMap = false;
-int m2tweopOptions::isOpenGateOnStratMapActive = 0;
+bool m2tweopOptions::alwaysAbortLua = false;
 
 scriptCommand::scriptCommand(const char* name) : className(name)
 {
