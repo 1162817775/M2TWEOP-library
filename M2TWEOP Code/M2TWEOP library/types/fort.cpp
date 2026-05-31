@@ -236,6 +236,9 @@ namespace fortHelpers
 		@tfield int gatesAreOpened
 		@tfield int fortFortificationLevel
 		@tfield int characterCount
+		@tfield float bannerPosX
+		@tfield float bannerPosZ
+		@tfield float bannerPosY
 		@tfield getSiege getSiege
 		@tfield getCharacter getCharacter
 		@tfield changeOwner changeOwner

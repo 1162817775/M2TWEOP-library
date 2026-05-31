@@ -295,6 +295,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield setApIsShieldPiercing setApIsShieldPiercing
 	@tfield setWatchTowerRange setWatchTowerRange
 	@tfield drawUnitCardOutline drawUnitCardOutline
+	@tfield alwaysAbortLua alwaysAbortLua
 	@tfield enableFamilyEventsWithoutTree enableFamilyEventsWithoutTree
 	@tfield useEopFrontiers useEopFrontiers
 	@tfield modelExists modelExists
@@ -1220,6 +1221,15 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 		M2TWEOP.drawUnitCardOutline(true)
 	*/
 	tables.M2TWEOP.set_function("drawUnitCardOutline", &m2tweopOptions::setDrawUnitCardOutline);
+	
+	/***
+	Always abort on LUA errors. Prevents savegame corruption.
+	@function M2TWEOP.alwaysAbortLua 
+	@tparam bool set
+	@usage
+		M2TWEOP.alwaysAbortLua(true)
+	*/
+	tables.M2TWEOP.set_function("alwaysAbortLua", &m2tweopOptions::setAlwaysAbortLua);
 
 	/***
 	Set watchtower range. Default: 10.

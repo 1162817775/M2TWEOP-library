@@ -320,6 +320,30 @@ portBuildingStruct* settlementStruct::createPort(int x, int y, bool recalculate)
 	return port;
 }
 
+bool settlementStruct::hasRecruitmentCapability(const int eduIndex)
+{
+	const auto poolNum = this->getRecruitmentCapabilityNum();
+	for (auto i = 0; i < poolNum; ++i)
+	{
+		const auto pool = this->getRecruitmentCapability(i);
+		if (pool && pool->eduIndex == eduIndex)
+		{
+			return pool->maxSize >= 1.0;
+		}
+	}
+	return false;
+}
+
+int settlementStruct::getFreeRecruitmentSlots()
+{
+	if (this->getUnitQueueSize() >= 9)
+		return 0;
+
+	const auto slots = this->getSettlementCapabilityEnum(buildingCapabilities::recruitment_slots);
+	const auto slotNum = slots->value + slots->bonus;
+	return slotNum - this->getUnitQueueSize();
+}
+
 void eopSettlementDataDb::newGameLoaded()
 {
 	const auto map = stratMapHelpers::getStratMap();
@@ -1282,6 +1306,9 @@ namespace settlementHelpers
 		@tfield int populationSize
 		@tfield bool gatesAreOpened
 		@tfield int characterCount
+		@tfield float bannerPosX
+		@tfield float bannerPosZ
+		@tfield float bannerPosY
 		@tfield table savedData
 		@tfield getReligion getReligion
 		@tfield setReligion setReligion
@@ -1313,9 +1340,7 @@ namespace settlementHelpers
 		@tfield getCharacter getCharacter
 		@tfield canConstructBuilding canConstructBuilding
 		@tfield getFortificationLevel getFortificationLevel
-		@tfield float bannerPosX
-		@tfield float bannerPosZ
-		@tfield float bannerPosY
+		@tfield createPort createPort
 
 		@table settlementStruct
 		*/
@@ -1643,7 +1668,7 @@ namespace settlementHelpers
 		*/
 		types.settlementStruct.set_function("getFortificationLevel", &settlementStruct::getFortificationLevel);
 		/***
-		Add a port to a settlement. The port and settlement must be located in the same region.
+		Add a port to a settlement. The port and settlement must be located in the same region. Keep in mind that minor settlements do not trade. Also the AI will not attack minor settlements on islands different from the main settlement.
 		@function settlementStruct:createPort
 		@tparam int xCoord
 		@tparam int yCoord

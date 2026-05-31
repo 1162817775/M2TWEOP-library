@@ -18,6 +18,7 @@
 #include "luaPlugin.h"
 #include "strategyMap.h"
 #include "techFuncs.h"
+#include "settlement.h"
 
 std::shared_ptr<globalEopAiConfig> globalEopAiConfig::m_Instance = std::make_shared<globalEopAiConfig>();
 
@@ -125,7 +126,8 @@ namespace campaignAi
 		}
 		balance += clamp(settlement->stats.settlementStats.TotalIncomeWithoutAdmin / 10, 0, 10000);
 		balance += clamp(gsdData->regionValue / 5, 0, 10000);
-		return clamp(balance, 0, 100000);
+		const int modified = static_cast<int>(static_cast<float>(balance) * globalEopAiConfig::getInstance()->getFactionData(faction)->getSettlementFactor(settlement)); // NOLINT(readability-static-accessed-through-instance) 
+		return clamp(modified, 0, 100000);
 	}
 	
 
@@ -135,6 +137,7 @@ namespace campaignAi
 		{
 			sol::usertype<globalEopAiConfig> eopAiConfig;
 			sol::usertype<aiFactionData> aiFactionData;
+			sol::usertype<eopProductionHelper> eopProductionHelper;
 		}typeAll;
 		
 		///EOP AI
@@ -154,6 +157,7 @@ namespace campaignAi
 		@tfield float invadePriorityFactor
 		@tfield int maxTurnSearchCount
 		@tfield getFactionData getFactionData
+		@tfield getProductionHelper getProductionHelper
 
 		@table eopAiConfig
 		*/
@@ -179,6 +183,33 @@ namespace campaignAi
 			  local data = eopAiConfig.getFactionData(fac)
 		*/
 		typeAll.eopAiConfig.set_function("getFactionData", &globalEopAiConfig::getFactionDataLua);
+		
+		/***
+		Get EOP production helper
+		@function eopAiConfig.getProductionHelper
+		@treturn eopProductionHelper prodHelper
+		@usage
+			  local prodHelper = eopAiConfig.getProductionHelper()
+			  prodHelper.enabled = true
+		*/
+		typeAll.eopAiConfig.set_function("getProductionHelper", &globalEopAiConfig::getProductionHelper);
+		
+		/***
+		Basic eopProductionHelper table
+		@tfield int upkeepTurns How many turns of the units upkeep the faction must have in treasury for the unit to be considered. Default: 8
+		@tfield int minMoney Minimum treasury for script to activate. Default: 1000
+		@tfield float costMultiplier Unit cost is multiplied by this value when considering if the faction should buy this unit (actual treasury subtracted is not affected). Default: 2.0
+		@tfield bool enabled Enable the script. Default: true
+		@tfield bool logProduction Log produced units. Default: true
+		
+		@table eopProductionHelper
+		*/
+		typeAll.eopProductionHelper = luaState.new_usertype<eopProductionHelper>("eopProductionHelper");
+		typeAll.eopProductionHelper.set("upkeepTurns", &eopProductionHelper::upkeepTurns);
+		typeAll.eopProductionHelper.set("minMoney", &eopProductionHelper::minMoney);
+		typeAll.eopProductionHelper.set("costMultiplier", &eopProductionHelper::costMultiplier);
+		typeAll.eopProductionHelper.set("enabled", &eopProductionHelper::enabled);
+		typeAll.eopProductionHelper.set("logProduction", &eopProductionHelper::logProduction);
 		
 		/***
 		Basic aiFactionData table
@@ -2017,6 +2048,118 @@ void aiFactionData::setTargetReligionFactor(const int religion, float factor)
 void aiFactionData::setAidReligionFactor(const int religion, float factor)
 {
 	aidReligionFactors.insert_or_assign(religion, factor);
+}
+
+void eopProductionHelper::unitProducer(const factionStruct* faction)
+{
+	const auto campaign = campaignHelpers::getCampaignData();
+	if (!faction || faction->isPlayerControlled == 1 )
+		return;
+
+	if (faction->factionID == campaign->slaveFactionID)
+		return;
+
+	auto money = faction->money;
+	if (money < minMoney)
+		return;
+
+	struct settRecruitInfo
+	{
+		int freeSlots;
+		std::vector<eduEntry*> recruitedEntries;
+	};
+	const auto settNum = faction->settlementsNum;
+	bool recruited = true;
+	std::unordered_map<std::string, settRecruitInfo> settOptionsCache{};
+	while (true)
+	{
+		if (!recruited)
+			break;
+
+		recruited = false;
+		for (auto s = 0; s < settNum; ++s)
+		{
+			const auto settlement = faction->settlements[s];
+			if (!settlement)
+				continue;
+
+			auto it = settOptionsCache.find(settlement->name);
+			settRecruitInfo* settInfo = nullptr;
+
+			if (it == settOptionsCache.end())
+			{
+				settOptionsCache[settlement->name] = {
+					settlement->getFreeRecruitmentSlots(),
+					std::vector<eduEntry*>{}
+				};
+				settInfo = &settOptionsCache[settlement->name];
+			}
+			else
+			{
+				settInfo = &it->second;
+			}
+
+			const auto recruitOptions = settlementHelpers::getAvailableUnits(settlement);
+			
+			if (settInfo->freeSlots <= 0 || !recruitOptions)
+				continue;
+
+			unitRQ* bestUnit = nullptr;
+			float bestUnitValue = 0.f;
+			int bestRecruitCost = 0;
+			
+			const int optionNum = recruitOptions->size();
+			for (int r = 0; r < optionNum; ++r)
+			{
+				const auto option = &(*recruitOptions)[r];
+
+				if (!option || !option->getUnitEntry())
+					continue;
+
+				const auto eduEntry = option->getUnitEntry();
+				
+				bool alreadyRecruited = false;
+				for (const auto& recruitedEntry : settInfo->recruitedEntries)
+				{
+					if (recruitedEntry == eduEntry)
+					{
+						alreadyRecruited = true;
+						break;
+					}
+				}
+
+				if (alreadyRecruited)
+					continue;
+
+				if (option->recruitType == 0
+					&& static_cast<float>(option->cost) * costMultiplier < static_cast<float>(money)
+					&& eduEntry
+					&& eduEntry->category != static_cast<uint32_t>(unitCategory::siege)
+					&& eduEntry->aiUnitValue > bestUnitValue
+					&& eduEntry->upkeepCost * upkeepTurns < money
+					&& settlement->hasRecruitmentCapability(static_cast<int>(eduEntry->index)))
+				{
+					bestUnit = option;
+					bestUnitValue = eduEntry->aiUnitValue;
+					bestRecruitCost = option->cost;
+				}
+
+				if (bestUnit)
+				{
+					if (settlementHelpers::addUnitToQueue(bestUnit))
+					{
+						if (logProduction)
+							gameHelpers::logStringGame("unitProducer - " + string(bestUnit->getUnitEntry()->eduType) + " recruited in " + string(settlement->name));
+						money -= bestRecruitCost;
+						money -= bestUnit->getUnitEntry()->upkeepCost * (upkeepTurns / 2);
+						settInfo->freeSlots--;
+						recruited = true;
+						settInfo->recruitedEntries.emplace_back(bestUnit->getUnitEntry());
+					}
+				}
+			}
+		}
+	}
 }
 
 globalEopAiConfig::globalEopAiConfig()

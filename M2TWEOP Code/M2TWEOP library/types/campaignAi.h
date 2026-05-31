@@ -1053,6 +1053,18 @@ enum priorityType
 	priType_aid
 };
 
+class eopProductionHelper
+{
+public:
+	eopProductionHelper() = default;
+	int upkeepTurns= 8;
+	int minMoney = 1000;
+	float costMultiplier = 2;
+	bool enabled = true;
+	bool logProduction = true;
+	void unitProducer(const factionStruct* faction);
+};
+
 class globalEopAiConfig
 {
 public:
@@ -1108,6 +1120,7 @@ public:
 	static void clearFactionData() { m_Instance = std::make_shared<globalEopAiConfig>(); }
 	bool isEndTurn = false;
 	void characterTurnStart(character* currentChar);
+	static eopProductionHelper* getProductionHelper() { return &getInstance()->m_prodHelper; }
 protected:
 	static std::shared_ptr<globalEopAiConfig> m_Instance;
 	factionStruct* m_Faction{};
@@ -1116,6 +1129,7 @@ protected:
 	float calculateSettPriority(const std::shared_ptr<settlementResource>& settRes, priorityType priType);
 	float calculateArmyPriority(const std::shared_ptr<armyResource>& armyRes, priorityType priType);
 	void checkRegion(int regionId);
+	eopProductionHelper m_prodHelper;
 	void getData(const factionStruct* fac);
 	void clearData()
 	{

@@ -765,6 +765,8 @@ public:
 	building* buildingPresent(const std::string& buildingName);
 	bool buildingPresentMinLevel(const std::string& levelName, bool exact);
 	portBuildingStruct* createPort(int x, int y, bool recalculate);
+	bool hasRecruitmentCapability(int eduIndex);
+	int getFreeRecruitmentSlots();
 };
 
 struct eopSettlementData
