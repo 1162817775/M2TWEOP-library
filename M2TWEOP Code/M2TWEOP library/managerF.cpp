@@ -1300,6 +1300,12 @@ void managerF::execPatches()
 	toDrawBanner->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onFixPrec patch" << '\n';
+	onFixPrec* toFixPrec = new onFixPrec(mem, (LPVOID)patchesForGame::onFixPrec, globals::dataS.gameVersion);
+	toFixPrec->SetNewCode();
+	toFixPrec->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying onSetupBattleFromStrat patch" << '\n';
 	onSetupBattleFromStrat* toSetupBattleFromStrat = new onSetupBattleFromStrat(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
 	toSetupBattleFromStrat->SetNewCode();

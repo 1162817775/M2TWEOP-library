@@ -117,6 +117,7 @@ public:
 	static void __fastcall onSetSettlementModel(settlementStruct* settlement);
 	static int __fastcall onGeneralAssaultAction(generalAssault* assault);
 	static int __fastcall onCalcBgSize(character* general, eduEntry* entry);
+	static int __fastcall onFixPrec(unitTaskEngage* task);
 	static void __fastcall onInitControllers(aiPersonalityValues* personality);
 	static void __fastcall onExitToMenu();
 	static int __fastcall onCheckOwnership(uint32_t facShifted, const eduEntry* entry);

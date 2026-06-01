@@ -403,6 +403,79 @@ struct unitTaskMem
 	char field_1817;
 };
 
+struct FSM
+{
+	DWORD vtbl;
+	void* state;
+};
+
+struct unitTask
+{
+	DWORD vftbl;
+	unsigned __int32 started : 1;
+	unsigned __int32 finished : 1;
+	unsigned __int32 terminate : 1;
+	unsigned __int32 stage : 3;
+	unsigned __int32 mode : 4;
+	unsigned __int32 canInterrupt : 1;
+	unit* unit;
+};
+
+struct unitTaskEngage
+{
+	unitTask task;
+	int endMode;
+	int nextMode;
+	unit* target;
+	int engageMode;
+	float distance;
+	int attackType;
+	float volleyTime;
+	int pursuitTime;
+	unsigned __int32 fast : 1;
+	unsigned __int32 intercept : 1;
+	unsigned __int32 freeAttack : 1;
+	unsigned __int32 missileAttack : 1;
+	unsigned __int32 finishIntercept : 1;
+	unsigned __int32 run : 1;
+	unsigned __int32 charge : 1;
+	unsigned __int32 formedCharge : 1;
+	unsigned __int32 melee : 1;
+	unsigned __int32 firedPrec : 1;
+	unsigned __int32 contact : 1;
+	unsigned __int32 moving : 1;
+	unsigned __int32 ranged : 1;
+	unsigned __int32 targetOnWalls : 1;
+	uint32_t pullingAway;
+};
+
+struct unitTaskIntercept
+{
+	unitTask task;
+	FSM fsm;
+	int triggers;
+	float distance;
+	bool stopAtTarget;
+	bool allowMoveOffWalls;
+	bool moveToDistance;
+	bool returnOnFail;
+	bool pursue;
+	bool ranged;
+	int updateFreq;
+	float headOffDistance;
+	uint16_t headingTolerance;
+	float time;
+	int updates;
+	bool almostFinished;
+	bool allowIntercept;
+	float posX;
+	float posY;
+	int currentTarget;
+	bool monitor;
+	bool pathFollowPushed;
+	bool pathFollowSuccessfull;
+};
+
 struct projectile
 {
 	char pad_0000[4];

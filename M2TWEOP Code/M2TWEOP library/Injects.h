@@ -2514,6 +2514,18 @@ private:
 	LPVOID funcAddress;
 };
 
+class onFixPrec
+	:public AATemplate
+{
+public:
+	onFixPrec(MemWork* mem, LPVOID addr, int ver);
+	~onFixPrec() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 class onSetBuildPolicies
 	:public AATemplate
 {

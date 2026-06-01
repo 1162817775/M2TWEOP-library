@@ -26,6 +26,8 @@
 #include "rebelFactions.h"
 #include <memWork.h>
 
+#include <algorithm>
+
 
 worldRecord* __fastcall patchesForGame::selectWorldpkgdesc(char* database, worldRecord* selectedRecord)
 {
@@ -769,15 +771,18 @@ unitGroup** __fastcall patchesForGame::onGetGroupByLabel(DWORD groupLabels, char
 	return GAME_FUNC(unitGroup**(__thiscall*)(DWORD, char*), getGroupByLabel)(groupLabels, label);
 }
 
-std::string sound;
+namespace
+{
+	std::string CULTURE_SOUND;
+}
 
 char* patchesForGame::onGetCultureEndTurnSound(int cultureID)
 {
 	if (cultureID == 0)
-		sound = "END_TURN";
+		CULTURE_SOUND = "END_TURN";
 	else
-		sound = "END_TURN_CULTURE_" + to_string(cultureID);
-	return sound.data();
+		CULTURE_SOUND = "END_TURN_CULTURE_" + to_string(cultureID);
+	return CULTURE_SOUND.data();
 }
 
 int __fastcall patchesForGame::onCreateMercUnitCheck(char** entryName, int eduIndex)
@@ -1019,6 +1024,17 @@ int patchesForGame::onGeneralAssaultAction(generalAssault* assault)
 int patchesForGame::onCalcBgSize(character* general, eduEntry* entry)
 {
 	return gameHelpers::calculateMaxBodyguardSize(general, entry);
+}
+
+int patchesForGame::onFixPrec(unitTaskEngage* task)
+{
+	if (task->task.unit->unitPositionData->engagedUnitsNum > 0)
+		task->task.mode = 0;
+	else
+		task->task.mode = 6;
+	
+	const auto bitfield = reinterpret_cast<uint32_t>(task) + 4;
+	return *reinterpret_cast<uint32_t*>(bitfield);
 }
 
 void patchesForGame::onInitControllers(aiPersonalityValues* personality)
@@ -2886,7 +2902,6 @@ minHookFunctions::t_onCreateMessageAboutMarriage         minHookFunctions::o_onC
 minHookFunctions::t_onCreateCandidateMarrying            minHookFunctions::o_onCreateCandidateMarrying = nullptr;
 minHookFunctions::t_onDaughterReadyMarryHusband          minHookFunctions::o_onDaughterReadyMarryHusband = nullptr;
 
-
 DWORD minHookFunctions::lastSoundClass = NULL;
 bool minHookFunctions::isUnlockWeaponLimit = false;
 oneTile* minHookFunctions::selectTile = nullptr;
@@ -2953,10 +2968,7 @@ bool __thiscall minHookFunctions::onMaybeWillSpyOpenGates(void* _this, character
 	{
 		result = m2tweopOptions::isOpenGateOnStratMap;
 		m2tweopOptions::isOpenGateOnStratMapActive--;
-		if (m2tweopOptions::isOpenGateOnStratMapActive < 0)
-		{
-			m2tweopOptions::isOpenGateOnStratMapActive = 0;
-		}
+		m2tweopOptions::isOpenGateOnStratMapActive = max(m2tweopOptions::isOpenGateOnStratMapActive, 0);
 	}
 
 	return result;
