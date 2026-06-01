@@ -6395,6 +6395,95 @@ void onFixPrec::SetNewCode()
 	delete a;
 }
 
+onInitAttackMelee::onInitAttackMelee(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x7CCA22;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x7CC1C2;
+}
+
+void onInitAttackMelee::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->pushad();
+	a->pushf();
+	a->mov(edx, esi);
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->popf();
+	a->popad();
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+onProcessAttackMelee::onProcessAttackMelee(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x007CE2D8;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x7CDA78;
+}
+
+void onProcessAttackMelee::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->mov(edx, esi);
+	a->mov(ecx, dword_ptr(esp, 0x10));
+	a->pushad();
+	a->pushf();
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->popf();
+	a->popad();
+	a->mov(al, dword_ptr(esi, 0x3c));
+	a->mov(ecx, dword_ptr(esi, 0x8));
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+onFixPikeAttack::onFixPikeAttack(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x7CBC3F;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x7CB3DF;
+}
+
+void onFixPikeAttack::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+onFixPikeAttack2::onFixPikeAttack2(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x7CD76C;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x7CCF0C;
+}
+
+void onFixPikeAttack2::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
 onSpawnArmy::onSpawnArmy(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {

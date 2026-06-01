@@ -1037,6 +1037,22 @@ int patchesForGame::onFixPrec(unitTaskEngage* task)
 	return *reinterpret_cast<uint32_t*>(bitfield);
 }
 
+void patchesForGame::onInitAttackMelee(soldierInBattle* soldier, actAttackMelee* task)
+{
+	if (soldier->spear)
+		task->usePrimary = 1;
+}
+
+void patchesForGame::onProcessAttackMelee(actionInfo* info, actAttackMelee* task)
+{
+	const auto soldier = task->getSoldier();
+	if (soldier->spear)
+	{
+		const auto underThreat = GAME_FUNC(bool(__cdecl*)(soldierInBattle*, actionInfo*), isThreatened)(task->getSoldier(), info);
+		task->usePrimary = !soldier->usingSecondaryWeapon && !underThreat;
+	}
+}
+
 void patchesForGame::onInitControllers(aiPersonalityValues* personality)
 {
 	personality->initControllers();

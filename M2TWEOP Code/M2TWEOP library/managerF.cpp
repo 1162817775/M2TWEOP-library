@@ -1306,6 +1306,30 @@ void managerF::execPatches()
 	toFixPrec->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onInitAttackMelee patch" << '\n';
+	onInitAttackMelee* toInitAttackMelee = new onInitAttackMelee(mem, (LPVOID)patchesForGame::onInitAttackMelee, globals::dataS.gameVersion);
+	toInitAttackMelee->SetNewCode();
+	toInitAttackMelee->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onProcessAttackMelee patch" << '\n';
+	onProcessAttackMelee* toProcessAttackMelee = new onProcessAttackMelee(mem, (LPVOID)patchesForGame::onProcessAttackMelee, globals::dataS.gameVersion);
+	toProcessAttackMelee->SetNewCode();
+	toProcessAttackMelee->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying toFixPikeAttack patch" << '\n';
+	onFixPikeAttack* toFixPikeAttack = new onFixPikeAttack(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
+	toFixPikeAttack->SetNewCode();
+	toFixPikeAttack->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying toFixPikeAttack2 patch" << '\n';
+	onFixPikeAttack2* toFixPikeAttack2 = new onFixPikeAttack2(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
+	toFixPikeAttack2->SetNewCode();
+	toFixPikeAttack2->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying onSetupBattleFromStrat patch" << '\n';
 	onSetupBattleFromStrat* toSetupBattleFromStrat = new onSetupBattleFromStrat(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
 	toSetupBattleFromStrat->SetNewCode();

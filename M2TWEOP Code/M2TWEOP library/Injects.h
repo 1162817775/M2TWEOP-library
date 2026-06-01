@@ -2526,6 +2526,57 @@ private:
 	LPVOID funcAddress;
 };
 
+class onInitAttackMelee
+	:public AATemplate
+{
+public:
+	onInitAttackMelee(MemWork* mem, LPVOID addr, int ver);
+	~onInitAttackMelee() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+
+class onProcessAttackMelee
+	:public AATemplate
+{
+public:
+	onProcessAttackMelee(MemWork* mem, LPVOID addr, int ver);
+	~onProcessAttackMelee() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+
+class onFixPikeAttack
+	:public AATemplate
+{
+public:
+	onFixPikeAttack(MemWork* mem, LPVOID addr, int ver);
+	~onFixPikeAttack() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+
+class onFixPikeAttack2
+	:public AATemplate
+{
+public:
+	onFixPikeAttack2(MemWork* mem, LPVOID addr, int ver);
+	~onFixPikeAttack2() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 class onSetBuildPolicies
 	:public AATemplate
 {

@@ -112,6 +112,26 @@ struct actAttackMelee
 	}
 };
 
+struct actionInfoSoldier
+{
+	soldierInBattle* soldier;
+	bool collided;
+};
+
+struct actionInfo
+{
+	float rt;
+	float rp;
+	uint16_t blockedCounter;
+	actionInfoSoldier enemies[100];
+	actionInfoSoldier friendlies[100];
+	int spearsMem[200];
+	void* spears;
+	int spearsUsed;
+	int enemyNum;
+	int friendlyNum;
+};
+
 /* 1869 */
 struct gateEntry
 {
