@@ -1037,10 +1037,102 @@ int patchesForGame::onFixPrec(unitTaskEngage* task)
 	return *reinterpret_cast<uint32_t*>(bitfield);
 }
 
+void patchesForGame::onUpdatePhalanx(unitTaskMeleeAttackPhalanx* task)
+{
+	vector2 top{};
+	top.x = 0.0f;
+	top.y = 0.0f;
+
+	const auto un = task->task.unit;
+	const auto formation = un->formationsArray;
+	const auto formationData = &un->offsetRowX;
+
+	callClassFunc<void*, void, float*, vector2*>(formation, 0xF4, formationData, &top);
+	float standoff = 0.5f;
+	/*
+	if (un->SoldierCountBattlemap)
+	{
+		const auto soldier = un->soldiersBattleArr[0];
+		if (soldier->spear)
+		{
+			constexpr float spearMargin = 0.75f;
+			vector3 spearTip{};
+			spearTip.x = 0.0f;
+			spearTip.y = 0.0f;
+			spearTip.z = 0.0f;
+
+			GAME_FUNC(int (__cdecl*)(vector3*, soldierInBattle*, int), getImpactPoint)(&spearTip, soldier, 608);
+			float reach = sqrtf(spearTip.x * spearTip.x + spearTip.z * spearTip.z);
+			standoff = max(standoff, reach - spearMargin);
+		}
+	}
+	*/
+	top.x += 0.25f;
+	top.y += standoff;
+	const auto sineValues = battleHelpers::getSineValues();
+	const auto sine = sineValues[task->angle >> 2];
+	task->formationOriginY = task->targetPosY - ((top.y * sineValues[(task->angle + 0x4000) >> 2]) - (sine * top.x));
+	task->formationOriginX = task->targetPosX - ((top.y * sine) + (sineValues[(task->angle + 0x4000) >> 2] * top.x));
+}
+
 void patchesForGame::onInitAttackMelee(soldierInBattle* soldier, actAttackMelee* task)
 {
 	if (soldier->spear)
 		task->usePrimary = 1;
+}
+
+void patchesForGame::onUpdateBrace(soldierInBattle* soldier)
+{
+	soldier->updateBrace();
+}
+
+void patchesForGame::onSpearLocomotion(spearStruct* spear)
+{
+	if (const auto braceType = spear->soldier->braceType; braceType == 1)
+		spear->moveState = spear->shuffleState;
+}
+
+void patchesForGame::onAttackSpear(actAttackSpear* action)
+{
+	const auto soldier = action->baseAction.soldier;
+	const auto spear = soldier->spear;
+
+	constexpr float arrivedDistSq = 0.5f;
+	const auto soldierPos = soldier->get2dPos();
+	const vector2 tmp = vector2(soldierPos.x - action->posX, soldierPos.x - action->posY);
+	const float dist = tmp.x * tmp.x + tmp.y * tmp.y;
+	if (dist < arrivedDistSq
+		&& spear
+		&& GAME_FUNC(bool(__thiscall*)(soldierInBattle*), isSpearActive)(soldier)
+		)
+	{
+		auto idleState = spear->idleState;
+		if (soldier->locomotiveElement.currentStateGroupID != idleState.groupId)
+		{
+			callClassFunc<soldierInBattle*, void, locomotionId*>(soldier, 0xb8, &idleState);
+		}
+		return;
+	}
+
+	locomotionId moveState;
+	moveState.groupId = 4;
+	moveState.stateId = 2;
+	if (spear)
+	{
+		moveState = spear->moveState;
+	}
+	struct location
+	{
+		void* ref;
+		float posX;
+		float posY;
+		float posZ;
+		uint16_t angle;
+		location(float x, float z, uint16_t angle) : posX(x), posY(0.0f), posZ(z), angle(angle), ref(nullptr) {}
+	};
+	auto loc = location(action->posX, action->posY, action->rotation);
+	callClassFunc<soldierInBattle*, void, location*, locomotionId*, uint32_t>(soldier, 0xb4,
+		&loc, &moveState, (1 << 2) | (1 << 8));
 }
 
 void patchesForGame::onProcessAttackMelee(actionInfo* info, actAttackMelee* task)
@@ -1049,7 +1141,7 @@ void patchesForGame::onProcessAttackMelee(actionInfo* info, actAttackMelee* task
 	if (soldier->spear)
 	{
 		const auto underThreat = GAME_FUNC(bool(__cdecl*)(soldierInBattle*, actionInfo*), isThreatened)(task->getSoldier(), info);
-		task->usePrimary = !soldier->usingSecondaryWeapon && !underThreat;
+		task->usePrimary = !soldier->usingSecondaryWeapon && !underThreat && info->enemyNum < 4;
 	}
 }
 
@@ -1068,6 +1160,19 @@ void patchesForGame::onExitToMenu()
 	gameHelpers::logStringGame("DATA CLEARED");
 	gameEvents::onExitToMenu();
 	gameHelpers::logStringGame("EXIT TO MENU EVENTS PROCESSED");
+}
+
+void patchesForGame::onRaiseSpear(spearStruct* spear, bool facingAway, int rank)
+{
+	if (!spear->raised || !facingAway)
+		return;
+	const auto formationType = spear->unit->getUnitFormation();
+	bool inPhalanx = formationType == formation::phalanx ||
+		(spear->unit->eduEntry->priStats.isShortPike && spear->unit->actionStatus != unitStatus::routing);
+	bool inReadyMode = spear->unit->unitPositionData->closestEnemyUnitDist < 60.f;
+	bool advancingInFormation = (inPhalanx || formationType == formation::schiltrom) && inReadyMode && rank < 4;
+	if (advancingInFormation)
+		spear->raised = false;
 }
 
 int patchesForGame::onCheckOwnership(const uint32_t facShifted, const eduEntry* entry)

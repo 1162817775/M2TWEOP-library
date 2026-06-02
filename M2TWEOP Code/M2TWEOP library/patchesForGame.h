@@ -118,10 +118,15 @@ public:
 	static int __fastcall onGeneralAssaultAction(generalAssault* assault);
 	static int __fastcall onCalcBgSize(character* general, eduEntry* entry);
 	static int __fastcall onFixPrec(unitTaskEngage* task);
+	static void __fastcall onUpdatePhalanx(unitTaskMeleeAttackPhalanx* task);
 	static void __fastcall onInitAttackMelee(soldierInBattle* soldier, actAttackMelee* task);
+	static void __fastcall onUpdateBrace(soldierInBattle* soldier);
+	static void __fastcall onSpearLocomotion(spearStruct* spear);
+	static void __fastcall onAttackSpear(actAttackSpear* action);
 	static void __fastcall onProcessAttackMelee(actionInfo* info, actAttackMelee* task);
 	static void __fastcall onInitControllers(aiPersonalityValues* personality);
 	static void __fastcall onExitToMenu();
+	static void __fastcall onRaiseSpear(spearStruct* spear, bool facingAway, int rank);
 	static int __fastcall onCheckOwnership(uint32_t facShifted, const eduEntry* entry);
 	static void __fastcall onSpawnArmy(factionStruct* faction, coordPair* coords, armyStruct* army);
 	static unit* __fastcall onCreateGeneralUnit(unitDb* edu, character* general, int exp, int wpnlvl, int armlvl, eduEntry* entry); 

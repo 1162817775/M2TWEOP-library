@@ -1330,6 +1330,36 @@ void managerF::execPatches()
 	toFixPikeAttack2->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onUpdatePhalanx patch" << '\n';
+	onUpdatePhalanx* toUpdatePhalanx = new onUpdatePhalanx(mem, (LPVOID)patchesForGame::onUpdatePhalanx, globals::dataS.gameVersion);
+	toUpdatePhalanx->SetNewCode();
+	toUpdatePhalanx->Enable();
+	f1 << "Done" << '\n';
+	//
+	f1 << "Start applying onRaiseSpear patch" << '\n';
+	onRaiseSpear* toRaiseSpear = new onRaiseSpear(mem, (LPVOID)patchesForGame::onRaiseSpear, globals::dataS.gameVersion);
+	toRaiseSpear->SetNewCode();
+	toRaiseSpear->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onUpdateBrace patch" << '\n';
+	onUpdateBrace* toUpdateBrace = new onUpdateBrace(mem, (LPVOID)patchesForGame::onUpdateBrace, globals::dataS.gameVersion);
+	toUpdateBrace->SetNewCode();
+	toUpdateBrace->Enable();
+	f1 << "Done" << '\n';
+	
+	//f1 << "Start applying onAttackSpear patch" << '\n';
+	//onAttackSpear* toAttackSpear = new onAttackSpear(mem, (LPVOID)patchesForGame::onAttackSpear, globals::dataS.gameVersion);
+	//toAttackSpear->SetNewCode();
+	//toAttackSpear->Enable();
+	//f1 << "Done" << '\n';
+	
+	//f1 << "Start applying onSpearLocomotion patch" << '\n';
+	//onSpearLocomotion* toSpearLocomotion = new onSpearLocomotion(mem, (LPVOID)patchesForGame::onSpearLocomotion, globals::dataS.gameVersion);
+	//toSpearLocomotion->SetNewCode();
+	//toSpearLocomotion->Enable();
+	//f1 << "Done" << '\n';
+	
 	f1 << "Start applying onSetupBattleFromStrat patch" << '\n';
 	onSetupBattleFromStrat* toSetupBattleFromStrat = new onSetupBattleFromStrat(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
 	toSetupBattleFromStrat->SetNewCode();

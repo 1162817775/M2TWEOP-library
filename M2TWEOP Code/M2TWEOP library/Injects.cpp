@@ -6484,6 +6484,155 @@ void onFixPikeAttack2::SetNewCode()
 	delete a;
 }
 
+onUpdatePhalanx::onUpdatePhalanx(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x77B9DE;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x77B20E;
+}
+
+void onUpdatePhalanx::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->pushad();
+	a->pushf();
+	a->mov(ecx, esi);
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->popf();
+	a->popad();
+	a->movss(xmm0, dword_ptr(esi, 0x7C));
+	a->movss(xmm1, dword_ptr(esi, 0x80));
+	a->movss(dword_ptr(esp, 0x28), xmm0);
+	a->movss(dword_ptr(esp, 0x2C), xmm1);
+	if (m_adress == 0x077B9DE)
+		a->mov(eax, 0x77BAD3);
+	else
+		a->mov(eax, 0x77B303);
+	a->jmp(eax);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+onRaiseSpear::onRaiseSpear(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x819290;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x818A20;
+}
+
+void onRaiseSpear::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->push(ecx);
+	a->push(edx);
+	a->mov(edx, dword_ptr(esp, 0x30));
+	a->push(edx);
+	a->mov(edx, 0);
+	a->mov(dl, bl);
+	a->mov(ecx, esi);
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->pop(edx);
+	a->pop(ecx);
+	a->mov(eax, dword_ptr(esi, 0x64));
+	a->mov(bl, byte_ptr(eax, 0x74));
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+onUpdateBrace::onUpdateBrace(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x7BFA92;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x7BF252;
+}
+
+void onUpdateBrace::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->pushad();
+	a->pushf();
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->popf();
+	a->popad();
+	if (m_adress == 0x7BFA92)
+		a->mov(eax, 0x7BFB20);
+	else
+		a->mov(eax, 0x7BF2E0);
+	a->jmp(eax);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+onSpearLocomotion::onSpearLocomotion(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x8181BF;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x81794F;
+}
+
+void onSpearLocomotion::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->mov(dword_ptr(ecx, 0x98), eax);
+	a->pushad();
+	a->pushf();
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->popf();
+	a->popad();
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+onAttackSpear::onAttackSpear(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x7D1038;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x7D07D8;
+}
+
+void onAttackSpear::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->pushad();
+	a->pushf();
+	a->mov(ecx, esi);
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->popf();
+	a->popad();
+	if (m_adress == 0x7D1038)
+		a->mov(eax, 0x7D10B3);
+	else
+		a->mov(eax, 0x7D0853);
+	a->jmp(eax);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
 onSpawnArmy::onSpawnArmy(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {

@@ -2577,6 +2577,71 @@ private:
 	LPVOID funcAddress;
 };
 
+
+class onUpdatePhalanx
+	:public AATemplate
+{
+public:
+	onUpdatePhalanx(MemWork* mem, LPVOID addr, int ver);
+	~onUpdatePhalanx() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+
+class onUpdateBrace
+	:public AATemplate
+{
+public:
+	onUpdateBrace(MemWork* mem, LPVOID addr, int ver);
+	~onUpdateBrace() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+
+class onAttackSpear
+	:public AATemplate
+{
+public:
+	onAttackSpear(MemWork* mem, LPVOID addr, int ver);
+	~onAttackSpear() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+
+class onSpearLocomotion
+	:public AATemplate
+{
+public:
+	onSpearLocomotion(MemWork* mem, LPVOID addr, int ver);
+	~onSpearLocomotion() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+
+class onRaiseSpear
+	:public AATemplate
+{
+public:
+	onRaiseSpear(MemWork* mem, LPVOID addr, int ver);
+	~onRaiseSpear() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 class onSetBuildPolicies
 	:public AATemplate
 {

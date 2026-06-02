@@ -476,6 +476,29 @@ struct unitTaskIntercept
 	bool pathFollowSuccessfull;
 };
 
+struct unitTaskMeleeAttackPhalanx
+{
+	unitTask task;
+	unit *target;
+	int endMode;
+	float prev[15];
+	int pos;
+	float total;
+	bool initialized;
+	char pad[3];
+	uint16_t angle;
+	float targetPosX;
+	float targetPosY;
+	int initialMenUnit;
+	int initialMenTarget;
+	int updateTicks;
+	int attackType;
+	int initialWidth;
+	float formationOriginX;
+	float formationOriginY;
+};
+
+
 struct projectile
 {
 	char pad_0000[4];
@@ -751,6 +774,37 @@ struct physicalObject
 	int field_5C;
 };
 
+struct locomotionId
+{
+	int groupId;
+	int stateId;
+};
+
+struct spearStruct
+{
+	physicalObject object;
+	uint16_t angle;
+	char gap62[2];
+	soldierInBattle *soldier;
+	unit *unit;
+	float forceX;
+	float forceY;
+	float momentumX;
+	float momentumY;
+	locomotionId idleState;
+	locomotionId shuffleState;
+	locomotionId moveState;
+	locomotionId runState;
+	soldierInBattle *target;
+	uint16_t strikeHandle;
+	uint8_t strikeChain;
+	char pad[1];
+	int anim;
+	int stage;
+	bool active;
+	bool raised;
+};
+
 struct locomotiveElement
 {
 	int field_0;
@@ -899,7 +953,7 @@ struct soldierInBattle {
 	uint16_t fatigueCount;
 	int groundFatigueModifier;
 	int displayInfo[0x48];
-	void *spear;
+	spearStruct *spear;
 	float attackTimeStamp;
 	unit *thisUnit;
 	struct soldierInBattle *mount;
@@ -963,6 +1017,12 @@ struct soldierInBattle {
 	int groundType;
 	float overlayEffect;
 	soldierActionMem memory;
+	void updateBrace();
+	[[nodiscard]] int getFormationIndex() const;
+	[[nodiscard]] vector2 get2dPos() const
+	{
+		return {thisObject.xCoord, thisObject.zCoord};
+	}
 };
 
 struct generalInfo
@@ -2179,6 +2239,12 @@ public:
 	unitStatus getActionStatusEnum();
 	bool isFiring();
 	bool isIdle();
+	soldierInBattle* getSoldier(const int index) const
+	{
+		if (index < 0 || index >= SoldierCountBattlemap)
+			return nullptr;
+		return soldiersBattleArr[index];
+	}
 	int getUnitFormation()
 	{
 		return callVFunc<0x1, int>(formationsArray);
