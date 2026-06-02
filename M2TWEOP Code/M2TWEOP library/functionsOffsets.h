@@ -21,6 +21,7 @@ public:
 		DWORD releaseCultureSettlement = NULL;
 		DWORD createCultureFort = NULL;
 		DWORD createCultureCasEntry = NULL;
+		DWORD isThreatened = NULL;
 
 		DWORD allocMemFunc = NULL;
 		

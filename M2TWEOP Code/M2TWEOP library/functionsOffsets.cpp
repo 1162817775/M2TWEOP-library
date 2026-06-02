@@ -378,6 +378,7 @@ void codes::initCodes(int gameVer)
 		offsets.setDocks = 0x004c1f80;
 		offsets.initPortRallyPoint = 0x004c1c00;
 		offsets.addPortToCampaign = 0x004c3050;
+		offsets.isThreatened = 0x7EC290;
 	}
 
 
@@ -759,5 +760,6 @@ void codes::initCodes(int gameVer)
 		offsets.setDocks = 0x004c2510;
 		offsets.initPortRallyPoint = 0x004c2190;
 		offsets.addPortToCampaign = 0x004c35e0;
+		offsets.isThreatened = 0x7ECB20;
 	}
 }
