@@ -48,6 +48,52 @@ std::unordered_map<int, const char*> actionTypes = {
 	{23,"infighting"},
 };
 
+int braceData[3][2][2] = 
+{
+	{{ 0,	2}, { 0,	2},},
+	{{ 0,	3}, { 0,	1},},
+	{{ 4,	4}, { 4,	3},},
+};
+
+void soldierInBattle::updateBrace()
+{
+	const auto soldierUnit = this->thisUnit;
+	if (!this->isOfficer && soldierUnit && soldierUnit->eduEntry->formationPhalanx)
+	{
+		const auto guardMode = soldierUnit->hasBattleProperty(unitBattleProperties::guardMode);
+		const auto phalanx = soldierUnit->getUnitFormation() == formation::phalanx;
+		constexpr float phalanxPikeDist = 10.f;
+		const bool engage = !guardMode && phalanx && soldierUnit->unitPositionData && soldierUnit->unitPositionData->closestEnemyUnitDist < phalanxPikeDist;
+		const int formationIndex = getFormationIndex();
+		switch (int row = callClassFunc<void*, int, float*, int>(soldierUnit->formationsArray, 0x2A * 4, &soldierUnit->offsetRowX, formationIndex))
+		{
+		case 0:
+		case 1:  this->braceType = engage ? 1 : braceData[row][phalanx][guardMode]; break;
+		case 2:  this->braceType = braceData[2][phalanx][guardMode]; break;
+		default: this->braceType = 4; break;
+		}
+	}
+	else
+	{
+		this->braceType = 5;
+	}
+}
+
+int soldierInBattle::getFormationIndex() const
+{
+	const auto un = this->thisUnit;
+	if (!un)
+		return 0;
+
+	for (auto i = 0; i < un->SoldierCountBattlemap; ++i)
+	{
+		if (const auto soldier = un->getSoldier(i); this == soldier)
+			return i;
+	}
+	
+	return 0;
+}
+
 void unit::setUnitParams(int count, int exp, int armor, int weap)
 {
 	unitHelpers::setSoldiersCountAndExp(this, count, exp);
@@ -1651,7 +1697,7 @@ void luaPlugin::initUnits()
 	@tfield armyStruct army
 	@tfield int siegeEngineNum (only infantry and artillery units!)
 	@tfield kill kill
-	@tfield setParams setParams change soldierCountStratMap, exp, armourLVL, weaponLVL at one time.
+	@tfield setParams setParams change exp, armourLVL, weaponLVL at one time.
 	@tfield hasAttribute hasAttribute Check if unit has edu attribute.
 	@tfield string alias
 	@tfield int crusadeState >0 means crusading, <0 means disbaning, 0 means no crusade

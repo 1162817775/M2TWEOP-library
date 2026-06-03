@@ -112,6 +112,15 @@ struct actAttackMelee
 	}
 };
 
+struct actAttackSpear
+{
+	action baseAction;
+	float posX;
+	float posY;
+	uint16_t rotation;
+	char pad[2];
+};
+
 struct actionInfoSoldier
 {
 	soldierInBattle* soldier;
@@ -190,6 +199,8 @@ struct vector2
 {
 	float x;
 	float y;
+	vector2(float x, float y) : x(x), y(y) {}
+	vector2() : x(0.0f), y(0.0f) {}
 };
 
 struct arrayInUnitGroup

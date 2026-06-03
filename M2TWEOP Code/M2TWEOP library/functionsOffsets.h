@@ -22,6 +22,8 @@ public:
 		DWORD createCultureFort = NULL;
 		DWORD createCultureCasEntry = NULL;
 		DWORD isThreatened = NULL;
+		DWORD getImpactPoint = NULL;
+		DWORD isSpearActive = NULL;
 
 		DWORD allocMemFunc = NULL;
 		

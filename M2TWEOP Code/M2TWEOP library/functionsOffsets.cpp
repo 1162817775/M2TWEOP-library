@@ -379,6 +379,8 @@ void codes::initCodes(int gameVer)
 		offsets.initPortRallyPoint = 0x004c1c00;
 		offsets.addPortToCampaign = 0x004c3050;
 		offsets.isThreatened = 0x7EC290;
+		offsets.getImpactPoint = 0x817A60;
+		offsets.isSpearActive = 0x7BCAB0;
 	}
 
 
@@ -761,5 +763,7 @@ void codes::initCodes(int gameVer)
 		offsets.initPortRallyPoint = 0x004c2190;
 		offsets.addPortToCampaign = 0x004c35e0;
 		offsets.isThreatened = 0x7ECB20;
+		offsets.getImpactPoint = 0x8182D0;
+		offsets.isSpearActive = 0x7BD2F0;
 	}
 }
