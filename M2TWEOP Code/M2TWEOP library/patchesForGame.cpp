@@ -275,12 +275,14 @@ int __fastcall patchesForGame::onFortificationLevelS(settlementStruct* settlemen
 	}
 	return selectedLevel;//use old thing
 }
+
 char* __fastcall patchesForGame::onSaveEDUStringS(const eduEntry* eduEntry)
 {
-	char* retName = eopDu::getEopNameOfEduEntry(eduEntry);
-	if (retName == nullptr)
-		return eduEntry->eduType;
-	return retName;
+	if (!eduEntry)
+		return nullptr;
+	if (const auto eopEntry = eopDu::getEopEduEntryInternal(static_cast<int>(eduEntry->index)); eopEntry && !eopEntry->isFileAdded)
+		return const_cast<char*>(eopEntry->eopTypeName.c_str());
+	return eduEntry->eduType;
 }
 
 int __fastcall patchesForGame::onCreateUnit(char** entryName, const int* eduIndex)

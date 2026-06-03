@@ -1697,7 +1697,7 @@ void luaPlugin::initUnits()
 	@tfield armyStruct army
 	@tfield int siegeEngineNum (only infantry and artillery units!)
 	@tfield kill kill
-	@tfield setParams setParams change soldierCountStratMap, exp, armourLVL, weaponLVL at one time.
+	@tfield setParams setParams change exp, armourLVL, weaponLVL at one time.
 	@tfield hasAttribute hasAttribute Check if unit has edu attribute.
 	@tfield string alias
 	@tfield int crusadeState >0 means crusading, <0 means disbaning, 0 means no crusade
