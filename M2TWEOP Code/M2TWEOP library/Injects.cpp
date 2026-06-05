@@ -6549,6 +6549,36 @@ void onRaiseSpear::SetNewCode()
 	delete a;
 }
 
+onUpdateSpear::onUpdateSpear(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x818E60;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x818A20;
+}
+
+void onUpdateSpear::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->push(edi);
+	a->mov(edx, dword_ptr(esp, 0x78));
+	a->push(edx);
+	a->mov(edx, dword_ptr(esp, 0x78));
+	a->mov(ecx, esi);
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	if (m_adress == 0x818E60)
+		a->mov(eax, 0x819572);
+	else
+		a->mov(eax, 0x818A5F);
+	a->jmp(eax);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
 onUpdateBrace::onUpdateBrace(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {

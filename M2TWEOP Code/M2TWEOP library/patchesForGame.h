@@ -123,6 +123,7 @@ public:
 	static void __fastcall onUpdateBrace(soldierInBattle* soldier);
 	static void __fastcall onSpearLocomotion(spearStruct* spear);
 	static void __fastcall onAttackSpear(actAttackSpear* action);
+	static void __fastcall onUpdateSpear(spearStruct* spear, bool placed, bool complete);
 	static void __fastcall onProcessAttackMelee(actionInfo* info, actAttackMelee* task);
 	static void __fastcall onInitControllers(aiPersonalityValues* personality);
 	static void __fastcall onExitToMenu();

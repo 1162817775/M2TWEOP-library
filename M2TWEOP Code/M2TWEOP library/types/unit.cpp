@@ -55,6 +55,192 @@ int braceData[3][2][2] =
 	{{ 4,	4}, { 4,	3},},
 };
 
+int16_t rad2tab(float rad)
+{
+	return static_cast<int16_t>(roundf(rad * *reinterpret_cast<float*>(dataOffsets::offsets.rad2tab)));
+}
+constexpr float pi = 3.1415926535897932333797165867879296635503123989707390137482903185973555f;
+float deg2rad(float angle)
+{
+	return angle * (pi / 180);
+}
+
+uint16_t angleAbs(int16_t angle)
+{
+	uint16_t result = static_cast<uint16_t>(angle);
+	if ( angle < 0 )
+	{
+		if ( result == 0x8000 )
+			return 0x7FFF;
+		result = -angle;
+	}
+	return result;
+}
+
+void vector3::rotateY(int16_t angle)
+{
+	const auto sineValues = battleHelpers::getSineValues();
+	float cosA = sineValues[(angle + 0x4000) >> 2];
+	float sinA = sineValues[angle >> 2];
+	float newX = x * cosA + z * sinA;
+	float newZ = x * sinA - z * cosA;
+	x = newX;
+	z = newZ;
+}
+
+void spearStruct::update(bool placed, bool complete)
+{
+	const auto spear = this;
+	spear->forceX = 0;
+	spear->forceY = 0;
+	spear->momentumX = 0;
+	spear->momentumY = 0;
+	
+	const auto spearUnit = spear->unit;
+	const auto status = spearUnit->actionStatus;
+	const auto weaponStats = spearUnit->battleStats.priStats;
+
+	const auto formationType = spearUnit->getUnitFormation();
+	const bool horde = formationType == formation::horde;
+	const int formationIndex = spear->soldier->getFormationIndex();
+	const auto rank = callClassFunc<void*, int, float*, int>(spearUnit->formationsArray, 0x2A * 4, &spearUnit->offsetRowX, formationIndex);
+	bool bracing = spearUnit->meleeStateBitfield & 1 && rank < 4;
+	const bool isFighting = status == unitStatus::fighting;
+	const bool ready = spearUnit->unitPositionData->closestEnemyUnitDist < 60.0f;
+	bool spearDown = false;
+	const auto braceType = spear->soldier->braceType;
+	const auto currentState = soldier->locomotiveElement.currentStateGroupID;
+	if (bracing
+		&& braceType != 4
+		&& braceType != 5
+		&& (currentState == spear->idleState.groupId || soldier->locomotiveElement.pendingStateGroupID == spear->idleState.groupId)
+		|| (currentState >= 4 && currentState <= 5))
+	{
+		spearDown = true;
+	}
+	
+	if (spear->soldier->health == 0
+		|| !spear->soldier->usingPrimaryWeapon
+		|| status == unitStatus::routing
+		|| !GAME_FUNC(bool(__thiscall*)(soldierInBattle*), isSpearActive)(spear->soldier)
+		|| horde)
+	{
+		GAME_FUNC(void(__thiscall*)(spearStruct*, bool), spearPointActivate)(spear, false);
+		return;
+	}
+	const bool phalanx = formationType == formation::phalanx || (weaponStats.isShortPike && status != unitStatus::routing);
+	const bool schiltrom = formationType == formation::schiltrom;
+	int16_t rotation = 0;
+	if (schiltrom)
+	{
+		const auto x = soldier->thisObject.xCoord - spearUnit->positionX;
+		const auto y = soldier->thisObject.zCoord - spearUnit->positionZ;
+		rotation = rad2tab(atan2f(x, y));
+	}
+	else
+	{
+		rotation = rad2tab(spearUnit->rotation);
+	}
+	auto soldierRot = spear->soldier->thisObject.rotation;
+	auto maxDeviation = rad2tab(schiltrom ? deg2rad(40.f) : deg2rad(15.f));
+	auto manDeviation = angleAbs(soldierRot - rotation);
+	if (manDeviation <= maxDeviation && (isFighting || (schiltrom && spearDown)))
+	{
+		soldierRot = rotation;
+	}
+	spear->angle = spearUnit->rotation; 
+	vector3 spearTip;
+	spearTip.x = spear->soldier->thisObject.xCoord;
+	spearTip.y = spear->soldier->thisObject.yCoord;
+	spearTip.z = spear->soldier->thisObject.zCoord;
+	//if (!spearDown)
+	//	spearDown = isFighting || bracing || ((phalanx || schiltrom) && ready && rank < 4);
+	if (spearDown)
+	{
+		bool ok = true;
+		switch (currentState)
+		{
+			case 4:
+			case 5:
+			case 0xE:
+				GAME_FUNC(int (__cdecl*)(vector3*, soldierInBattle*, int), getImpactPoint)(&spearTip, soldier, 608);
+				break;
+			case 0xD:
+				GAME_FUNC(int (__cdecl*)(vector3*, soldierInBattle*, int), getImpactPoint)(&spearTip, soldier, 599);
+				break;
+			case 0xF:
+				GAME_FUNC(int (__cdecl*)(vector3*, soldierInBattle*, int), getImpactPoint)(&spearTip, soldier, 611);
+				break;
+			default:
+				{
+					ok = false;
+				}
+		}
+		if (ok)
+		{
+			spearTip.rotateY(spear->soldier->thisObject.rotation);
+			spearTip.x += spear->soldier->thisObject.xCoord;
+			spearTip.y += spear->soldier->thisObject.yCoord;
+			spearTip.z += spear->soldier->thisObject.zCoord;
+			if (soldier->thisObject.field_5C)
+			{
+				vector2 tip(spearTip.x, spearTip.z);
+				spearTip.y = GAME_FUNC(float(__thiscall*)(battlePerimeters*, int, vector2*),
+					queryHeight)(battleHelpers::getBattlePerimeters(), soldier->thisObject.field_5C, &tip);
+			}
+		}
+	}
+	bool needSpear = isFighting || bracing || ((phalanx || schiltrom) && ready && rank < 4);
+	spear->raised = !needSpear;
+
+	spear->object.xCoord = spearTip.x;
+	spear->object.yCoord = spearTip.y;
+	spear->object.zCoord = spearTip.z;
+	GAME_FUNC(void(__thiscall*)(spearStruct*, bool), spearPointActivate)(spear, weaponStats.isLongPike && spearDown && !raised);
+	GAME_FUNC(void(__thiscall*)(spearStruct*), updateSpearLocomotion)(spear);
+
+	if (spear->active)
+	{
+		struct poArray
+		{
+			void * things;
+			int size;
+			int num;
+		} lines;
+		
+		GAME_FUNC(void(__thiscall*)(poArray*), createPoArray)(&lines);
+		const float reciprocal = 1.f / soldier->thisObject.mass;
+		callClassFunc<void*, void, spearStruct*,
+			soldierInBattle*,
+			float*,
+			float*,
+			float,
+			vector3*,
+			float,
+			uint32_t,
+			int16_t,
+			poArray*,
+		uint32_t>(spear->soldier->obstacleHandlerIgnore, 0x4, spear, soldier,
+		&spear->forceX, &spear->momentumX, reciprocal, &spearTip, 0.2f, -1, spear->angle, &lines, false);
+		GAME_FUNC(void(__thiscall*)(poArray*), deletePoArray)(&lines);
+	}
+	
+	if (!stage &&
+		spear->active
+		&& (phalanx || schiltrom)
+		&& ready
+		&& (braceType == 0 || braceType == 1)
+		&& rank < 4
+		&& !placed)
+	{
+		GAME_FUNC(void(__thiscall*)(spearStruct*), spearAttemptStrike)(spear);
+	}
+	else if (stage)
+	{
+		GAME_FUNC(void(__thiscall*)(spearStruct*, bool), spearUpdateStrike)(spear, complete);
+	}
+}
+
 void soldierInBattle::updateBrace()
 {
 	const auto soldierUnit = this->thisUnit;
@@ -69,7 +255,7 @@ void soldierInBattle::updateBrace()
 		{
 		case 0:
 		case 1:  this->braceType = engage ? 1 : braceData[row][phalanx][guardMode]; break;
-		case 2:  this->braceType = braceData[2][phalanx][guardMode]; break;
+		case 2:  this->braceType = engage ? 1 : braceData[2][phalanx][guardMode]; break;
 		default: this->braceType = 4; break;
 		}
 	}

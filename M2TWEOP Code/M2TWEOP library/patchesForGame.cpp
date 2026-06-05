@@ -1137,6 +1137,11 @@ void patchesForGame::onAttackSpear(actAttackSpear* action)
 		&loc, &moveState, (1 << 2) | (1 << 8));
 }
 
+void patchesForGame::onUpdateSpear(spearStruct* spear, bool placed, bool complete)
+{
+	spear->update(placed, complete);
+}
+
 void patchesForGame::onProcessAttackMelee(actionInfo* info, actAttackMelee* task)
 {
 	const auto soldier = task->getSoldier();

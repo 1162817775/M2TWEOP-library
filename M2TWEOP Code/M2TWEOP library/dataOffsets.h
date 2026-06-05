@@ -51,6 +51,7 @@ public:
 		DWORD selectedFactionSymbol = NULL;
 		DWORD weaponLimit1 = NULL;
 		DWORD weaponLimit2 = NULL;
+		DWORD rad2tab = NULL;
 		DWORD weaponLimit3 = NULL;
 		DWORD weaponLimit4 = NULL;
 		DWORD weaponLimit5 = NULL;

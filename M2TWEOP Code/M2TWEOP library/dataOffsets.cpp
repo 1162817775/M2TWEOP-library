@@ -284,5 +284,6 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.onCreateCandidateMarrying = 0x005a6850;
 		offsets.onDaughterReadyMarryHusband = 0x00c49200;
 		offsets.marriageOptionClassConstructor = 0x004e43b0;
+		offsets.rad2tab = 0x1615CF0;
 	}
 }

@@ -191,6 +191,9 @@ struct vector3
 	float x;
 	float y;
 	float z;
+	vector3() : x(0), y(0), z(0) {}
+	vector3(float x, float y, float z) : x(x), y(y), z(z) {}
+	void rotateY(int16_t angle);
 };
 
 struct descrMountEntry
@@ -803,6 +806,7 @@ struct spearStruct
 	int stage;
 	bool active;
 	bool raised;
+	void update(bool immediate, bool complete);
 };
 
 struct locomotiveElement

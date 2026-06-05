@@ -381,6 +381,7 @@ void codes::initCodes(int gameVer)
 		offsets.isThreatened = 0x7EC290;
 		offsets.getImpactPoint = 0x817A60;
 		offsets.isSpearActive = 0x7BCAB0;
+		offsets.spearPointActivate = 0x8184E0;
 	}
 
 
@@ -765,5 +766,12 @@ void codes::initCodes(int gameVer)
 		offsets.isThreatened = 0x7ECB20;
 		offsets.getImpactPoint = 0x8182D0;
 		offsets.isSpearActive = 0x7BD2F0;
+		offsets.spearPointActivate = 0x8184E0;
+		offsets.queryHeight = 0xE078F0;
+		offsets.spearUpdateStrike = 0x818C40;
+		offsets.spearAttemptStrike = 0x818920;
+		offsets.updateSpearLocomotion = 0x818140;
+		offsets.createPoArray = 0x808B00;
+		offsets.deletePoArray = 0x809030;
 	}
 }

@@ -24,6 +24,13 @@ public:
 		DWORD isThreatened = NULL;
 		DWORD getImpactPoint = NULL;
 		DWORD isSpearActive = NULL;
+		DWORD spearPointActivate = NULL;
+		DWORD spearUpdateStrike = NULL;
+		DWORD spearAttemptStrike = NULL;
+		DWORD updateSpearLocomotion = NULL;
+		DWORD queryHeight = NULL;
+		DWORD createPoArray = NULL;
+		DWORD deletePoArray = NULL;
 
 		DWORD allocMemFunc = NULL;
 		
