@@ -68,7 +68,7 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.groupLabels = 0x001BA96A0;
 		offsets.stratCursorCoords = 0x02c86c28;
 		offsets.battleCursorCoords = 0x02C86C10;
-		offsets.modelsDb = 0x016e9dc8;
+		offsets.displayGameGfx = 0x016e9dc8;
 		offsets.customTiles = 0x02C3BF50;
 		offsets.battlePerimeters = 0x16F0600;
 		offsets.battlefieldEngines = 0x02C8329C;
@@ -144,6 +144,8 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.onCreateCandidateMarrying = 0x005a6370;
 		offsets.onDaughterReadyMarryHusband = 0x00c4ee00;
 		offsets.marriageOptionClassConstructor = 0x004e3db0;
+		offsets.rad2tab = 0x165DBE0;
+		offsets.debugLines = 0x2CBDA24;
 	}
 	else if (gameVer == 2) //steam
 	{
@@ -207,7 +209,7 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.groupLabels = 0x01B60580;
 		offsets.stratCursorCoords = 0x02c3da48;
 		offsets.battleCursorCoords = 0x02c3da30;
-		offsets.modelsDb = 0x016a0b98;
+		offsets.displayGameGfx = 0x016a0b98;
 		offsets.battlefieldEngines = 0x02C3A254;
 		offsets.battleAreas = 0x02C3A248;
 		offsets.options1 = 0x02C6D804;
@@ -285,5 +287,6 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.onDaughterReadyMarryHusband = 0x00c49200;
 		offsets.marriageOptionClassConstructor = 0x004e43b0;
 		offsets.rad2tab = 0x1615CF0;
+		offsets.debugLines = 0x2C749CC;
 	}
 }

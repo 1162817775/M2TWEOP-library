@@ -80,7 +80,8 @@ public:
 		DWORD tgaDataBase = NULL;
 		DWORD stratModelArray = NULL;
 		DWORD getMovePath = NULL;
-		DWORD modelsDb = NULL;
+		DWORD displayGameGfx = NULL;
+		DWORD debugLines = NULL;
 		DWORD eventManager = NULL;
 		DWORD currentCharacterActionType = NULL;
 		DWORD aStarTilesGlobal = NULL;

@@ -6,6 +6,7 @@
 struct soldierInBattle;
 struct streetPosition;
 struct towerStats;
+struct vector3;
 
 enum class battleType
 {
@@ -1656,6 +1657,22 @@ public:
 	}
 }; //Size: 0x0014
 
+class phalanxOptions
+{
+public:
+	int braceRanks = 3;
+	int maxSoldiersSecondary = 2;
+	float readyDist = 60.f;
+	bool drawDebugInfo = false;
+	bool enableEnhancedTargeting = true;
+	static phalanxOptions* getInstance()
+	{
+		return m_instance;
+	}
+private:
+	static phalanxOptions* m_instance;
+};
+
 namespace battleHelpers
 {
 	int getBattleCondCode(DWORD condObject);
@@ -1679,4 +1696,5 @@ namespace battleHelpers
 	void autoResolve();
 	bool autoWin(const char* winnerSide);
     void addToLua(sol::state& luaState);
+	int addDebugLine(vector3* start, vector3* end, uint32_t color, float time);
 };

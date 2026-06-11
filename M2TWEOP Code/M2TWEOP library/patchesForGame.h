@@ -330,6 +330,19 @@ public:
 	static int __fastcall onReadLogonOrLogoff(int isLogonNow);
 };
 
+
+struct color8888
+{
+	uint8_t b;
+	uint8_t g;
+	uint8_t r;
+	uint8_t a;
+	uint32_t asInt() const
+	{
+		return (a << 24) | (r << 16) | (g << 8) | b;
+	}
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// MIN HOOK FUNCTIONS //////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -351,6 +364,22 @@ public:
 	static t_onUnitCreate o_onUnitCreate;
 	static unit* __thiscall onUnitCreate(unitDb* _this, regionStruct* region, stringWithHash* id, int factionID, int combat_ability, int soldiers, int armour_lvl, int weapon_lvl);
 	static bool isUnlockWeaponLimit;
+	
+	using t_debugRenderLine = void(__cdecl*)(vector2* start, vector2* end, color8888 color, float time, bool zbuffered, float hOffset);
+	static t_debugRenderLine o_debugRenderLine;
+	static void __cdecl debugRenderLine(vector2* start, vector2* end, color8888 color, float time, bool zbuffered, float hOffset = 0.f);
+	
+	using t_debugRenderPeg = void(__cdecl*)(vector2* start, float height, color8888 color, float time);
+	static t_debugRenderPeg o_debugRenderPeg;
+	static void __cdecl debugRenderPeg(vector2* start, float height, color8888 color, float time);
+	
+	using t_debugRenderCircle = void(__cdecl*)(vector2* center, float radius, int segments, color8888 color, float time);
+	static t_debugRenderCircle o_debugRenderCircle;
+	static void __cdecl debugRenderCircle(vector2* center, float radius, int segments, color8888 color, float time);
+	
+	using t_debugLineAdd = void(__thiscall*)(vector2* start, vector2* end, color8888 color, float time, bool zbuffered, float hOffset);
+	static t_debugLineAdd o_debugLineAdd;
+	static int __thiscall debugLineAdd(void*, vector3* start, vector3* end, color8888 color, float time, bool zbuffered);
 
 	using t_onMaybeWillSpyOpenGates = bool(__thiscall*)(void* _this, character* general);
 	static t_onMaybeWillSpyOpenGates o_onMaybeWillSpyOpenGates;

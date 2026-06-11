@@ -6556,7 +6556,7 @@ onUpdateSpear::onUpdateSpear(MemWork* mem, LPVOID addr, int ver)
 		m_adress = 0x818E60;
 
 	else if (ver == 1)//kingdoms
-		m_adress = 0x818A20;
+		m_adress = 0x8185F0;
 }
 
 void onUpdateSpear::SetNewCode()
@@ -6572,7 +6572,7 @@ void onUpdateSpear::SetNewCode()
 	if (m_adress == 0x818E60)
 		a->mov(eax, 0x819572);
 	else
-		a->mov(eax, 0x818A5F);
+		a->mov(eax, 0x818D02);
 	a->jmp(eax);
 	a->ret();
 	m_cheatBytes = static_cast<unsigned char*>(a->make());

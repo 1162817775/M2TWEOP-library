@@ -80,12 +80,12 @@ uint16_t angleAbs(int16_t angle)
 void vector3::rotateY(int16_t angle)
 {
 	const auto sineValues = battleHelpers::getSineValues();
-	float cosA = sineValues[(angle + 0x4000) >> 2];
-	float sinA = sineValues[angle >> 2];
-	float newX = x * cosA + z * sinA;
-	float newZ = x * sinA - z * cosA;
+	float cosA = sineValues[static_cast<uint32_t>(static_cast<uint16_t>(angle + 0x4000)) >> 2];
+	float sinA = sineValues[static_cast<uint32_t>(static_cast<uint16_t>(angle) >> 2)];
+	float newX = y * sinA + x * cosA;
+	float newZ = y * cosA - x * sinA;
 	x = newX;
-	z = newZ;
+	y = newZ;
 }
 
 void spearStruct::update(bool placed, bool complete)
@@ -95,6 +95,8 @@ void spearStruct::update(bool placed, bool complete)
 	spear->forceY = 0;
 	spear->momentumX = 0;
 	spear->momentumY = 0;
+
+	const auto rankDepth = phalanxOptions::getInstance()->braceRanks;
 	
 	const auto spearUnit = spear->unit;
 	const auto status = spearUnit->actionStatus;
@@ -104,9 +106,11 @@ void spearStruct::update(bool placed, bool complete)
 	const bool horde = formationType == formation::horde;
 	const int formationIndex = spear->soldier->getFormationIndex();
 	const auto rank = callClassFunc<void*, int, float*, int>(spearUnit->formationsArray, 0x2A * 4, &spearUnit->offsetRowX, formationIndex);
-	bool bracing = spearUnit->meleeStateBitfield & 1 && rank < 4;
+	bool bracing = (spearUnit->meleeStateBitfield & 1 || spearUnit->unitPositionData->closestEnemyUnitDist < phalanxOptions::getInstance()->readyDist / 3) && rank <= rankDepth;
+	if (!phalanxOptions::getInstance()->enableEnhancedTargeting)
+		bracing = spearUnit->meleeStateBitfield & 1 && rank <= rankDepth;
 	const bool isFighting = status == unitStatus::fighting;
-	const bool ready = spearUnit->unitPositionData->closestEnemyUnitDist < 60.0f;
+	const bool ready = spearUnit->unitPositionData->closestEnemyUnitDist < phalanxOptions::getInstance()->readyDist;
 	bool spearDown = false;
 	const auto braceType = spear->soldier->braceType;
 	const auto currentState = soldier->locomotiveElement.currentStateGroupID;
@@ -114,7 +118,7 @@ void spearStruct::update(bool placed, bool complete)
 		&& braceType != 4
 		&& braceType != 5
 		&& (currentState == spear->idleState.groupId || soldier->locomotiveElement.pendingStateGroupID == spear->idleState.groupId)
-		|| (currentState >= 4 && currentState <= 5))
+		|| ((currentState >= 4 && currentState <= 5) || currentState >= 13))
 	{
 		spearDown = true;
 	}
@@ -134,7 +138,7 @@ void spearStruct::update(bool placed, bool complete)
 	if (schiltrom)
 	{
 		const auto x = soldier->thisObject.xCoord - spearUnit->positionX;
-		const auto y = soldier->thisObject.zCoord - spearUnit->positionZ;
+		const auto y = soldier->thisObject.yCoord - spearUnit->positionY;
 		rotation = rad2tab(atan2f(x, y));
 	}
 	else
@@ -148,11 +152,8 @@ void spearStruct::update(bool placed, bool complete)
 	{
 		soldierRot = rotation;
 	}
-	spear->angle = spearUnit->rotation; 
-	vector3 spearTip;
-	spearTip.x = spear->soldier->thisObject.xCoord;
-	spearTip.y = spear->soldier->thisObject.yCoord;
-	spearTip.z = spear->soldier->thisObject.zCoord;
+	spear->angle = soldierRot; 
+	vector3 spearTip{};
 	//if (!spearDown)
 	//	spearDown = isFighting || bracing || ((phalanx || schiltrom) && ready && rank < 4);
 	if (spearDown)
@@ -173,6 +174,9 @@ void spearStruct::update(bool placed, bool complete)
 				break;
 			default:
 				{
+					spearTip.x = spear->soldier->thisObject.xCoord;
+					spearTip.y = spear->soldier->thisObject.yCoord;
+					spearTip.z = spear->soldier->thisObject.zCoord;
 					ok = false;
 				}
 		}
@@ -184,13 +188,19 @@ void spearStruct::update(bool placed, bool complete)
 			spearTip.z += spear->soldier->thisObject.zCoord;
 			if (soldier->thisObject.field_5C)
 			{
-				vector2 tip(spearTip.x, spearTip.z);
-				spearTip.y = GAME_FUNC(float(__thiscall*)(battlePerimeters*, int, vector2*),
+				vector2 tip(spearTip.x, spearTip.y);
+				spearTip.z = GAME_FUNC(float(__thiscall*)(battlePerimeters*, int, vector2*),
 					queryHeight)(battleHelpers::getBattlePerimeters(), soldier->thisObject.field_5C, &tip);
 			}
 		}
 	}
-	bool needSpear = isFighting || bracing || ((phalanx || schiltrom) && ready && rank < 4);
+	else
+	{
+		spearTip.x = spear->soldier->thisObject.xCoord;
+		spearTip.y = spear->soldier->thisObject.yCoord;
+		spearTip.z = spear->soldier->thisObject.zCoord;
+	}
+	bool needSpear = isFighting || bracing || ((phalanx || schiltrom) && ready && rank <= rankDepth);
 	spear->raised = !needSpear;
 
 	spear->object.xCoord = spearTip.x;
@@ -201,6 +211,22 @@ void spearStruct::update(bool placed, bool complete)
 
 	if (spear->active)
 	{
+		struct wm3sphere
+		{
+			float x;
+			float y;
+			float z;
+			float r;
+			wm3sphere(const vector3& input, const float radius) : x(input.x), y(input.z), z(input.y), r(radius) {}
+		};
+
+		if (phalanxOptions::getInstance()->drawDebugInfo)
+		{
+			wm3sphere sphereTip(spearTip, 0.2f);
+			auto viewport = GAME_FUNC(DWORD(__thiscall*)(DWORD), getViewport)(*reinterpret_cast<int*>(dataOffsets::offsets.displayGameGfx));
+			GAME_FUNC(void(__thiscall*)(DWORD*, wm3sphere*, int), debugAddSphere)(*(DWORD **)(*(DWORD *)viewport + 0x50), &sphereTip, -1);
+		}
+		
 		struct poArray
 		{
 			void * things;
@@ -224,13 +250,21 @@ void spearStruct::update(bool placed, bool complete)
 		&spear->forceX, &spear->momentumX, reciprocal, &spearTip, 0.2f, -1, spear->angle, &lines, false);
 		GAME_FUNC(void(__thiscall*)(poArray*), deletePoArray)(&lines);
 	}
+
+
+	bool strike;
+	if (phalanxOptions::getInstance()->enableEnhancedTargeting)
+	{
+		strike = (phalanx || schiltrom) && ready;
+	}
+	else
+	{
+		strike = (phalanx || schiltrom) && ready && (braceType == 0 || braceType == 1) && rank <= (rankDepth - 1);
+	}
 	
 	if (!stage &&
 		spear->active
-		&& (phalanx || schiltrom)
-		&& ready
-		&& (braceType == 0 || braceType == 1)
-		&& rank < 4
+		&& strike
 		&& !placed)
 	{
 		GAME_FUNC(void(__thiscall*)(spearStruct*), spearAttemptStrike)(spear);
@@ -1354,7 +1388,7 @@ namespace unitHelpers
 	modelDbEntry* findBattleModel(const char* modelName)
 	{
 		DWORD funcAdr = codes::offsets.findBattleModel;
-		DWORD paramAdr = *reinterpret_cast<int*>(dataOffsets::offsets.modelsDb);
+		DWORD paramAdr = *reinterpret_cast<int*>(dataOffsets::offsets.displayGameGfx);
 		paramAdr += 0x84;
 		modelDbEntry* res = nullptr;
 		_asm
