@@ -72,6 +72,7 @@
 "towerStats",
 "battleTile",
 "battleCameraStruct",
+"phalanxOptions",
 "campaignStruct",
 "weatherData",
 "factionDiplomacy",

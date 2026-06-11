@@ -51,6 +51,7 @@ public:
 		DWORD selectedFactionSymbol = NULL;
 		DWORD weaponLimit1 = NULL;
 		DWORD weaponLimit2 = NULL;
+		DWORD rad2tab = NULL;
 		DWORD weaponLimit3 = NULL;
 		DWORD weaponLimit4 = NULL;
 		DWORD weaponLimit5 = NULL;
@@ -79,7 +80,8 @@ public:
 		DWORD tgaDataBase = NULL;
 		DWORD stratModelArray = NULL;
 		DWORD getMovePath = NULL;
-		DWORD modelsDb = NULL;
+		DWORD displayGameGfx = NULL;
+		DWORD debugLines = NULL;
 		DWORD eventManager = NULL;
 		DWORD currentCharacterActionType = NULL;
 		DWORD aStarTilesGlobal = NULL;

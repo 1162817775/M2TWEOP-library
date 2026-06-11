@@ -2642,6 +2642,19 @@ private:
 	LPVOID funcAddress;
 };
 
+
+class onUpdateSpear
+	:public AATemplate
+{
+public:
+	onUpdateSpear(MemWork* mem, LPVOID addr, int ver);
+	~onUpdateSpear() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 class onSetBuildPolicies
 	:public AATemplate
 {

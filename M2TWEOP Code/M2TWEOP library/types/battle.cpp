@@ -16,6 +16,7 @@
 #include "unit.h"
 #include "gameHelpers.h"
 
+phalanxOptions* phalanxOptions::m_instance = new phalanxOptions();
 
 void buildingBattle::getFacing(vector2& facing)
 {
@@ -319,6 +320,20 @@ namespace battleHelpers
 		return *reinterpret_cast<battleAreas**>(dataOffsets::offsets.battleAreas);
 	}
 
+	void* getDebugLines()
+	{
+		return reinterpret_cast<void*>(dataOffsets::offsets.debugLines);
+	}
+
+	int addDebugLine(vector3* start, vector3* end, uint32_t color, float time)
+	{
+		const auto lines = getDebugLines();
+		if (!lines)
+			return -1;
+
+		return GAME_FUNC(int (__thiscall*)(void*, vector3* start, vector3* end, uint32_t color, float time), debugLineAddFinal)(lines, start, end, color, time);
+	}
+
 	battleTile* getBattleTile(const float xCoord, const float yCoord)
 	{
 		const auto terrainData = getBattleTerrainData();
@@ -360,6 +375,7 @@ namespace battleHelpers
             sol::usertype<towerEntry> battleBuildingStats;
             sol::usertype<towerStats> towerStats;
             sol::usertype<battleCameraStruct>battleCameraStruct;
+            sol::usertype<phalanxOptions>phalanxOptions;
         }typeAll;
     	
 		///Battle Data
@@ -1496,6 +1512,25 @@ namespace battleHelpers
 		typeAll.battleCameraStruct.set("xCoord", &battleCameraStruct::xCoord);
 		typeAll.battleCameraStruct.set("yCoord", &battleCameraStruct::yCoord);
 		typeAll.battleCameraStruct.set("zCoord", &battleCameraStruct::zCoord);
+		
+		///Phalanx options
+		//@section Phalanx options
+
+		/***
+		Get Phalanx options
+		@tfield int braceRanks How many ranks will brace. Default: 3
+		@tfield int maxSoldiersSecondary How many soldiers a pikeman can engage at once before drawing secondary. Default: 2
+		@tfield float readyDist Distance in meters to be considered ready for enemy. Default: 60
+		@tfield bool drawDebugInfo Draw sphere's where the spear points are on the battlemap. Default: false
+		@tfield bool enableEnhancedTargeting Pikeman soldiers attack more. Default: true
+		@table phalanxOptions
+		*/
+		typeAll.phalanxOptions = luaState.new_usertype<phalanxOptions>("phalanxOptions");
+		typeAll.phalanxOptions.set("braceRanks", &phalanxOptions::braceRanks);
+		typeAll.phalanxOptions.set("maxSoldiersSecondary", &phalanxOptions::maxSoldiersSecondary);
+		typeAll.phalanxOptions.set("readyDist", &phalanxOptions::readyDist);
+		typeAll.phalanxOptions.set("drawDebugInfo", &phalanxOptions::drawDebugInfo);
+		typeAll.phalanxOptions.set("enableEnhancedTargeting", &phalanxOptions::enableEnhancedTargeting);
     }
 	
 
