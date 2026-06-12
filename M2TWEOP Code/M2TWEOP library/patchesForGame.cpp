@@ -1069,7 +1069,7 @@ void patchesForGame::onUpdatePhalanx(unitTaskMeleeAttackPhalanx* task)
 		}
 	}
 	*/
-	top.x += 0.25f;
+	//top.x += 0.25f;
 	top.y += standoff;
 	const auto sineValues = battleHelpers::getSineValues();
 	const auto sine = sineValues[task->angle >> 2];
@@ -1099,7 +1099,7 @@ void patchesForGame::onAttackSpear(actAttackSpear* action)
 	const auto soldier = action->baseAction.soldier;
 	const auto spear = soldier->spear;
 
-	constexpr float arrivedDistSq = 0.5f;
+	constexpr float arrivedDistSq = 10.f;
 	const auto soldierPos = soldier->get2dPos();
 	const vector2 tmp = vector2(soldierPos.x - action->posX, soldierPos.x - action->posY);
 	const float dist = tmp.x * tmp.x + tmp.y * tmp.y;
@@ -1109,7 +1109,7 @@ void patchesForGame::onAttackSpear(actAttackSpear* action)
 		)
 	{
 		auto idleState = spear->idleState;
-		if (soldier->locomotiveElement.currentStateGroupID != idleState.groupId)
+		if (soldier->locomotiveElement.currentStateGroupID == spear->moveState.groupId)
 		{
 			callClassFunc<soldierInBattle*, void, locomotionId*>(soldier, 0xb8, &idleState);
 		}
@@ -1137,13 +1137,18 @@ void patchesForGame::onAttackSpear(actAttackSpear* action)
 		&loc, &moveState, (1 << 2) | (1 << 8));
 }
 
+void patchesForGame::onUpdateSpear(spearStruct* spear, bool placed, bool complete)
+{
+	spear->update(placed, complete);
+}
+
 void patchesForGame::onProcessAttackMelee(actionInfo* info, actAttackMelee* task)
 {
 	const auto soldier = task->getSoldier();
 	if (soldier->spear)
 	{
 		const auto underThreat = GAME_FUNC(bool(__cdecl*)(soldierInBattle*, actionInfo*), isThreatened)(task->getSoldier(), info);
-		task->usePrimary = !soldier->usingSecondaryWeapon && !underThreat && info->enemyNum < 4;
+		task->usePrimary = !soldier->usingSecondaryWeapon && !underThreat && info->enemyNum <= phalanxOptions::getInstance()->maxSoldiersSecondary;
 	}
 }
 
@@ -3024,6 +3029,10 @@ minHookFunctions::t_onCreateWife                         minHookFunctions::o_onC
 minHookFunctions::t_onCreateMessageAboutMarriage         minHookFunctions::o_onCreateMessageAboutMarriage = nullptr;
 minHookFunctions::t_onCreateCandidateMarrying            minHookFunctions::o_onCreateCandidateMarrying = nullptr;
 minHookFunctions::t_onDaughterReadyMarryHusband          minHookFunctions::o_onDaughterReadyMarryHusband = nullptr;
+minHookFunctions::t_debugRenderLine                      minHookFunctions::o_debugRenderLine = nullptr;
+minHookFunctions::t_debugLineAdd                         minHookFunctions::o_debugLineAdd = nullptr;
+minHookFunctions::t_debugRenderPeg                       minHookFunctions::o_debugRenderPeg = nullptr;
+minHookFunctions::t_debugRenderCircle                    minHookFunctions::o_debugRenderCircle = nullptr;
 
 DWORD minHookFunctions::lastSoundClass = NULL;
 bool minHookFunctions::isUnlockWeaponLimit = false;
@@ -3059,6 +3068,97 @@ void minHookFunctions::init()
 	MIN_HOOK(dataOffsets::offsets.onCreateMessageAboutMarriage,      onCreateMessageAboutMarriage,       o_onCreateMessageAboutMarriage);
 	MIN_HOOK(dataOffsets::offsets.onCreateCandidateMarrying,         onCreateCandidateMarrying,          o_onCreateCandidateMarrying);
 	MIN_HOOK(dataOffsets::offsets.onDaughterReadyMarryHusband,       onDaughterReadyMarryHusband,        o_onDaughterReadyMarryHusband);
+	MIN_HOOK(codes::offsets.debugRenderLine,                         debugRenderLine,                    o_debugRenderLine);
+	MIN_HOOK(codes::offsets.debugLineAdd,                            debugLineAdd,                       o_debugLineAdd);
+	MIN_HOOK(codes::offsets.debugRenderPeg,                          debugRenderPeg,                     o_debugRenderPeg);
+	MIN_HOOK(codes::offsets.debugRenderCircle,                       debugRenderCircle,                  o_debugRenderCircle);
+}
+
+int __thiscall minHookFunctions::debugLineAdd(void* _this, vector3* start, vector3* end, color8888 color, float time, bool zbuffered)
+{
+	return battleHelpers::addDebugLine(start, end, color.asInt(), time);
+}
+
+void __cdecl minHookFunctions::debugRenderLine(vector2* start, vector2* end, color8888 color, float time, bool zbuffered, float hOffset)
+{
+	vector2 dir{};
+	dir.x = end->x - start->x;
+	dir.y = end->y - start->y;
+
+	float length = sqrtf(dir.x * dir.x + dir.y * dir.y);
+	const auto inv = 1.f / length;
+	dir.x *= inv;
+	dir.y *= inv;
+
+	color.r = 0;
+	color.b = 0;
+
+	constexpr float pointSeparation = 10.f;
+
+	vector3 startLand(0.f, 0.f, 0.f);
+	vector3 endLand(start->x, battleHelpers::getBattleMapHeight(start->x, start->y) + 1.f + hOffset, start->y);
+
+	while (length > 0.f)
+	{
+		startLand = endLand;
+		float separation = 0.0f;
+
+		if (length >= pointSeparation)
+		{
+			separation = pointSeparation;
+		}
+		else
+		{
+			separation = length;
+		}
+		length -= separation;
+
+		vector2 end2d (endLand.x, endLand.y);
+		end2d.x += dir.x * separation;
+		end2d.y += dir.y * separation;
+		endLand = vector3(end2d.x, battleHelpers::getBattleMapHeight(end2d.x, end2d.y) + 1.f + hOffset, end2d.y);
+
+		battleHelpers::addDebugLine(&startLand, &endLand, color.asInt(), time);
+	}
+}
+
+void minHookFunctions::debugRenderPeg(vector2* start, float height, color8888 color, float time)
+{
+	vector3 bottom(start->x, battleHelpers::getBattleMapHeight(start->x, start->y) + 0.1f, start->y);
+	vector3 top(start->x, height, start->y);
+
+	color.r = 0;
+	color.b = 0;
+	
+	battleHelpers::addDebugLine(&bottom, &top, color.asInt(), time);
+}
+constexpr float pi = 3.1415926535897932333797165867879296635503123989707390137482903185973555f;
+
+int16_t rad2tab2(float rad)
+{
+	return static_cast<int16_t>(roundf(rad * *reinterpret_cast<float*>(dataOffsets::offsets.rad2tab)));
+}
+
+void minHookFunctions::debugRenderCircle(vector2* center, float radius, int segments, color8888 color, float time)
+{
+	const float segments_recip = 1.f / static_cast<float>(segments);
+
+	for (auto i = 0;  i < segments; ++i)
+	{
+		const int16_t startAngle = rad2tab2(2.f * pi * static_cast<float>(i) * segments_recip);
+		const int16_t endAngle = rad2tab2(2.f * pi * static_cast<float>(i + 1) * segments_recip);
+
+		vector2 start;
+		const auto sineValues = battleHelpers::getSineValues();
+		start.x = center->x + sineValues[static_cast<uint16_t>(startAngle) >> 2] * radius;
+		start.y = center->y + sineValues[static_cast<uint16_t>(startAngle + 0x4000) >> 2] * radius;
+
+		vector2 end;
+		end.x = center->x + sineValues[static_cast<uint16_t>(endAngle) >> 2] * radius;
+		end.y = center->y + sineValues[static_cast<uint16_t>(endAngle + 0x4000) >> 2] * radius;
+
+		debugRenderLine(&start, &end, color, time, false, 0.f);
+	}
 }
 
 // Called when uploading files descr_strat.txt and descr_battle.txt, as well as when creating rebel units.   

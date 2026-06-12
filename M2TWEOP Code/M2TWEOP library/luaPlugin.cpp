@@ -228,6 +228,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield getExpandedString getExpandedString
 	@tfield setStratString setStratString
 	@tfield getStratString getStratString
+	@tfield getPhalanxOptions getPhalanxOptions
 	@tfield getGameVersion getGameVersion
 	@tfield setPerfectSpy setPerfectSpy
 	@tfield getLocalFactionID getLocalFactionID
@@ -1277,6 +1278,15 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 		M2TWEOP.generateSprite("peasants")
 	*/
 	tables.M2TWEOP.set_function("generateSprite", &gameHelpers::generateSprite);
+	
+	/***
+	Get EOP Phalanx Options
+	@function M2TWEOP.getPhalanxOptions
+	@treturn phalanxOptions options
+	@usage
+		local options = M2TWEOP.getPhalanxOptions()
+	*/
+	tables.M2TWEOP.set_function("getPhalanxOptions", &phalanxOptions::getInstance);
 	
 	/***
 	Get the move cost of a ground type.

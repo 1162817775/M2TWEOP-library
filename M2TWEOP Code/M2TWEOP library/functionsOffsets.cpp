@@ -381,6 +381,20 @@ void codes::initCodes(int gameVer)
 		offsets.isThreatened = 0x7EC290;
 		offsets.getImpactPoint = 0x817A60;
 		offsets.isSpearActive = 0x7BCAB0;
+		offsets.spearPointActivate = 0x817C70;
+		offsets.queryHeight = 0xE0D260;
+		offsets.spearUpdateStrike = 0x8183D0;
+		offsets.spearAttemptStrike = 0x8180B0;
+		offsets.updateSpearLocomotion = 0x8178D0;
+		offsets.createPoArray = 0x808260;
+		offsets.deletePoArray = 0x808790;
+		offsets.getViewport = 0x901040;
+		offsets.debugAddSphere = 0x100FFA0;
+		offsets.debugRenderLine = 0xD411E0;
+		offsets.debugLineAddFinal = 0xD40A20;
+		offsets.debugLineAdd = 0xD40860;
+		offsets.debugRenderPeg = 0xD411F0;
+		offsets.debugRenderCircle = 0xD41200;
 	}
 
 
@@ -765,5 +779,19 @@ void codes::initCodes(int gameVer)
 		offsets.isThreatened = 0x7ECB20;
 		offsets.getImpactPoint = 0x8182D0;
 		offsets.isSpearActive = 0x7BD2F0;
+		offsets.spearPointActivate = 0x8184E0;
+		offsets.queryHeight = 0xE078F0;
+		offsets.spearUpdateStrike = 0x818C40;
+		offsets.spearAttemptStrike = 0x818920;
+		offsets.updateSpearLocomotion = 0x818140;
+		offsets.createPoArray = 0x808B00;
+		offsets.deletePoArray = 0x809030;
+		offsets.getViewport = 0x901B00;
+		offsets.debugAddSphere = 0x10106F0;
+		offsets.debugRenderLine = 0xD3B530;
+		offsets.debugLineAddFinal = 0xD3AD70;
+		offsets.debugLineAdd = 0xD3ABB0;
+		offsets.debugRenderPeg = 0xD3B540;
+		offsets.debugRenderCircle = 0xD3B550;
 	}
 }

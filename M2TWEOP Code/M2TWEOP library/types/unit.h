@@ -186,11 +186,16 @@ public:
 	char pad_007C[4]; //0x007C
 }; //Size: 0x0080
 
+// Warning: XZY not XYZ! Cursed AF
+// TODO: Fix XZY in structs
 struct vector3
 {
 	float x;
-	float y;
 	float z;
+	float y;
+	vector3() : x(0), y(0), z(0) {}
+	vector3(float x, float z, float y) : x(x), y(y), z(z) {}
+	void rotateY(int16_t angle);
 };
 
 struct descrMountEntry
@@ -783,7 +788,7 @@ struct locomotionId
 struct spearStruct
 {
 	physicalObject object;
-	uint16_t angle;
+	int16_t angle;
 	char gap62[2];
 	soldierInBattle *soldier;
 	unit *unit;
@@ -803,6 +808,7 @@ struct spearStruct
 	int stage;
 	bool active;
 	bool raised;
+	void update(bool immediate, bool complete);
 };
 
 struct locomotiveElement
@@ -1021,7 +1027,7 @@ struct soldierInBattle {
 	[[nodiscard]] int getFormationIndex() const;
 	[[nodiscard]] vector2 get2dPos() const
 	{
-		return {thisObject.xCoord, thisObject.zCoord};
+		return {thisObject.xCoord, thisObject.yCoord};
 	}
 };
 

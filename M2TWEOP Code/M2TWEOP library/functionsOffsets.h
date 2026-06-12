@@ -24,6 +24,19 @@ public:
 		DWORD isThreatened = NULL;
 		DWORD getImpactPoint = NULL;
 		DWORD isSpearActive = NULL;
+		DWORD spearPointActivate = NULL;
+		DWORD spearUpdateStrike = NULL;
+		DWORD spearAttemptStrike = NULL;
+		DWORD updateSpearLocomotion = NULL;
+		DWORD queryHeight = NULL;
+		DWORD getViewport = NULL;
+		DWORD debugAddSphere = NULL;
+		DWORD createPoArray = NULL;
+		DWORD deletePoArray = NULL;
+		DWORD debugLineAddFinal = NULL;
+		DWORD debugLineAdd = NULL;
+		DWORD debugRenderPeg = NULL;
+		DWORD debugRenderCircle = NULL;
 
 		DWORD allocMemFunc = NULL;
 		
@@ -44,6 +57,7 @@ public:
 		DWORD createCADTargetFort = NULL;
 		DWORD createCADTargetSettlement = NULL;
 		DWORD saveGame = NULL;
+		DWORD debugRenderLine = NULL;
 
 
 		DWORD createSiegeSettlementGarrisonedFunc = NULL;

@@ -18,7 +18,7 @@
 
 bool m2tweopOptions::hideUnknownUnitTooltips = false;
 bool m2tweopOptions::eopHandleUnitCards = true;
-bool m2tweopOptions::enableFamilyEventsForTeutonic = true;
+bool m2tweopOptions::enableFamilyEventsForTeutonic = false;
 bool m2tweopOptions::useEopFrontiers = true;
 int m2tweopOptions::watchTowerRange = 10;
 int m2tweopOptions::weaponBonusModifier = 3;

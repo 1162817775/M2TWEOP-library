@@ -1330,23 +1330,29 @@ void managerF::execPatches()
 	toFixPikeAttack2->Enable();
 	f1 << "Done" << '\n';
 	
-	f1 << "Start applying onUpdatePhalanx patch" << '\n';
-	onUpdatePhalanx* toUpdatePhalanx = new onUpdatePhalanx(mem, (LPVOID)patchesForGame::onUpdatePhalanx, globals::dataS.gameVersion);
-	toUpdatePhalanx->SetNewCode();
-	toUpdatePhalanx->Enable();
-	f1 << "Done" << '\n';
+	//f1 << "Start applying onUpdatePhalanx patch" << '\n';
+	//onUpdatePhalanx* toUpdatePhalanx = new onUpdatePhalanx(mem, (LPVOID)patchesForGame::onUpdatePhalanx, globals::dataS.gameVersion);
+	//toUpdatePhalanx->SetNewCode();
+	//toUpdatePhalanx->Enable();
+	//f1 << "Done" << '\n';
 	//
-	f1 << "Start applying onRaiseSpear patch" << '\n';
-	onRaiseSpear* toRaiseSpear = new onRaiseSpear(mem, (LPVOID)patchesForGame::onRaiseSpear, globals::dataS.gameVersion);
-	toRaiseSpear->SetNewCode();
-	toRaiseSpear->Enable();
+	//f1 << "Start applying onRaiseSpear patch" << '\n';
+	//onRaiseSpear* toRaiseSpear = new onRaiseSpear(mem, (LPVOID)patchesForGame::onRaiseSpear, globals::dataS.gameVersion);
+	//toRaiseSpear->SetNewCode();
+	//toRaiseSpear->Enable();
+	//f1 << "Done" << '\n';
+	
+	f1 << "Start applying onUpdateSpear patch" << '\n';
+	onUpdateSpear* toUpdateSpear = new onUpdateSpear(mem, (LPVOID)patchesForGame::onUpdateSpear, globals::dataS.gameVersion);
+	toUpdateSpear->SetNewCode();
+	toUpdateSpear->Enable();
 	f1 << "Done" << '\n';
 	
-	f1 << "Start applying onUpdateBrace patch" << '\n';
-	onUpdateBrace* toUpdateBrace = new onUpdateBrace(mem, (LPVOID)patchesForGame::onUpdateBrace, globals::dataS.gameVersion);
-	toUpdateBrace->SetNewCode();
-	toUpdateBrace->Enable();
-	f1 << "Done" << '\n';
+	//f1 << "Start applying onUpdateBrace patch" << '\n';
+	//onUpdateBrace* toUpdateBrace = new onUpdateBrace(mem, (LPVOID)patchesForGame::onUpdateBrace, globals::dataS.gameVersion);
+	//toUpdateBrace->SetNewCode();
+	//toUpdateBrace->Enable();
+	//f1 << "Done" << '\n';
 	
 	//f1 << "Start applying onAttackSpear patch" << '\n';
 	//onAttackSpear* toAttackSpear = new onAttackSpear(mem, (LPVOID)patchesForGame::onAttackSpear, globals::dataS.gameVersion);
