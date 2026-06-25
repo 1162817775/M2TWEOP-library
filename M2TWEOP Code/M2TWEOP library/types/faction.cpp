@@ -483,6 +483,8 @@ void factionStruct::updateNeighbours()
 {
 	if (settlementsNum == 0)
 		return;
+	if (campaignHelpers::getCampaignData()->type == 3)
+		return;
 	for (int i = 0; i < settlementsNum; i++)
 	{
 		const auto settlement = settlements[i];

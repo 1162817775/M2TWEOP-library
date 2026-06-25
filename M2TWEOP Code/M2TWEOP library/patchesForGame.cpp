@@ -2537,6 +2537,9 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 		else if (strcmp(str, "post_battle_scroll") == 0)
 		{
 			battleCreator::onPostBattleStratScreen();
+			const auto campData = campaignHelpers::getCampaignData();
+			if (campData->type == 3)
+				minorSettlementDb::clear();
 		}
 		else if (strcmp(str, "hotseat_scroll") == 0)
 		{
@@ -2713,7 +2716,16 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 		const auto region = stratMapHelpers::getRegion(sett->regionID);
 		region->fixReligionLevels();
 	}
-	else if (eventCode == postBattle || eventCode == preBattleWithdrawal || eventCode == generalAssaultsResidence)
+	else if (eventCode == postBattle)
+	{
+		const auto campData = campaignHelpers::getCampaignData();
+		campData->ignoreSpeedUp = false;
+		if (campData->type == 3)
+		{
+			minorSettlementDb::clear();
+		}
+	}
+	else if (eventCode == preBattleWithdrawal || eventCode == generalAssaultsResidence)
 	{
 		campaignHelpers::getCampaignData()->ignoreSpeedUp = false;
 	}
