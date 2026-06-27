@@ -6557,6 +6557,32 @@ void onRaiseSpear::SetNewCode()
 	delete a;
 }
 
+onGetUnitEduIndex::onGetUnitEduIndex(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x8ED0D1;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x8EC651;
+}
+
+void onGetUnitEduIndex::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->mov(ecx, dword_ptr(esp, 0x8));
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	if (m_adress == 0x8ED0D1)
+		a->mov(ebx, 0x008ED131);
+	else
+		a->mov(ebx, 0x008EC6B1);
+	a->jmp(ebx);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
 onUpdateSpear::onUpdateSpear(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {

@@ -1740,26 +1740,23 @@ namespace unitHelpers
 	{
 		if (!type)
 			return -1;
-		
-		if (const auto data = eopDu::getEopEduEntryByName(type))
-			return data->index;
-		
-		unitDb* EDB = reinterpret_cast<unitDb*>(dataOffsets::offsets.unitTypesStart - 4);
 
-		int unitsNum = EDB->numberOfEntries;
-		for (int i = 0; i < unitsNum; i++)
+		const auto entry = getEduEntryByName(type);
+		if (!entry)
 		{
-			if (strcmp(EDB->unitEntries[i].eduType, type) == 0)
-			{
-				return i;
-			}
+			gameHelpers::logStringGame("Edu index not found for type: " + std::string(type));
+			return -1;
 		}
-
-		gameHelpers::logStringGame("Edu index not found for type: " + std::string(type));
-		return -1;
+		return static_cast<int>(entry->index);
 	}
 
 	std::unordered_map<std::string, int> BASE_UNITS_LOOKUP = {};
+	bool SUPPRESS_ERRORS = false;
+
+	void setSuppressErrors(bool suppress)
+	{
+		SUPPRESS_ERRORS = suppress;
+	}
 
 	void initBaseUnitsLookup()
 	{
@@ -1798,7 +1795,8 @@ namespace unitHelpers
 				gameHelpers::logStringGame("getEduEntryByName: No name for unit at index: " + std::to_string(i));
 			}
 		}
-		gameHelpers::logStringGame("getEduEntryByName: No unit found with name: " + std::string(type));
+		if (!SUPPRESS_ERRORS)
+			gameHelpers::logStringGame("getEduEntryByName: No unit found with name: " + std::string(type));
 		return nullptr;
 	}
 

@@ -162,6 +162,7 @@ eduEntry* eopDu::addEopEduEntryFromFile(const char* fileName, int newIdx)
     try
     {
         const auto sharedP = std::make_shared<eopEduEntry>(fileName, newIdx);
+		unitHelpers::setSuppressErrors(true);
         if (unitHelpers::getEduEntryByName(sharedP->originalTypeName.c_str()))
         {
             gameHelpers::logStringGame("Duplicate unit name " + sharedP->originalTypeName + " in addEopEduEntryFromFile");
@@ -169,6 +170,7 @@ eduEntry* eopDu::addEopEduEntryFromFile(const char* fileName, int newIdx)
             MessageBoxA(NULL, errS.c_str(), "ERROR!", NULL);
             exit(0);
         }
+		unitHelpers::setSuppressErrors(false);
         eopUnitDb.push_back(sharedP);
     	eopUnitLookup.insert_or_assign(eopUnitDb.back()->originalTypeName, sharedP);
     	eopUnitLookup.insert_or_assign(eopUnitDb.back()->eopTypeName, sharedP);
@@ -184,6 +186,7 @@ eduEntry* eopDu::addEopEduEntryFromFile(const char* fileName, int newIdx)
 void eopDu::addEopEduEntryFromEdu(eduEntry* entry)
 {
 	const auto sharedP = std::make_shared<eopEduEntry>(entry);
+	unitHelpers::setSuppressErrors(true);
 	if (unitHelpers::getEduEntryByName(sharedP->originalTypeName.c_str()))
 	{
 		gameHelpers::logStringGame("Duplicate unit name " + sharedP->originalTypeName + " in addEopEduEntryFromFile");
@@ -191,6 +194,7 @@ void eopDu::addEopEduEntryFromEdu(eduEntry* entry)
 		MessageBoxA(NULL, errS.c_str(), "ERROR!", NULL);
 		exit(0);
 	}
+	unitHelpers::setSuppressErrors(false);
 	eopUnitDb.push_back(sharedP);
 	eopUnitLookup.insert_or_assign(eopUnitDb.back()->originalTypeName, sharedP);
 	eopUnitLookup.insert_or_assign(eopUnitDb.back()->eopTypeName, sharedP);
@@ -230,6 +234,13 @@ eopEduEntry* eopDu::getEopEduEntryInternal(int idx)
 eopEduEntry* eopDu::getEopEduEntryInternalIterating(int idx)
 {
 	return eopUnitDb[idx].get();
+}
+
+eduEntry* eopDu::getEopEduEntryIteratingLua(int idx)
+{
+	if (const auto eopEntry = getEopEduEntryInternal(idx))
+		return &eopEntry->data.edu;
+	return nullptr;
 }
 	
 int eopDu::getEopEntryNum()
@@ -445,6 +456,7 @@ namespace eopDuHelpers
 		@tfield getEduEntryNum getEduEntryNum
 		@tfield getEopEntryNum getEopEntryNum
 		@tfield findGeneralUnit findGeneralUnit
+		@tfield getEopEduEntryIterating getEopEduEntryIterating
 		@tfield findGeneralUpgradeUnit findGeneralUpgradeUnit
 		@table M2TWEOPDU
 		*/
@@ -546,6 +558,18 @@ namespace eopDuHelpers
 		M2TWEOPDU.setEntrySoldierModel(1000,"Sword_and_Buckler_Men");
 		*/
 		tables.M2TWEOPEDUTable.set_function("setEntrySoldierModel", &eopDu::setEntrySoldierModelLua);
+		/***
+		Get an eop entry by using it's index in the EOP database, not edu index!
+		@function M2TWEOPDU.getEopEduEntryIterating
+		@tparam int index - NOT Edu index! this is for looping
+		@treturn eduEntry retEntry
+		@usage
+		for i = 0, M2TWEOPDU.getEopEntryNum()-1 do
+			local entry = M2TWEOPDU.getEopEduEntryIterating(i)
+			--etc
+		end
+		*/
+		tables.M2TWEOPEDUTable.set_function("getEopEduEntryIterating", &eopDu::getEopEduEntryIteratingLua);
 		/***
 		Get the faction's standard bodyguard unit.
 		@function M2TWEOPDU.findGeneralUnit

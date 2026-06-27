@@ -242,7 +242,6 @@ namespace fortHelpers
 		@tfield getSiege getSiege
 		@tfield getCharacter getCharacter
 		@tfield changeOwner changeOwner
-		@tfield changeOwner changeOwner
 		@tfield isAllyToFaction isAllyToFaction
 		@tfield isEnemyToFaction isEnemyToFaction
 		

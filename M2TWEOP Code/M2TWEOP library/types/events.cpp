@@ -4157,7 +4157,7 @@ void luaPlugin::onPluginLoadF()
 	Called every time an image is rendered for display
 
 	@function draw
-	@tparam LPDIRECT3DDEVICE9 pDevice
+	@tparam userdata pDevice
 
 	@usage
 	function draw(device)
@@ -4643,7 +4643,7 @@ void luaPlugin::onPluginLoadF()
 	Called when a faction dies.
 
 	@function onFactionDied
-	@tparam faction faction
+	@tparam factionStruct faction
 
 	@usage
 	function onFactionDied(faction)

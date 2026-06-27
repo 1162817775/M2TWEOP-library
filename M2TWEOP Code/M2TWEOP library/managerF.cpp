@@ -1613,6 +1613,12 @@ void managerF::execPatches()
 	toCreateMercUnitCheck->Enable();
 	f1 << "Done" << '\n';
 
+	f1 << "Start applying onGetUnitEduIndex patch" << '\n';
+	onGetUnitEduIndex* toGetUnitEduIndex = new onGetUnitEduIndex(mem, (LPVOID)patchesForGame::onGetUnitEduIndex, globals::dataS.gameVersion);
+	toGetUnitEduIndex->SetNewCode();
+	toGetUnitEduIndex->Enable();
+	f1 << "Done" << '\n';
+
 	if (globals::dataS.gameCfg.isSaveBackupEnabled == true) {
 		f1 << "Start applying OnQuickSave patch" << '\n';
 		OnQuickSave* onQuickSave = new OnQuickSave(mem, (LPVOID)patchesForGame::onQuickSave, globals::dataS.gameVersion);

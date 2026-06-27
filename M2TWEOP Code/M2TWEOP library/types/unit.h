@@ -2605,6 +2605,7 @@ namespace unitHelpers
 	unit* createUnitIdx2(int index, int regionId, int facNum, int exp, uint8_t arm, uint8_t weapon, int soldiers);
 	unit* createUnitEDB(int edb, int regionID, int facNum, int exp, int arm, int weap);
 	int getEduIndex(const char* type);
+	void setSuppressErrors(bool suppress);
 	eduEntry* getEduEntryByName(const char* type);
 	eduEntry* getEDUEntryById(int id);
 	bool modelExists(const std::string& model);
