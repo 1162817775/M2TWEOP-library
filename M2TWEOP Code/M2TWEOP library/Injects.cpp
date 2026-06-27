@@ -5349,14 +5349,26 @@ void onDamageCoreBuilding2::SetNewCode()
 {
 	const auto a = new Assembler();
 	a->mov(ecx, dword_ptr(eax, 0x14));
-	a->pushad();
+	a->push(esp);
+	a->push(eax);
+	a->push(ebx);
+	a->push(ecx);
+	a->push(edx);
+	a->push(edi);
+	a->push(esi);
 	a->mov(edx, ecx);
 	a->mov(ecx, esi);
 	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
 	a->call(eax);
 	a->xor_(ebp, ebp);
 	a->cmp(eax, ebp);
-	a->popad();
+	a->pop(esi);
+	a->pop(edi);
+	a->pop(edx);
+	a->pop(ecx);
+	a->pop(ebx);
+	a->pop(eax);
+	a->pop(esp);
 	a->ret();
 	m_cheatBytes = static_cast<unsigned char*>(a->make());
 	delete a;
@@ -5380,17 +5392,13 @@ void onDamageCoreBuilding3::SetNewCode()
 	a->push(ebx);
 	a->push(ecx);
 	a->push(edx);
-	a->push(esp);
-	a->push(ebp);
 	a->push(esi);
 	a->mov(edx, eax);
-	a->mov(ecx, edi);
+	a->mov(ecx, esi);
 	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
 	a->call(eax);
 	a->mov(edi, eax);
 	a->pop(esi);
-	a->pop(ebp);
-	a->pop(esp);
 	a->pop(edx);
 	a->pop(ecx);
 	a->pop(ebx);
@@ -5413,10 +5421,10 @@ onGetWatchTowerRange::onGetWatchTowerRange(MemWork* mem, LPVOID addr, int ver)
 void onGetWatchTowerRange::SetNewCode()
 {
 	const auto a = new Assembler();
+	a->push(esp);
 	a->push(ebx);
 	a->push(ecx);
 	a->push(edx);
-	a->push(esp);
 	a->push(ebp);
 	a->push(edi);
 	a->push(esi);
@@ -5425,10 +5433,10 @@ void onGetWatchTowerRange::SetNewCode()
 	a->pop(esi);
 	a->pop(edi);
 	a->pop(ebp);
-	a->pop(esp);
 	a->pop(edx);
 	a->pop(ecx);
 	a->pop(ebx);
+	a->pop(esp);
 	a->ret();
 	m_cheatBytes = static_cast<unsigned char*>(a->make());
 	delete a;
@@ -5447,9 +5455,9 @@ onCheckGarrison::onCheckGarrison(MemWork* mem, LPVOID addr, int ver)
 void onCheckGarrison::SetNewCode()
 {
 	const auto a = new Assembler();
+	a->push(esp);
 	a->push(ebx);
 	a->push(ecx);
-	a->push(esp);
 	a->push(ebp);
 	a->push(edi);
 	a->push(esi);
@@ -5460,9 +5468,9 @@ void onCheckGarrison::SetNewCode()
 	a->pop(esi);
 	a->pop(edi);
 	a->pop(ebp);
-	a->pop(esp);
 	a->pop(ecx);
 	a->pop(ebx);
+	a->pop(esp);
 	a->ret();
 	m_cheatBytes = static_cast<unsigned char*>(a->make());
 	delete a;
@@ -5481,11 +5489,11 @@ onValidateGarrison::onValidateGarrison(MemWork* mem, LPVOID addr, int ver)
 void onValidateGarrison::SetNewCode()
 {
 	const auto a = new Assembler();
+	a->push(esp);
 	a->push(eax);
 	a->push(edx);
 	a->push(ebx);
 	a->push(ecx);
-	a->push(esp);
 	a->push(ebp);
 	a->push(edi);
 	a->push(esi);
@@ -5497,11 +5505,11 @@ void onValidateGarrison::SetNewCode()
 	a->pop(esi);
 	a->pop(edi);
 	a->pop(ebp);
-	a->pop(esp);
 	a->pop(ecx);
 	a->pop(ebx);
 	a->pop(edx);
 	a->pop(eax);
+	a->pop(esp);
 	a->ret();
 	m_cheatBytes = static_cast<unsigned char*>(a->make());
 	delete a;
@@ -5521,10 +5529,10 @@ void onGeneralAssaultAction::SetNewCode()
 {
 	const auto a = new Assembler();
 	const auto label = a->newLabel();
+	a->push(esp);
 	a->push(edx);
 	a->push(ebx);
 	a->push(ecx);
-	a->push(esp);
 	a->push(ebp);
 	a->push(eax);
 	a->mov(esi, ecx);
@@ -5532,10 +5540,10 @@ void onGeneralAssaultAction::SetNewCode()
 	a->call(eax);
 	a->pop(edi);
 	a->pop(ebp);
-	a->pop(esp);
 	a->pop(ecx);
 	a->pop(ebx);
 	a->pop(edx);
+	a->pop(esp);
 	a->test(eax, eax);
 	a->mov(eax, edi);
 	a->jnz(label);
@@ -7597,12 +7605,12 @@ onElephantHitpointDamage::onElephantHitpointDamage(MemWork* mem, LPVOID addr, in
 void onElephantHitpointDamage::SetNewCode()
 {
 	const auto a = new Assembler();
+	a->push(esp);
 	a->push(eax);
 	a->push(ecx);
 	a->push(edx);
 	a->push(esi);
 	a->push(edi);
-	a->push(esp);
 	a->push(ebp);
 	a->pushf();
 	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
@@ -7610,12 +7618,12 @@ void onElephantHitpointDamage::SetNewCode()
 	a->mov(ebx, eax);
 	a->popf();
 	a->pop(ebp);
-	a->pop(esp);
 	a->pop(edi);
 	a->pop(esi);
 	a->pop(edx);
 	a->pop(ecx);
 	a->pop(eax);
+	a->pop(esp);
 	a->ret();
 	m_cheatBytes = static_cast<unsigned char*>(a->make());
 	delete a;
