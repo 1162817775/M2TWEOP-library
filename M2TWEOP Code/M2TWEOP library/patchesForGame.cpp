@@ -3164,8 +3164,9 @@ int minHookFunctions::displayMissileStats(eduEntry* entry, int exp, int wpn)
 {
 	if (entry->engineStats.isValid)
 		return entry->engineStats.attack;
-	
-	return entry->priStats.attack + wpn * m2tweopOptions::weaponBonusModifier;
+	if (m2tweopOptions::enableRangedWeaponUpg)
+		return entry->priStats.attack + wpn * m2tweopOptions::weaponBonusModifier;
+	return entry->priStats.attack;
 }
 
 int combatExperienceBonuses[10] = {0, 1, 1, 1, 2, 2, 2, 3, 3, 3};
