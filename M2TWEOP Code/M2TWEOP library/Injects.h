@@ -2643,6 +2643,19 @@ private:
 };
 
 
+class onGetUnitEduIndex
+	:public AATemplate
+{
+public:
+	onGetUnitEduIndex(MemWork* mem, LPVOID addr, int ver);
+	~onGetUnitEduIndex() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+
 class onUpdateSpear
 	:public AATemplate
 {

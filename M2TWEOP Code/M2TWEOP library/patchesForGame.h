@@ -171,6 +171,7 @@ public:
 	static void __fastcall onUpdateControllerAlloc(aiCampaignController* controller);
 	static int __fastcall onScoreBestCapital(const settlementStruct* sett);
 	static int __fastcall onGetUnitCard(const eduEntry* entry, int factionId, stringWithHash* newPath);
+	static int __fastcall onGetUnitEduIndex(const stringWithHash* entryName);
 	static int __fastcall onGetUnitInfoCard(const eduEntry* entry, int factionId, stringWithHash* newPath);
 	static int __fastcall onAssessRequiredStrength(const aiRegionController* controller);
 	static int __fastcall onCalcGarrisonStr(const aiRegionData* regData, const factionStruct* fac, const settlementStruct* sett);

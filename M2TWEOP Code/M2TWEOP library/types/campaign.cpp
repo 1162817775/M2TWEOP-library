@@ -644,6 +644,7 @@ namespace campaignHelpers
 		@tfield getFactionByID getFactionByID
 		@tfield getFactionByOrder getFactionByOrder
 		@tfield isPlayableFaction isPlayableFaction
+		@tfield setPlayableFaction setPlayableFaction
 		@tfield isPlayerFaction isPlayerFaction
 		@tfield isExistingFaction isExistingFaction
 		@tfield getNumberOfMarriages getNumberOfMarriages
@@ -900,6 +901,19 @@ namespace campaignHelpers
 		end
 		*/
 		typeAll.campaignTable.set_function("isPlayableFaction", &campaign::isPlayableFaction);
+		/***
+		Set if a faction is playable.
+		@function campaignStruct:setPlayableFaction
+		@tparam int factionID
+		@tparam bool set
+		@usage
+		local campaign = M2TW.campaign
+		for i = 0, campaign.numberOfFactions - 1 do
+			local fac = campaign:getFactionByOrder(i)
+    	    campaign:setPlayableFaction(fac.factionID, true)
+		end
+		*/
+		typeAll.campaignTable.set_function("setPlayableFaction", &campaign::setPlayableFaction);
 		/***
 		Check if a faction is player controlled.
 		@function campaignStruct:isPlayerFaction

@@ -1768,6 +1768,13 @@ int patchesForGame::onGetUnitCard(const eduEntry* entry, const int factionId, st
 	return 0;
 }
 
+int patchesForGame::onGetUnitEduIndex(const stringWithHash* entryName)
+{
+	if (!entryName || !entryName->name)
+		return -1;
+	return unitHelpers::getEduIndex(entryName->name);
+}
+
 int patchesForGame::onGetUnitInfoCard(const eduEntry* entry, const int factionId, stringWithHash* newPath)
 {
 	if (!m2tweopOptions::getHandleUnitCards())

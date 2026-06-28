@@ -87,7 +87,7 @@ void luaPlugin::initEopFbx()
 	@function M2TWEOPFBX.addFbxObject
 	@tparam int modelID Model's ID that was specified when calling addFbxModel()
 	@tparam int objectID The ID that the object should use
-	@treturn fbxObject The newly created FBX object (not it's ID)
+	@treturn userdata The newly created FBX object (not it's ID)
 
 	@usage
 	--1 is model id here
@@ -101,7 +101,7 @@ void luaPlugin::initEopFbx()
 	/***
 	Delete an fbx object.
 	@function M2TWEOPFBX.deleteFbxObject
-	@tparam fbxObject object The created FBX object (not it's ID)
+	@tparam userdata object The created FBX object (not it's ID)
 
 	@usage
 	--1 is model id here
@@ -117,7 +117,7 @@ void luaPlugin::initEopFbx()
 	Get an fbx object by it's ID.
 	@function M2TWEOPFBX.getFbxObject
 	@tparam objectID int The ID of the FBX object you wish to retrieve
-	@treturn fbxObject The created FBX object (not it's ID)
+	@treturn userdata The created FBX object (not it's ID)
 
 	@usage
 	--1 is model id here
@@ -134,7 +134,7 @@ void luaPlugin::initEopFbx()
 	/***
 	Set an fbx object's coordinates.
 	@function M2TWEOPFBX.setFbxObjectCoords
-	@tparam fbxObject fbx object
+	@tparam userdata fbx object
 	@tparam float x coord
 	@tparam float y coord
 	@tparam float z coord
@@ -153,7 +153,7 @@ void luaPlugin::initEopFbx()
 	/***
 	Get an fbx object's coordinates.
 	@function M2TWEOPFBX.getFbxObjectCoords
-	@tparam fbxObject fbx object
+	@tparam userdata fbx object
 	@treturn float x coord
 	@treturn float y coord
 	@treturn float z coord
@@ -173,7 +173,7 @@ void luaPlugin::initEopFbx()
 	/***
 	Set an fbx object's size modifier.
 	@function M2TWEOPFBX.setFbxObjectSize
-	@tparam fbxObject fbx object
+	@tparam userdata fbx object
 	@tparam float sizeModifier object size modifier
 
 	@usage
@@ -194,7 +194,7 @@ void luaPlugin::initEopFbx()
 	/***
 	Get an fbx object's size modifier.
 	@function M2TWEOPFBX.getFbxObjectSize
-	@tparam fbxObject fbx object
+	@tparam userdata fbx object
 	@treturn float sizeModifier object size modifier
 	@usage
 	--1 is model id here
@@ -215,7 +215,7 @@ void luaPlugin::initEopFbx()
 	/***
 	Set an fbx object's draw state.
 	@function M2TWEOPFBX.setFbxObjectDrawState
-	@tparam fbxObject fbx object
+	@tparam userdata fbx object
 	@tparam bool is draw needed
 
 	@usage
@@ -240,7 +240,7 @@ void luaPlugin::initEopFbx()
 	/***
 	Get an fbx object's draw state.
 	@function M2TWEOPFBX.getFbxObjectDrawState
-	@tparam fbxObject fbx object
+	@tparam userdata fbx object
 	@treturn bool is draw needed
 
 	@usage
@@ -267,7 +267,7 @@ void luaPlugin::initEopFbx()
 	/***
 	Set an fbx object's animation state.
 	@function M2TWEOPFBX.setFbxObjectAnimState
-	@tparam fbxObject fbx object
+	@tparam userdata fbx object
 	@tparam bool is animation needed
 
 	@usage
@@ -294,7 +294,7 @@ void luaPlugin::initEopFbx()
 	/***
 	Get an fbx object's animation state.
 	@function M2TWEOPFBX.getFbxObjectAnimState
-	@tparam fbxObject fbx object
+	@tparam userdata fbx object
 	@treturn bool is animation needed
 
 	@usage
@@ -329,7 +329,7 @@ void luaPlugin::initEopFbx()
 	Default value - 1
 
 	@function M2TWEOPFBX.setFbxObjectDrawType
-	@tparam fbxObject fbx object
+	@tparam userdata fbx object
 	@tparam int current draw type
 
 	@usage
@@ -370,7 +370,7 @@ void luaPlugin::initEopFbx()
 	Default value - 1
 
 	@function M2TWEOPFBX.getFbxObjectDrawType
-	@tparam fbxObject fbx object
+	@tparam userdata fbx object
 	@treturn int current draw type
 
 	@usage

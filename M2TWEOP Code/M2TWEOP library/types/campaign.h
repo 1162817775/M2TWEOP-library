@@ -645,6 +645,15 @@ public:
 			return false;
 		return (playableFactionsBitmap & (1 << index)) != 0;
 	}
+	void setPlayableFaction(int index, bool set)
+	{
+		if (index < 0 || index >= 31)
+			return;
+		if (set)
+			playableFactionsBitmap |= (1 << index);
+		else
+			playableFactionsBitmap &= ~(1 << index);
+	}
 	bool isPlayerFaction(int index)
 	{
 		if (index < 0 || index >= 31)

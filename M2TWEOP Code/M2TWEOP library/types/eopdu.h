@@ -35,6 +35,7 @@ public:
     static eopEduEntry* getEopEduEntryInternal(int idx);
     static eopEduEntry* getEopEduEntryInternalIterating(int idx);
     static int getEopEntryNum();
+    static eduEntry* getEopEduEntryIteratingLua(int idx);
     static char* getEopNameOfEduEntry(const eduEntry* entryAddress);
     static eduEntry* getEopEduEntryByName(const char* entryName);
     static eduEntry* getEduEntry(int idx);
