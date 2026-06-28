@@ -559,7 +559,7 @@ namespace eopDuHelpers
 		*/
 		tables.M2TWEOPEDUTable.set_function("setEntrySoldierModel", &eopDu::setEntrySoldierModelLua);
 		/***
-		Get an eop entry by using it's index in the EOP database, not edu index!
+		Get an eop entry by using its index in the EOP database, not edu index!
 		@function M2TWEOPDU.getEopEduEntryIterating
 		@tparam int index - NOT Edu index! this is for looping
 		@treturn eduEntry retEntry

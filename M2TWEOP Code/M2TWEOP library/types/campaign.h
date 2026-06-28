@@ -744,6 +744,7 @@ public:
 	factionStruct* getFactionHashed(const std::string& name);
 	std::string getCampaignPath();
 	bool isMicroManageAll();
+	void switchFactionOrder(factionStruct* fac1, factionStruct* fac2);
 };
 
 struct stratPortModel {

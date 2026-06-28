@@ -73,7 +73,7 @@ void luaPlugin::initEopFbx()
 	Get an added fbx model by it's ID.
 	@function M2TWEOPFBX.getFbxModel
 	@tparam int modelID Model's ID that was specified when calling addFbxModel()
-	@treturn fbxModel fbx model, not it`s ID!
+	@treturn userdata fbx model, not it`s ID!
 
 	@usage
 	--1 is id here
@@ -116,8 +116,8 @@ void luaPlugin::initEopFbx()
 	/***
 	Get an fbx object by it's ID.
 	@function M2TWEOPFBX.getFbxObject
-	@tparam objectID int The ID of the FBX object you wish to retrieve
-	@treturn userdata The created FBX object (not it's ID)
+	@tparam integer objectID The ID of the FBX object you wish to retrieve
+	@treturn userdata The created FBX object (not its ID)
 
 	@usage
 	--1 is model id here
