@@ -27,7 +27,7 @@ inline bool operator == (int a, battleType b)
 
 inline bool operator != (int a, battleType b)
 {
-	return a == static_cast<int>(b);
+	return a != static_cast<int>(b);
 }
 
 enum class battleGroundType

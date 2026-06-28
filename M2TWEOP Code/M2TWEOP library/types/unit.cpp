@@ -2010,7 +2010,7 @@ void luaPlugin::initUnits()
 	types.unit.set("nearbyFriendlyUnitsNum", &unit::nearbyFriendlyUnitsNum);
 	types.unit.set("nearbyEnemyUnitsNum", &unit::nearbyEnemyUnitsNum);
 	/***
-	Kill this unit
+	Kill this unit. It disbands the unit, including returning to recruitment pool if disband_to_pools is true for its faction.
 	@function unit:kill
 	@usage
 	unit:kill();

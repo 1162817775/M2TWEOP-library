@@ -1462,7 +1462,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	Called at a character's turn start.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onCharacterTurnStart
 	@tparam eventTrigger eventData
@@ -1475,7 +1475,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A captured character has been successfully ransomed back from the enemy.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onCapturedCharacterRansomed
 	@tparam eventTrigger eventData
@@ -1488,7 +1488,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A captured character has been released by the enemy.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onCapturedCharacterReleased
 	@tparam eventTrigger eventData
@@ -1501,7 +1501,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A character father died of natural causes.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onFatherDiesNatural
 	@tparam eventTrigger eventData
@@ -1514,7 +1514,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	When a battle is about to start but one of the armies withdraws.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onPreBattleWithdrawal
 	@tparam eventTrigger eventData
@@ -1527,7 +1527,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	When a battle has finished.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onPostBattle
 	@tparam eventTrigger eventData
@@ -1540,7 +1540,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A General has hired some mercenaries.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onHireMercenaries
 	@tparam eventTrigger eventData
@@ -1553,7 +1553,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A General has captured a residence such as a fort or watchtower.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onGeneralCaptureResidence
 	@tparam eventTrigger eventData
@@ -1566,7 +1566,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A faction has been destroyed.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onLeaderDestroyedFaction
 	@tparam eventTrigger eventData
@@ -1579,7 +1579,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	An adoption has been proposed.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onOfferedForAdoption
 	@tparam eventTrigger eventData
@@ -1592,7 +1592,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A lesser general adoption has been proposed (man of the hour event).
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onLesserGeneralOfferedForAdoption
 	@tparam eventTrigger eventData
@@ -1605,7 +1605,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A marriage offer has been proposed.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onOfferedForMarriage
 	@tparam eventTrigger eventData
@@ -1618,7 +1618,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A brother has been adopted.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onBrotherAdopted
 	@tparam eventTrigger eventData
@@ -1631,7 +1631,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A child is born to the faction leader.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onBirth
 	@tparam eventTrigger eventData
@@ -1644,7 +1644,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A character has come of age.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onCharacterComesOfAge
 	@tparam eventTrigger eventData
@@ -1657,7 +1657,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A character has married.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onCharacterMarries
 	@tparam eventTrigger eventData
@@ -1670,7 +1670,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A character has married a princess.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onCharacterMarriesPrincess
 	@tparam eventTrigger eventData
@@ -1683,7 +1683,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A marriage alliance is possible.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onMarriageAlliancePossible
 	@tparam eventTrigger eventData
@@ -1696,7 +1696,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A marriage alliance has been offered.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onMarriageAllianceOffered
 	@tparam eventTrigger eventData
@@ -1709,7 +1709,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A priest has gone mad.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onPriestBecomesHeretic
 	@tparam eventTrigger eventData
@@ -1722,7 +1722,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A character is adjacent to a heretic.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onCharacterNearHeretic
 	@tparam eventTrigger eventData
@@ -1735,7 +1735,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A character is adjacent to a witch.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onCharacterNearWitch
 	@tparam eventTrigger eventData
@@ -1748,7 +1748,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A character has been promoted to a cardinal.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onCardinalPromoted
 	@tparam eventTrigger eventData
@@ -1761,7 +1761,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A character has become a father.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onCharacterBecomesAFather
 	@tparam eventTrigger eventData
@@ -1774,7 +1774,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A General and his army has devastated an enemy's fertile land.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onGeneralDevastatesTile
 	@tparam eventTrigger eventData
@@ -1787,7 +1787,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A spying mission has failed and the spy is executed by the target.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onExecutesASpyOnAMission
 	@tparam eventTrigger eventData
@@ -1800,7 +1800,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	An assassination mission has failed and the assassin is executed by the target.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onExecutesAnAssassinOnAMission
 	@tparam eventTrigger eventData
@@ -1813,7 +1813,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	Someone has had an attempt on their life.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onSufferAssassinationAttempt
 	@tparam eventTrigger eventData
@@ -1826,7 +1826,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	Someone has had an attempt on their assets.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onSufferAcquisitionAttempt
 	@tparam eventTrigger eventData
@@ -1839,7 +1839,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	Someone has had an attempt on their bachelorhood.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onSufferMarriageAttempt
 	@tparam eventTrigger eventData
@@ -1852,7 +1852,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	Someone has had a denouncement attempt.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onSufferDenouncementAttempt
 	@tparam eventTrigger eventData
@@ -1865,7 +1865,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A Faction leader has ordered a sabotage mission.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onLeaderOrderedSabotage
 	@tparam eventTrigger eventData
@@ -1878,7 +1878,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	Someone has been bribed.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onAcceptBribe
 	@tparam eventTrigger eventData
@@ -1891,7 +1891,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	Someone has refused a bribe.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onRefuseBribe
 	@tparam eventTrigger eventData
@@ -1904,7 +1904,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	Insurgence has been provoked.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onInsurrection
 	@tparam eventTrigger eventData
@@ -1917,7 +1917,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A Faction leader has ordered a diplomacy mission.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onLeaderOrderedDiplomacy
 	@tparam eventTrigger eventData
@@ -1930,7 +1930,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A new admiral has been created for a new ship.
-	Exports: stratCharacter, character, faction, regionID, characterType, religion
+	Exports: stratCharacter (character), character (characterRecord), faction, regionID, characterType, religion
 
 	@function onNewAdmiralCreated
 	@tparam eventTrigger eventData
@@ -1943,7 +1943,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A building has been destroyed.
-	Exports: character, faction, regionID, characterType, religion, settlement
+	Exports: character (characterRecord), faction, regionID, characterType, religion, settlement
 
 	@function onGovernorBuildingDestroyed
 	@tparam eventTrigger eventData
@@ -1956,7 +1956,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	Games have been thrown.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onGovernorThrowGames
 	@tparam eventTrigger eventData
@@ -1969,7 +1969,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	Races have been thrown.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onGovernorThrowRaces
 	@tparam eventTrigger eventData
@@ -1982,7 +1982,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	The player has selected a character.
-	Exports: character, targetSettlement, faction, regionID, characterType, religion
+	Exports: character (characterRecord), targetSettlement, faction, regionID, characterType, religion
 
 	@function onCharacterSelected
 	@tparam eventTrigger eventData
@@ -1995,7 +1995,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	The player has selected an enemy character.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onEnemyCharacterSelected
 	@tparam eventTrigger eventData
@@ -2008,7 +2008,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	The player has selected a position beyond the character's extents.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onMultiTurnMove
 	@tparam eventTrigger eventData
@@ -2021,7 +2021,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	The player has opened the panel for the selected character.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onCharacterPanelOpen
 	@tparam eventTrigger eventData
@@ -2034,7 +2034,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A mission has been completed.
-	Exports: character, faction, regionID, characterType, missionDetails, religion
+	Exports: character (characterRecord), faction, regionID, characterType, missionDetails, religion
 
 	@function onLeaderMissionSuccess
 	@tparam eventTrigger eventData
@@ -2047,7 +2047,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A mission has failed.
-	Exports: character, faction, regionID, characterType, missionDetails, religion
+	Exports: character (characterRecord), faction, regionID, characterType, missionDetails, religion
 
 	@function onLeaderMissionFailed
 	@tparam eventTrigger eventData
@@ -2060,7 +2060,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A General has been sent on Crusade/Jihad.
-	Exports: character, targetSettlement, faction, targetFaction, regionID, targetRegionID, characterType, religion, targetReligion, crusade
+	Exports: character (characterRecord), targetSettlement, faction, targetFaction, regionID, targetRegionID, characterType, religion, targetReligion, crusade
 
 	@function onGeneralJoinCrusade
 	@tparam eventTrigger eventData
@@ -2073,7 +2073,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A General has left a Crusade/Jihad.
-	Exports: character, targetSettlement, faction, targetFaction, regionID, targetRegionID, characterType, religion, targetReligion, crusade
+	Exports: character (characterRecord), targetSettlement, faction, targetFaction, regionID, targetRegionID, characterType, religion, targetReligion, crusade
 
 	@function onGeneralAbandonCrusade
 	@tparam eventTrigger eventData
@@ -2086,7 +2086,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A General has arrived in the Crusade/Jihad target region.
-	Exports: character, targetSettlement, faction, targetFaction, army, regionID, targetRegionID, characterType, religion, targetReligion, crusade
+	Exports: character (characterRecord), targetSettlement, faction, targetFaction, army, regionID, targetRegionID, characterType, religion, targetReligion, crusade
 
 	@function onGeneralArrivesCrusadeTargetRegion
 	@tparam eventTrigger eventData
@@ -2099,7 +2099,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A General has taken the Crusade/Jihad target settlement.
-	Exports: character, targetSettlement, faction, targetFaction, regionID, targetRegionID, characterType, religion, targetReligion, crusade
+	Exports: character (characterRecord), targetSettlement, faction, targetFaction, regionID, targetRegionID, characterType, religion, targetReligion, crusade
 
 	@function onGeneralTakesCrusadeTarget
 	@tparam eventTrigger eventData
@@ -2112,7 +2112,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A Character has finished its turn.
-	Exports: character, settlement, faction, regionID, characterType, religion
+	Exports: character (characterRecord), settlement, faction, regionID, characterType, religion
 
 	@function onCharacterTurnEnd
 	@tparam eventTrigger eventData
@@ -2125,7 +2125,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A Character has finished its turn in a settlement.
-	Exports: character, settlement, faction, regionID, characterType, religion
+	Exports: character (characterRecord), settlement, faction, regionID, characterType, religion
 
 	@function onCharacterTurnEndInSettlement
 	@tparam eventTrigger eventData
@@ -2138,7 +2138,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	The character has been made the faction leader.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onBecomesFactionLeader
 	@tparam eventTrigger eventData
@@ -2151,7 +2151,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	The character is no longer faction leader.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onCeasedFactionLeader
 	@tparam eventTrigger eventData
@@ -2164,7 +2164,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	The character has been made a faction heir.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onBecomesFactionHeir
 	@tparam eventTrigger eventData
@@ -2177,7 +2177,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	The character is no longer faction heir.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onCeasedFactionHeir
 	@tparam eventTrigger eventData
@@ -2190,7 +2190,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A character has been injured by a disaster.
-	Exports: character, faction, regionID, disasterType, characterType, religion
+	Exports: character (characterRecord), faction, regionID, disasterType, characterType, religion
 	disasterTypes: earthquake, flood, horde, storm, volcano, dustbowl, locusts, famine, plague, riot, fire
 
 	@function onCharacterDamagedByDisaster
@@ -2204,7 +2204,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A General has captured a settlement.
-	Exports: character, settlement, targetSettlement, faction, targetFaction, regionID, characterType, religion
+	Exports: character (characterRecord), settlement, targetSettlement, faction, targetFaction, regionID, characterType, religion
 
 	@function onGeneralCaptureSettlement
 	@tparam eventTrigger eventData
@@ -2217,7 +2217,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	An assault has taken place. NOTE: settlement and fort are not in eventData! They are separate arguments!.
-	Exports: character, faction, targetFaction, regionID, targetRegionID, characterType, religion, targetReligion
+	Exports: character (characterRecord), faction, targetFaction, regionID, targetRegionID, characterType, religion, targetReligion
 
 	@function onGeneralAssaultsResidence
 	@tparam eventTrigger eventData
@@ -2232,7 +2232,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	An assault has taken place.
-	Exports: character, targetCharacter, faction, targetFaction, regionID, characterType, targetCharacterType, religion, targetReligion
+	Exports: character (characterRecord), targetCharacter, faction, targetFaction, regionID, characterType, targetCharacterType, religion, targetReligion
 
 	@function onGeneralAssaultsGeneral
 	@tparam eventTrigger eventData
@@ -2245,7 +2245,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A general on crusade/jihad has been attacked by other character (it includes crusading generals attacked in a residence or on navy and generals attacked by spotted and killed assassin).
-	Exports: character, targetCharacter, faction, targetFaction, regionID, characterType, targetCharacterType, religion, targetReligion
+	Exports: character (characterRecord), targetCharacter, faction, targetFaction, regionID, characterType, targetCharacterType, religion, targetReligion
 
 	@function onCharacterAttacksCrusadingGeneral
 	@tparam eventTrigger eventData
@@ -2258,7 +2258,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A General of a captor faction has made a ransom decision.
-	Exports: character, faction, targetFaction, regionID, characterType, religion, targetReligion, captureInfo, ransomType
+	Exports: character (characterRecord), faction, targetFaction, regionID, characterType, religion, targetReligion, captureInfo, ransomType
 	ransomType: ransom, execute, release, cannot_pay_ransom
 
 	@function onGeneralPrisonersRansomedCaptor
@@ -2272,7 +2272,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A General of a captive faction has made a ransom decision.
-	Exports: character, faction, targetFaction, regionID, characterType, religion, targetReligion, captureInfo, ransomType
+	Exports: character (characterRecord), faction, targetFaction, regionID, characterType, religion, targetReligion, captureInfo, ransomType
 
 	@function onGeneralPrisonersRansomedCaptive
 	@tparam eventTrigger eventData
@@ -2285,7 +2285,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A captor faction has made a ransom decision.
-	Exports: character, faction, targetFaction, regionID, characterType, religion, targetReligion, captureInfo, ransomType
+	Exports: character (characterRecord), faction, targetFaction, regionID, characterType, religion, targetReligion, captureInfo, ransomType
 
 	@function onFactionLeaderPrisonersRansomedCaptor
 	@tparam eventTrigger eventData
@@ -2298,7 +2298,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A captive faction has made a ransom decision.
-	Exports: character, faction, targetFaction, regionID, characterType, religion, targetReligion, captureInfo, ransomType
+	Exports: character (characterRecord), faction, targetFaction, regionID, characterType, religion, targetReligion, captureInfo, ransomType
 
 	@function onFactionLeaderPrisonersRansomedCaptive
 	@tparam eventTrigger eventData
@@ -2311,7 +2311,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A spy mission has completed. May also export fort or settlement if target was a garrison residence.
-	Exports: character, settlement, fort, faction, targetFaction, regionID, characterType, missionSuccessLevel, missionProbability, religion, targetReligion
+	Exports: character (characterRecord), settlement, fort, faction, targetFaction, regionID, characterType, missionSuccessLevel, missionProbability, religion, targetReligion
 	missionSuccessLevel: not_successful, slightly_successful, partly_successful, highly_successful
 
 	@function onSpyMission
@@ -2325,7 +2325,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	An assassination mission has completed.
-	Exports: character, faction, regionID, characterType, missionSuccessLevel, missionProbability, religion
+	Exports: character (characterRecord), faction, regionID, characterType, missionSuccessLevel, missionProbability, religion
 	missionSuccessLevel: not_successful, slightly_successful, partly_successful, highly_successful
 
 	@function onAssassinationMission
@@ -2339,7 +2339,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	An acquisition mission has completed.
-	Exports: character, faction, regionID, characterType, missionSuccessLevel, missionProbability, religion
+	Exports: character (characterRecord), faction, regionID, characterType, missionSuccessLevel, missionProbability, religion
 	missionSuccessLevel: not_successful, slightly_successful, partly_successful, highly_successful
 
 	@function onAcquisitionMission
@@ -2353,7 +2353,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A marriage mission has completed.
-	Exports: character, faction, regionID, characterType, missionSuccessLevel, missionProbability, religion
+	Exports: character (characterRecord), faction, regionID, characterType, missionSuccessLevel, missionProbability, religion
 	missionSuccessLevel: not_successful, slightly_successful, partly_successful, highly_successful
 
 	@function onMarriageMission
@@ -2367,7 +2367,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A denouncement mission has completed.
-	Exports: character, faction, regionID, characterType, missionSuccessLevel, missionProbability, religion
+	Exports: character (characterRecord), faction, regionID, characterType, missionSuccessLevel, missionProbability, religion
 	missionSuccessLevel: not_successful, slightly_successful, partly_successful, highly_successful
 
 	@function onDenouncementMission
@@ -2381,7 +2381,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A sabotage mission has completed.
-	Exports: character, faction, regionID, characterType, missionSuccessLevel, missionProbability, religion
+	Exports: character (characterRecord), faction, regionID, characterType, missionSuccessLevel, missionProbability, religion
 	missionSuccessLevel: not_successful, slightly_successful, partly_successful, highly_successful
 
 	@function onSabotageMission
@@ -2395,7 +2395,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A bribery mission has completed.
-	Exports: character, faction, targetFaction, regionID, characterType, missionSuccessLevel, religion, targetReligion
+	Exports: character (characterRecord), faction, targetFaction, regionID, characterType, missionSuccessLevel, religion, targetReligion
 	missionSuccessLevel: not_successful, slightly_successful, partly_successful, highly_successful
 	
 	@function onBriberyMission
@@ -2409,7 +2409,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A diplomacy mission has completed.
-	Exports: character, faction, targetFaction, regionID, characterType, missionSuccessLevel, religion, targetReligion
+	Exports: character (characterRecord), faction, targetFaction, regionID, characterType, missionSuccessLevel, religion, targetReligion
 	missionSuccessLevel: not_successful, slightly_successful, partly_successful, highly_successful
 	
 	@function onDiplomacyMission
@@ -2423,7 +2423,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A Faction leader has ordered a spying mission.
-	Exports: character, settlement, fort, faction, targetFaction, regionID, characterType, missionSuccessLevel, religion, targetReligion
+	Exports: character (characterRecord), settlement, fort, faction, targetFaction, regionID, characterType, missionSuccessLevel, religion, targetReligion
 	missionSuccessLevel: not_successful, slightly_successful, partly_successful, highly_successful
 	
 	@function onLeaderOrderedSpyingMission
@@ -2437,7 +2437,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A Faction leader has ordered an assassination mission.
-	Exports: character, targetCharacter, faction, regionID, characterType, missionSuccessLevel, religion
+	Exports: character (characterRecord), targetCharacter, faction, regionID, characterType, missionSuccessLevel, religion
 	missionSuccessLevel: not_successful, slightly_successful, partly_successful, highly_successful
 
 	@function onLeaderOrderedAssassination
@@ -2451,7 +2451,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A Faction leader has ordered a bribery mission.
-	Exports: character, faction, regionID, characterType, religion
+	Exports: character (characterRecord), faction, regionID, characterType, religion
 
 	@function onLeaderOrderedBribery
 	@tparam eventTrigger eventData
@@ -2646,7 +2646,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A settlement has been captured and occupied.
-	Exports: character, faction, targetFaction, regionID, characterType, religion, targetReligion
+	Exports: character (characterRecord), faction, targetFaction, regionID, characterType, religion, targetReligion
 
 	@function onOccupySettlement
 	@tparam eventTrigger eventData
@@ -2659,7 +2659,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A settlement has been captured and sacked.
-	Exports: character, faction, targetFaction, regionID, characterType, religion, targetReligion
+	Exports: character (characterRecord), faction, targetFaction, regionID, characterType, religion, targetReligion
 
 	@function onSackSettlement
 	@tparam eventTrigger eventData
@@ -2672,7 +2672,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A settlement has been captured and some of its population has been decimated.
-	Exports: character, faction, targetFaction, regionID, characterType, religion, targetReligion
+	Exports: character (characterRecord), faction, targetFaction, regionID, characterType, religion, targetReligion
 
 	@function onExterminatePopulation
 	@tparam eventTrigger eventData
@@ -2737,7 +2737,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A settlement has rioted.
-	Exports: character, settlement, faction, targetFaction, regionID, characterType, religion, targetReligion
+	Exports: character (characterRecord), settlement, faction, targetFaction, regionID, characterType, religion, targetReligion
 
 	@function onGovernorCityRiots
 	@tparam eventTrigger eventData
@@ -2750,7 +2750,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A settlement has rebelled.
-	Exports: character, settlement, faction, targetFaction, regionID, characterType, religion, targetReligion
+	Exports: character (characterRecord), settlement, faction, targetFaction, regionID, characterType, religion, targetReligion
 
 	@function onGovernorCityRebels
 	@tparam eventTrigger eventData
@@ -3145,7 +3145,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A unit has been trained.
-	Exports: character, settlement, faction, regionID, playerUnit, eduEntry, characterType, religion
+	Exports: character (characterRecord), settlement, faction, regionID, playerUnit, eduEntry, characterType, religion
 
 	@function onGovernorUnitTrained
 	@tparam eventTrigger eventData
@@ -3158,7 +3158,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A building has been completed.
-	Exports: character, settlement, faction, regionID, priorBuild, characterType, religion
+	Exports: character (characterRecord), settlement, faction, regionID, priorBuild, characterType, religion
 
 	@function onGovernorBuildingCompleted
 	@tparam eventTrigger eventData
@@ -3171,7 +3171,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	An agent has been trained.
-	Exports: character, settlement, faction, regionID, characterType, religion
+	Exports: character (characterRecord), settlement, faction, regionID, characterType, religion
 
 	@function onAgentCreated
 	@tparam eventTrigger eventData
@@ -3184,7 +3184,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	An agent has been trained.
-	Exports: character, settlement, faction, regionID, characterType, religion
+	Exports: character (characterRecord), settlement, faction, regionID, characterType, religion
 
 	@function onGovernorAgentCreated
 	@tparam eventTrigger eventData
@@ -3405,7 +3405,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A general has been routed.
-	Exports: stratCharacter, character
+	Exports: stratCharacter (character), character (characterRecord)
 
 	@function onBattleGeneralRouted
 	@tparam eventTrigger eventData
@@ -3418,7 +3418,7 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	A general has been killed.
-	Exports: stratCharacter
+	Exports: stratCharacter (character)
 
 	@function onBattleGeneralKilled
 	@tparam eventTrigger eventData
