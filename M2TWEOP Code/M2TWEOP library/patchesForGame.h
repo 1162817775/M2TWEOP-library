@@ -374,6 +374,22 @@ public:
 	static t_debugRenderPeg o_debugRenderPeg;
 	static void __cdecl debugRenderPeg(vector2* start, float height, color8888 color, float time);
 	
+	using t_displayMissileStats = int(__thiscall*)(eduEntry* entry, int exp, int wpn);
+	static t_displayMissileStats o_displayMissileStats;
+	static int __thiscall displayMissileStats(eduEntry* entry, int exp, int wpn);
+	
+	using t_displayMeleeStats = int(__thiscall*)(eduEntry* entry, int exp, int wpn);
+	static t_displayMeleeStats o_displayMeleeStats;
+	static int __thiscall displayMeleeStats(eduEntry* entry, int exp, int wpn);
+	
+	using t_displayArmourStats = int(__thiscall*)(eduEntry* entry, int armourUpg);
+	static t_displayArmourStats o_displayArmourStats;
+	static int __thiscall displayArmourStats(eduEntry* entry, int armourUpg);
+	
+	using t_displayDefenseStats = int(__thiscall*)(eduEntry* entry, int exp, int armourUpg);
+	static t_displayDefenseStats o_displayDefenseStats;
+	static int __thiscall displayDefenseStats(eduEntry* entry, int exp, int armourUpg);
+	
 	using t_debugRenderCircle = void(__cdecl*)(vector2* center, float radius, int segments, color8888 color, float time);
 	static t_debugRenderCircle o_debugRenderCircle;
 	static void __cdecl debugRenderCircle(vector2* center, float radius, int segments, color8888 color, float time);

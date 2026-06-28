@@ -3052,6 +3052,10 @@ minHookFunctions::t_debugRenderLine                      minHookFunctions::o_deb
 minHookFunctions::t_debugLineAdd                         minHookFunctions::o_debugLineAdd = nullptr;
 minHookFunctions::t_debugRenderPeg                       minHookFunctions::o_debugRenderPeg = nullptr;
 minHookFunctions::t_debugRenderCircle                    minHookFunctions::o_debugRenderCircle = nullptr;
+minHookFunctions::t_displayMissileStats                  minHookFunctions::o_displayMissileStats = nullptr;
+minHookFunctions::t_displayMeleeStats                    minHookFunctions::o_displayMeleeStats = nullptr;
+minHookFunctions::t_displayArmourStats                   minHookFunctions::o_displayArmourStats = nullptr;
+minHookFunctions::t_displayDefenseStats                  minHookFunctions::o_displayDefenseStats = nullptr;
 
 DWORD minHookFunctions::lastSoundClass = NULL;
 bool minHookFunctions::isUnlockWeaponLimit = false;
@@ -3091,6 +3095,10 @@ void minHookFunctions::init()
 	MIN_HOOK(codes::offsets.debugLineAdd,                            debugLineAdd,                       o_debugLineAdd);
 	MIN_HOOK(codes::offsets.debugRenderPeg,                          debugRenderPeg,                     o_debugRenderPeg);
 	MIN_HOOK(codes::offsets.debugRenderCircle,                       debugRenderCircle,                  o_debugRenderCircle);
+	MIN_HOOK(codes::offsets.displayMissileStats,                     displayMissileStats,                o_displayMissileStats);
+	MIN_HOOK(codes::offsets.displayMeleeStats,                       displayMeleeStats,                  o_displayMeleeStats);
+	MIN_HOOK(codes::offsets.displayArmourStats,                      displayArmourStats,                 o_displayArmourStats);
+	MIN_HOOK(codes::offsets.displayDefenseStats,                     displayDefenseStats,                o_displayDefenseStats);
 }
 
 int __thiscall minHookFunctions::debugLineAdd(void* _this, vector3* start, vector3* end, color8888 color, float time, bool zbuffered)
@@ -3151,6 +3159,66 @@ void minHookFunctions::debugRenderPeg(vector2* start, float height, color8888 co
 	
 	battleHelpers::addDebugLine(&bottom, &top, color.asInt(), time);
 }
+
+int minHookFunctions::displayMissileStats(eduEntry* entry, int exp, int wpn)
+{
+	if (entry->engineStats.isValid)
+		return entry->engineStats.attack;
+	
+	return entry->priStats.attack + wpn * m2tweopOptions::weaponBonusModifier;
+}
+
+int combatExperienceBonuses[10] = {0, 1, 1, 1, 2, 2, 2, 3, 3, 3};
+
+int minHookFunctions::displayMeleeStats(eduEntry* entry, int exp, int wpn)
+{
+	int att = entry->priStats.attack;
+	exp = max(exp, 0);
+	const auto xpBonus = combatExperienceBonuses[min(exp, 9)];
+	if (entry->animalStats.isValid)
+		att = entry->animalStats.attack;
+	else if (entry->mountStats.isValid)
+		att = entry->mountStats.attack;
+	else if (entry->priStats.isMissile || entry->priStats.isPrec)
+		att = entry->secStats.attack;
+	
+	return att + xpBonus + wpn * m2tweopOptions::weaponBonusModifier;
+}
+
+int minHookFunctions::displayArmourStats(eduEntry* entry, int armourUpg)
+{
+	int armour = entry->statPriArmour.armour;
+	if (entry->statArmourAnimal.isValid)
+		armour = entry->statArmourAnimal.armour;
+	else if (entry->statArmourMount.isValid)
+		armour = entry->statArmourMount.armour;
+	
+	return armour + armourUpg * m2tweopOptions::armourBonusModifier;
+}
+
+int minHookFunctions::displayDefenseStats(eduEntry* entry, int exp, int armourUpg)
+{
+	int def = entry->statPriArmour.defense;
+	int shield = 0;
+	int armour = entry->statPriArmour.armour;
+	if (entry->statArmourAnimal.isValid)
+	{
+		def = entry->statArmourAnimal.defense;
+		armour = entry->statArmourAnimal.armour;
+	}
+	else if (entry->statArmourMount.isValid)
+	{
+		def = entry->statArmourMount.defense;
+		armour = entry->statArmourMount.armour;
+	}
+	else
+	{
+		shield = entry->statPriArmour.shield;
+	}
+
+	return def + shield + armour + armourUpg * m2tweopOptions::armourBonusModifier;
+}
+
 constexpr float pi = 3.1415926535897932333797165867879296635503123989707390137482903185973555f;
 
 int16_t rad2tab2(float rad)
