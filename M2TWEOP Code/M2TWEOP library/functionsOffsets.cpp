@@ -395,6 +395,10 @@ void codes::initCodes(int gameVer)
 		offsets.debugLineAdd = 0xD40860;
 		offsets.debugRenderPeg = 0xD411F0;
 		offsets.debugRenderCircle = 0xD41200;
+		offsets.displayMissileStats = 0x8EA440;
+		offsets.displayMeleeStats = 0x8EA460;
+		offsets.displayArmourStats = 0x8EA5D0;
+		offsets.displayDefenseStats = 0x8EA4F0;
 	}
 
 
@@ -793,5 +797,9 @@ void codes::initCodes(int gameVer)
 		offsets.debugLineAdd = 0xD3ABB0;
 		offsets.debugRenderPeg = 0xD3B540;
 		offsets.debugRenderCircle = 0xD3B550;
+		offsets.displayMissileStats = 0x8EAEC0;
+		offsets.displayMeleeStats = 0x8EAEE0;
+		offsets.displayArmourStats = 0x8EB050;
+		offsets.displayDefenseStats = 0x8EAF70;
 	}
 }

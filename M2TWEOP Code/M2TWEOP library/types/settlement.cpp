@@ -555,11 +555,13 @@ namespace settlementHelpers
 			gameHelpers::logStringGame("settlementHelpers.createSettlement: tile is not suitable for settlement.");
 			return nullptr;
 		}
+		stratMapHelpers::setSuppressErrors(true);
 		if (stratMapHelpers::getSettlement(stratMapHelpers::getStratMap(), name))
 		{
 			gameHelpers::logStringGame("settlementHelpers.createSettlement: settlement with this name already exists.");
 			return nullptr;
 		}
+		stratMapHelpers::setSuppressErrors(false);
 		auto neighbours = stratMapHelpers::getNeighbourTiles(xCoord, yCoord);
 		while (true)
 		{

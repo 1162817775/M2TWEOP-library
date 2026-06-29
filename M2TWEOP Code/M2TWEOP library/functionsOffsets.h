@@ -37,6 +37,10 @@ public:
 		DWORD debugLineAdd = NULL;
 		DWORD debugRenderPeg = NULL;
 		DWORD debugRenderCircle = NULL;
+		DWORD displayMissileStats = NULL;
+		DWORD displayMeleeStats = NULL;
+		DWORD displayArmourStats = NULL;
+		DWORD displayDefenseStats = NULL;
 
 		DWORD allocMemFunc = NULL;
 		

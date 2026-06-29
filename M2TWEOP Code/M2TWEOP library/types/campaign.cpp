@@ -346,6 +346,26 @@ void campaign::setFactionProtectorate(const factionStruct* factionOne, const fac
 	GAME_FUNC(void(__thiscall*)(void*, int, int), setProtectorate)(diplomaticStuff, facIdOne, facIdTwo);
 }
 
+void campaign::switchFactionOrder(factionStruct* fac1, factionStruct* fac2)
+{
+	auto order1 = -1;
+	auto order2 = -1;
+	for (int i = 0; i < this->factionCount; ++i)
+	{
+		if (this->factionsSortedByTurnOrder[i] == fac1)
+			order1 = i;
+		else if (this->factionsSortedByTurnOrder[i] == fac2)
+			order2 = i;
+	}
+	if (order1 == -1 || order2 == -1)
+	{
+		gameHelpers::logStringGame("switchFactionOrder: One or both factions not found in turn order.");
+		return;
+	}
+	this->factionsSortedByTurnOrder[order1] = fac2;
+	this->factionsSortedByTurnOrder[order2] = fac1;
+}
+
 scriptEvent::scriptEvent(const std::string& name, const std::string& eventType, const int xCoord, const int yCoord,
 	const int scale, const std::string& movie)
 {
@@ -655,6 +675,7 @@ namespace campaignHelpers
 		@tfield getCharacterByLabel getCharacterByLabel
 		@tfield worldwideAncillaryExists worldwideAncillaryExists
 		@tfield execScriptEvent execScriptEvent
+		@tfield switchFactionOrder switchFactionOrder
 
 		@table campaignStruct
 		*/
@@ -973,6 +994,16 @@ namespace campaignHelpers
         end
 		*/
 		typeAll.campaignTable.set_function("getSettlement", &campaign::getSettlement);
+		
+		/***
+		Switch turn order for 2 factions. Useful to avoid bugs with control command.
+		@function campaignStruct:switchFactionOrder
+		@tparam factionStruct fac1
+		@tparam factionStruct fac2
+		@usage
+    	campaign:switchFactionOrder(fac1, fac2);
+		*/
+		typeAll.campaignTable.set_function("switchFactionOrder", &campaign::switchFactionOrder);
 		/***
 		Add a new .cas character strategy model to the game with a unique name. Only add it after loading to campaign map!
 		@function campaignStruct.addCharacterCas

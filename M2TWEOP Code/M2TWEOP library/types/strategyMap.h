@@ -1063,6 +1063,7 @@ namespace stratMapHelpers
 	bool isTileFreeLua(int x, int y);
 	bool isStratMap();
 	void updateTerrain();
+	void setSuppressErrors(bool suppress);
 	void* getMainStratObject(void* baseObj);
 	UINT32 getTileRegionID(int x, int y);
 	factionStruct* getRegionOwner(int regionID);

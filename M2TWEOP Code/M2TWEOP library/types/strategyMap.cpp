@@ -892,6 +892,13 @@ namespace stratMapHelpers
 		GAME_FUNC(void(__thiscall*)(DWORD), updateRadar)(dataOffsets::offsets.uiNotify);
 	}
 
+	bool SUPPRESS_ERRORS = false;
+
+	void setSuppressErrors(bool suppress)
+	{
+		SUPPRESS_ERRORS = suppress;
+	}
+
 	settlementStruct* getSettlement(stratMap* map, const std::string& name)
 	{
 		if (!plugData::data.luaAll.hashLoaded || plugData::data.luaAll.settlements.empty())
@@ -899,7 +906,8 @@ namespace stratMapHelpers
 		const auto regionId = plugData::data.luaAll.settlements.find(name);
 		if (regionId == plugData::data.luaAll.settlements.end())
 		{
-			gameHelpers::logStringGame("Settlement not found: " + name);
+			if (!SUPPRESS_ERRORS)
+				gameHelpers::logStringGame("Settlement not found: " + name);
 			return nullptr;
 		}
 		const auto region = &map->regions[regionId->second];
