@@ -280,8 +280,11 @@ char* __fastcall patchesForGame::onSaveEDUStringS(const eduEntry* eduEntry)
 {
 	if (!eduEntry)
 		return nullptr;
-	if (const auto eopEntry = eopDu::getEopEduEntryInternal(static_cast<int>(eduEntry->index)); eopEntry && !eopEntry->isFileAdded)
+	const auto eopEntry = eopDu::getEopEduEntryInternal(static_cast<int>(eduEntry->index));
+	if (eopEntry && !eopEntry->isFileAdded && !eopEntry->eopTypeName.empty())
+	{
 		return const_cast<char*>(eopEntry->eopTypeName.c_str());
+	}
 	return eduEntry->eduType;
 }
 
