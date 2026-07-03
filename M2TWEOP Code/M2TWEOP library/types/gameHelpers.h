@@ -467,6 +467,8 @@ public:
 	static void setApIsShieldPiercing(const bool value) { apIsShieldPiercing = value; }
 	static void setAlwaysAbortLua(const bool value) { alwaysAbortLua = value; }
 	static bool getAlwaysAbortLua() { return alwaysAbortLua; }
+	static bool getNoMovementResetOnFlee() { return noMovementResetOnFlee; }
+	static void setNoMovementResetOnFlee(const bool value) { noMovementResetOnFlee = value; }
 	static DWORD getColor() { return (static_cast<uint32_t>(0xFF) << 24) | (khakiTextRed << 16) | (khakiTextGreen << 8) | khakiTextBlue; }
 	static void setKhakiTextColor(const uint8_t red, const uint8_t green, const uint8_t blue) { khakiTextRed = red; khakiTextGreen = green; khakiTextBlue = blue; }
 	static int watchTowerRange;
@@ -492,6 +494,7 @@ public:
 	static bool drawUnitCardOutline;
 	static bool apIsShieldPiercing;
 	static bool alwaysAbortLua;
+	static bool noMovementResetOnFlee;
 	static uint8_t khakiTextRed;
 	static uint8_t khakiTextGreen;
 	static uint8_t khakiTextBlue;

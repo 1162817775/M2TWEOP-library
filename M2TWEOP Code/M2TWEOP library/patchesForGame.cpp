@@ -3056,6 +3056,8 @@ minHookFunctions::t_displayMissileStats                  minHookFunctions::o_dis
 minHookFunctions::t_displayMeleeStats                    minHookFunctions::o_displayMeleeStats = nullptr;
 minHookFunctions::t_displayArmourStats                   minHookFunctions::o_displayArmourStats = nullptr;
 minHookFunctions::t_displayDefenseStats                  minHookFunctions::o_displayDefenseStats = nullptr;
+minHookFunctions::t_fleeConstructor                      minHookFunctions::o_fleeConstructor1 = nullptr;
+minHookFunctions::t_fleeConstructor                      minHookFunctions::o_fleeConstructor2 = nullptr;
 
 DWORD minHookFunctions::lastSoundClass = NULL;
 bool minHookFunctions::isUnlockWeaponLimit = false;
@@ -3099,6 +3101,8 @@ void minHookFunctions::init()
 	MIN_HOOK(codes::offsets.displayMeleeStats,                       displayMeleeStats,                  o_displayMeleeStats);
 	MIN_HOOK(codes::offsets.displayArmourStats,                      displayArmourStats,                 o_displayArmourStats);
 	MIN_HOOK(codes::offsets.displayDefenseStats,                     displayDefenseStats,                o_displayDefenseStats);
+	MIN_HOOK(codes::offsets.fleeConstructor1,						 fleeConstructor1,                   o_fleeConstructor1);
+	MIN_HOOK(codes::offsets.fleeConstructor2,                        fleeConstructor2,                   o_fleeConstructor2);
 }
 
 int __thiscall minHookFunctions::debugLineAdd(void* _this, vector3* start, vector3* end, color8888 color, float time, bool zbuffered)
@@ -3218,6 +3222,22 @@ int minHookFunctions::displayDefenseStats(eduEntry* entry, int exp, int armourUp
 	}
 
 	return def + shield + armour + armourUpg * m2tweopOptions::armourBonusModifier;
+}
+
+void* minHookFunctions::fleeConstructor1(void* flee, void* sett, void* ch, bool action, bool back, bool clearMp)
+{
+	if (m2tweopOptions::getNoMovementResetOnFlee())
+		return o_fleeConstructor1(flee, sett, ch, action, back, false);
+	
+	return o_fleeConstructor1(flee, sett, ch, action, back, clearMp);
+}
+
+void* minHookFunctions::fleeConstructor2(void* flee, void* sett, void* ch, bool action, bool back, bool clearMp)
+{
+	if (m2tweopOptions::getNoMovementResetOnFlee())
+		return o_fleeConstructor2(flee, sett, ch, action, back, false);
+	
+	return o_fleeConstructor2(flee, sett, ch, action, back, clearMp);
 }
 
 constexpr float pi = 3.1415926535897932333797165867879296635503123989707390137482903185973555f;

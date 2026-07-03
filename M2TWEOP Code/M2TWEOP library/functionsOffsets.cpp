@@ -399,6 +399,10 @@ void codes::initCodes(int gameVer)
 		offsets.displayMeleeStats = 0x8EA460;
 		offsets.displayArmourStats = 0x8EA5D0;
 		offsets.displayDefenseStats = 0x8EA4F0;
+		offsets.fleeConstructor1 = 0x5BAE20;
+		offsets.fleeConstructor2 = 0x5BAF50;
+		offsets.getAreaHandle = 0x6426A0;
+		offsets.line2dGetClosest = 0xD72980;
 	}
 
 
@@ -801,5 +805,9 @@ void codes::initCodes(int gameVer)
 		offsets.displayMeleeStats = 0x8EAEE0;
 		offsets.displayArmourStats = 0x8EB050;
 		offsets.displayDefenseStats = 0x8EAF70;
+		offsets.fleeConstructor1 = 0x5BB300;
+		offsets.fleeConstructor2 = 0x5BB430;
+		offsets.getAreaHandle = 0x642A50;
+		offsets.line2dGetClosest = 0xD6CD00;
 	}
 }
