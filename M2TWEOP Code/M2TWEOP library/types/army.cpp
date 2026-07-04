@@ -336,6 +336,22 @@ bool armyStruct::canReceiveMerge(const armyStruct* other)
 	//return GAME_FUNC(bool(__thiscall*)(armyStruct*, armyStruct*, bool), canMerge)(this, other, checkZoc);
 }
 
+bool armyStruct::canReceiveUnit(const unit* other)
+{
+	if (!other || !this)  // NOLINT(clang-diagnostic-undefined-bool-conversion)
+		return false;
+	if (faction->factionID != other->army->faction->factionID)
+		return false;
+	if (settlement && settlement->siegeNum > 0)
+		return false;
+	if (other->army->settlement && other->army->settlement->siegeNum > 0)
+		return false;
+	if (numOfUnits + 1 > 20)
+		return false;
+	return true;
+	//return GAME_FUNC(bool(__thiscall*)(armyStruct*, armyStruct*, bool), canMerge)(this, other, checkZoc);
+}
+
 bool armyStruct::isEnemyTo(const armyStruct* other)
 {
 	return isEnemyToFaction(other->faction);
@@ -371,6 +387,52 @@ int armyStruct::getNumberOfCategory(unitCategory category)
 			num++;
 	}
 	return num;
+}
+
+void armyStruct::splitUnit(unit* splitUnit, int x, int y)
+{
+	coordPair targetCoords{x, y};
+	unit* un = splitUnit;
+	DWORD splitArmy = codes::offsets.splitArmy;
+	auto coordsPtr = &targetCoords;
+	auto listPtr = &un;
+	int unitCount = 1;
+	const auto fac = this->faction;
+	auto tile = stratMapHelpers::getTile(x, y);
+	if (auto tileChar = tile->getCharacter(); tileChar)
+	{
+		if (tileChar->army && tileChar->army->faction != faction)
+		{
+			gameHelpers::logStringGame("armyStruct::splitUnit: can not split army, tile is occupied by enemy.");
+			return;
+		}
+	}
+	if (auto tileSett = tile->getSettlement(); tileSett && tileSett->faction != faction)
+	{
+		gameHelpers::logStringGame("armyStruct::splitUnit: can not split army, tile is occupied by enemy settlement.");
+		return;
+	}
+	if (auto tileFort = tile->getFort(); tileFort && tileFort->faction != faction)
+	{
+		gameHelpers::logStringGame("armyStruct::splitUnit: can not split army, tile is occupied by enemy fort.");
+		return;
+	}
+	auto stratPathFind = gameHelpers::getGameDataAll()->stratPathFinding; 
+	if (!GAME_FUNC(bool(__thiscall*)(stratPathFinding*, unit**, int, coordPair*), canArmySplit)
+		(stratPathFind, listPtr, unitCount, &targetCoords))
+	{
+		gameHelpers::logStringGame("armyStruct.splitUnit: can not split army.");
+		return;
+	}
+	_asm
+	{
+		push coordsPtr
+		push unitCount
+		push listPtr
+		mov ecx, fac
+		mov eax, splitArmy
+		call eax
+	}
 }
 
 int armyStruct::attackArmy(armyStruct* defender)

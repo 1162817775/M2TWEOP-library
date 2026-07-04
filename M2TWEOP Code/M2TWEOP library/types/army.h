@@ -216,6 +216,8 @@ public:
 	bool isEnemyToFaction(const factionStruct* other);
 	bool isAllyToFaction(const factionStruct* other);
 	int getNumberOfCategory(unitCategory category);
+	void splitUnit(unit* splitUnit, int x, int y);
+	bool canReceiveUnit(const unit* other);
 	int getNumberOfCategoryLua(int category){return getNumberOfCategory(static_cast<unitCategory>(category));}
 	armyStruct* moveTactical(int x, int y, bool forceMerge = false);
 	unitGroup* getGroup(const int index)

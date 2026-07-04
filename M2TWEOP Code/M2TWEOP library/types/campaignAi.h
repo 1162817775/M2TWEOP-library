@@ -1119,11 +1119,13 @@ public:
 	std::shared_ptr<settlementResource> findSettResource(settlementStruct* sett);
 	static void clearFactionData() { m_Instance = std::make_shared<globalEopAiConfig>(); }
 	bool isEndTurn = false;
-	void characterTurnStart(character* currentChar);
+	void characterTurnStart(character* currentChar, bool turnStart);
 	static eopProductionHelper* getProductionHelper() { return &getInstance()->m_prodHelper; }
 protected:
 	static std::shared_ptr<globalEopAiConfig> m_Instance;
 	factionStruct* m_Faction{};
+	std::vector<character*> m_usedCharacters{};
+	std::vector<armyStruct*> m_usedArmies{};
 	std::shared_ptr<aiFactionData> m_CurrentFacData{};
 	std::array<std::shared_ptr<aiFactionData>, 31> m_FactionData{};
 	float calculateSettPriority(const std::shared_ptr<settlementResource>& settRes, priorityType priType);
