@@ -2351,6 +2351,7 @@ void __stdcall patchesForGame::onGameInit()
 	eopDu::fixCustomBattleGeneralEntries();
 	//gameHelpers::getOptions1()->microManageAllSettlements = 1;
 	gameHelpers::setNoAiLoose(m2tweopOptions::getNoAiMissileLooseFormation());
+	gameHelpers::setDisplayEnemyStats(m2tweopOptions::getDisplayEnemyStats());
 }
 
 void __stdcall patchesForGame::onUnloadCampaign()

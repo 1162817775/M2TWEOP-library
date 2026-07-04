@@ -45,6 +45,7 @@ bool m2tweopOptions::isOpenGateOnStratMap = false;
 bool m2tweopOptions::alwaysAbortLua = false;
 bool m2tweopOptions::noMovementResetOnFlee = true;
 bool m2tweopOptions::noAiMissileLooseFormation = true;
+bool m2tweopOptions::displayEnemyStats = true;
 
 scriptCommand::scriptCommand(const char* name) : className(name)
 {
@@ -3650,6 +3651,13 @@ namespace gameHelpers
 	{
 		uint8_t fix = 0;
 		const DWORD codeAdr = dataOffsets::offsets.removeSiegeBug;
+		MemWork::WriteData(&fix, codeAdr, 1);
+	}
+	
+	void setDisplayEnemyStats(bool set)
+	{
+		uint8_t fix = set ? 2 : 1;
+		const DWORD codeAdr = dataOffsets::offsets.displayEnemyStats;
 		MemWork::WriteData(&fix, codeAdr, 1);
 	}
 

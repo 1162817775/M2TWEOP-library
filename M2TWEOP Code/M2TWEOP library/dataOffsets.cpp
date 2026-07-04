@@ -147,6 +147,7 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.rad2tab = 0x165DBE0;
 		offsets.debugLines = 0x2CBDA24;
 		offsets.aiLooseFormation = 0x68A2A5;
+		offsets.displayEnemyStats = 0xB06E82;
 	}
 	else if (gameVer == 2) //steam
 	{
@@ -290,5 +291,6 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.rad2tab = 0x1615CF0;
 		offsets.debugLines = 0x2C749CC;
 		offsets.aiLooseFormation = 0x68A795;
+		offsets.displayEnemyStats = 0xB011B7;
 	}
 }

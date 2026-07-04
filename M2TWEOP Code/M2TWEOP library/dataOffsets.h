@@ -33,6 +33,7 @@ public:
 		DWORD ancLimit = NULL;
 		DWORD religionTriggerBug = NULL;
 		DWORD maxUnitSize = NULL;
+		DWORD displayEnemyStats = NULL;
 		DWORD maxBgSize1 = NULL;
 		DWORD maxBgSize2 = NULL;
 		DWORD unlockConsoleCommands1 = NULL;

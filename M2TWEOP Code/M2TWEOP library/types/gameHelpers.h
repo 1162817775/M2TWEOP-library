@@ -471,6 +471,8 @@ public:
 	static void setNoMovementResetOnFlee(const bool value) { noMovementResetOnFlee = value; }
 	static bool getNoAiMissileLooseFormation() { return noAiMissileLooseFormation; }
 	static void setNoAiMissileLooseFormation(const bool value) { noAiMissileLooseFormation = value; }
+	static bool getDisplayEnemyStats() { return displayEnemyStats; }
+	static void setDisplayEnemyStats(const bool value) { displayEnemyStats = value; }
 	static DWORD getColor() { return (static_cast<uint32_t>(0xFF) << 24) | (khakiTextRed << 16) | (khakiTextGreen << 8) | khakiTextBlue; }
 	static void setKhakiTextColor(const uint8_t red, const uint8_t green, const uint8_t blue) { khakiTextRed = red; khakiTextGreen = green; khakiTextBlue = blue; }
 	static int watchTowerRange;
@@ -498,6 +500,7 @@ public:
 	static bool alwaysAbortLua;
 	static bool noMovementResetOnFlee;
 	static bool noAiMissileLooseFormation;
+	static bool displayEnemyStats;
 	static uint8_t khakiTextRed;
 	static uint8_t khakiTextGreen;
 	static uint8_t khakiTextBlue;
@@ -601,6 +604,7 @@ namespace gameHelpers
 	void generateSprite(const std::string& model);
 	void addToLua(sol::state& luaState);
 	void setNoAiLoose(bool set);
+	void setDisplayEnemyStats(bool set);
 	
 	std::string callConsole(const std::string& cmdName, sol::variadic_args va);
 	bool callGameConsoleCommand(const char* name, const char* arg, char* errorBuffer);

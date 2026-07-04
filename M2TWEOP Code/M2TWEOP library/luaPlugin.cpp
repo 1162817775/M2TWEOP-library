@@ -1251,6 +1251,15 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 		M2TWEOP.alwaysAbortLua(true)
 	*/
 	tables.M2TWEOP.set_function("alwaysAbortLua", &m2tweopOptions::setAlwaysAbortLua);
+	
+	/***
+	Display enemy stats such as kills post battle, instead of only player. Enabled by default in EOP.
+	@function M2TWEOP.displayEnemyStats 
+	@tparam bool set
+	@usage
+		M2TWEOP.displayEnemyStats(true)
+	*/
+	tables.M2TWEOP.set_function("displayEnemyStats", &gameHelpers::setDisplayEnemyStats);
 
 	/***
 	Set watchtower range. Default: 10.
