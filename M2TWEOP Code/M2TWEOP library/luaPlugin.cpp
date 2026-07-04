@@ -302,6 +302,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield useEopFrontiers useEopFrontiers
 	@tfield modelExists modelExists
 	@tfield ignoreOwnershipRecruitment ignoreOwnershipRecruitment
+	@tfield noAiMissileLooseFormation noAiMissileLooseFormation
 	@tfield setKhakiTextColor setKhakiTextColor
 	@tfield getMinorSettlementBalance getMinorSettlementBalance
 	@tfield generateSprite generateSprite
@@ -1232,6 +1233,15 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 		M2TWEOP.noMovementResetOnFlee(true)
 	*/
 	tables.M2TWEOP.set_function("noMovementResetOnFlee", &m2tweopOptions::setNoMovementResetOnFlee);
+	
+	/***
+	Disable AI units going into loose formation while being shot at. Enabled by default in EOP.
+	@function M2TWEOP.noAiMissileLooseFormation 
+	@tparam bool set
+	@usage
+		M2TWEOP.noAiMissileLooseFormation(true)
+	*/
+	tables.M2TWEOP.set_function("noAiMissileLooseFormation", &gameHelpers::setNoAiLoose);
 	
 	/***
 	Always abort on LUA errors. Prevents savegame corruption.

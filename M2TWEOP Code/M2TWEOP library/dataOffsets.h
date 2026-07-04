@@ -39,6 +39,7 @@ public:
 		DWORD unlockConsoleCommands2 = NULL;
 		DWORD highlightUnits = NULL;
 		DWORD religionLimit = NULL;
+		DWORD aiLooseFormation = NULL;
 		DWORD scriptCounters = NULL;
 		DWORD scriptCountersSet = NULL;
 		DWORD buildingChainLimit = NULL;

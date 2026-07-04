@@ -2349,6 +2349,8 @@ void __stdcall patchesForGame::onGameInit()
 	gameEvents::onGameInit();
 	*reinterpret_cast<bool*>(dataOffsets::offsets.bugReport) = true;
 	eopDu::fixCustomBattleGeneralEntries();
+	//gameHelpers::getOptions1()->microManageAllSettlements = 1;
+	gameHelpers::setNoAiLoose(m2tweopOptions::getNoAiMissileLooseFormation());
 }
 
 void __stdcall patchesForGame::onUnloadCampaign()

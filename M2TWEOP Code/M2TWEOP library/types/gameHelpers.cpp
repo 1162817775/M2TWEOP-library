@@ -44,6 +44,7 @@ bool m2tweopOptions::enableRangedWeaponUpg = true;
 bool m2tweopOptions::isOpenGateOnStratMap = false;
 bool m2tweopOptions::alwaysAbortLua = false;
 bool m2tweopOptions::noMovementResetOnFlee = true;
+bool m2tweopOptions::noAiMissileLooseFormation = true;
 
 scriptCommand::scriptCommand(const char* name) : className(name)
 {
@@ -3531,6 +3532,13 @@ namespace gameHelpers
 	{
 		const DWORD ancillariesOffset = dataOffsets::offsets.ancLimit;
 		MemWork::WriteData(&limit, ancillariesOffset, 1);
+	}
+
+	void setNoAiLoose(bool set)
+	{
+		const DWORD looseOffset = dataOffsets::offsets.aiLooseFormation;
+		MemWork::WriteData(&set, looseOffset, 1);
+		m2tweopOptions::setNoAiMissileLooseFormation(set);
 	}
 
 	void setMaxUnitSize(signed short min, signed short max)
