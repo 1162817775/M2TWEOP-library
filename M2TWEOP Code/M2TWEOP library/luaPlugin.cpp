@@ -296,6 +296,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield setApIsShieldPiercing setApIsShieldPiercing
 	@tfield setWatchTowerRange setWatchTowerRange
 	@tfield drawUnitCardOutline drawUnitCardOutline
+	@tfield noMovementResetOnFlee noMovementResetOnFlee
 	@tfield alwaysAbortLua alwaysAbortLua
 	@tfield enableFamilyEventsWithoutTree enableFamilyEventsWithoutTree
 	@tfield useEopFrontiers useEopFrontiers
@@ -1222,6 +1223,15 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 		M2TWEOP.drawUnitCardOutline(true)
 	*/
 	tables.M2TWEOP.set_function("drawUnitCardOutline", &m2tweopOptions::setDrawUnitCardOutline);
+	
+	/***
+	Disable movement being set to 0 after a character withdraws from battle. This favours the player, because they aren't affected due to the turn order (end of slave turn gives everyone their movement back as well). Enabled by default in EOP.
+	@function M2TWEOP.noMovementResetOnFlee 
+	@tparam bool set
+	@usage
+		M2TWEOP.noMovementResetOnFlee(true)
+	*/
+	tables.M2TWEOP.set_function("noMovementResetOnFlee", &m2tweopOptions::setNoMovementResetOnFlee);
 	
 	/***
 	Always abort on LUA errors. Prevents savegame corruption.

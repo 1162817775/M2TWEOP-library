@@ -390,6 +390,12 @@ public:
 	static t_displayDefenseStats o_displayDefenseStats;
 	static int __thiscall displayDefenseStats(eduEntry* entry, int exp, int armourUpg);
 	
+	using t_fleeConstructor = void*(__thiscall*)(void* flee, void* sett, void* ch, bool action, bool back, bool clearMp);
+	static t_fleeConstructor o_fleeConstructor1;
+	static t_fleeConstructor o_fleeConstructor2;
+	static void* __thiscall fleeConstructor1(void* flee, void* sett, void* ch, bool action, bool back, bool clearMp);
+	static void* __thiscall fleeConstructor2(void* flee, void* sett, void* ch, bool action, bool back, bool clearMp);
+	
 	using t_debugRenderCircle = void(__cdecl*)(vector2* center, float radius, int segments, color8888 color, float time);
 	static t_debugRenderCircle o_debugRenderCircle;
 	static void __cdecl debugRenderCircle(vector2* center, float radius, int segments, color8888 color, float time);

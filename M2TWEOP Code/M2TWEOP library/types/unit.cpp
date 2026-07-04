@@ -200,8 +200,52 @@ void spearStruct::update(bool placed, bool complete)
 		spearTip.y = spear->soldier->thisObject.yCoord;
 		spearTip.z = spear->soldier->thisObject.zCoord;
 	}
+
+	
+
+	
 	bool needSpear = isFighting || bracing || ((phalanx || schiltrom) && ready && rank <= rankDepth);
 	spear->raised = !needSpear;
+	vector2 tip(spearTip.x, spearTip.y);
+	const auto areas = battleHelpers::getBattleAreas();
+	if (soldier->byte_74 != GAME_FUNC(int(__thiscall*)(void *, vector2*), getAreaHandle)(areas, &tip))
+	{
+		spear->raised = true;
+		if (soldier->byte_75 >= 0)
+		{
+			const auto link = &areas->riverCrossings[static_cast<uint8_t>(soldier->byte_75)];
+			struct line2d
+			{
+				vector2 point1;
+				vector2 point2;
+			};
+			line2d line;
+			line.point1.x = link->startPosX;
+			line.point1.y = link->startPosY;
+			line.point2.x = link->endPosX;
+			line.point2.y = link->endPosY;
+			vector2 resultTip{};
+			vector2 resultMan{};
+			vector2 man(soldier->thisObject.xCoord, soldier->thisObject.yCoord);
+			GAME_FUNC(vector2*(__thiscall*)(line2d*, vector2*, vector2*, bool), line2dGetClosest)(&line, &resultTip, &tip, false);
+			GAME_FUNC(vector2*(__thiscall*)(line2d*, vector2*, vector2*, bool), line2dGetClosest)(&line, &resultMan, &man, false);
+			const auto width = static_cast<float>(link->angle) * 0.5f;
+
+			if ( (width * width) > (((resultTip.x - tip.x)
+							* (resultTip.x - tip.x))
+						   + ((resultTip.y - tip.y)
+							* (resultTip.y - tip.y)))
+				&& (width * width) > (((resultMan.x - man.x)
+							* (resultMan.x - man.x))
+						   + ((resultMan.y - man.y)* (resultMan.y - man.y)
+				)))
+			{
+				if (const auto gate = link->field40; gate)
+					spear->raised = !callClassFunc<void*, bool>(gate, 0x0);
+			}
+			
+		}
+	}
 
 	spear->object.xCoord = spearTip.x;
 	spear->object.yCoord = spearTip.y;

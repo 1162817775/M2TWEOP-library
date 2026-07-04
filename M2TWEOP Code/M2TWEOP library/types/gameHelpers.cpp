@@ -43,6 +43,7 @@ bool m2tweopOptions::changeGeneralPosition = false;
 bool m2tweopOptions::enableRangedWeaponUpg = true;
 bool m2tweopOptions::isOpenGateOnStratMap = false;
 bool m2tweopOptions::alwaysAbortLua = false;
+bool m2tweopOptions::noMovementResetOnFlee = true;
 
 scriptCommand::scriptCommand(const char* name) : className(name)
 {

@@ -3908,7 +3908,7 @@ void aiPersonalityValues::initControllers()
 		{
 			if (const auto prodController = this->aiProductionControllers[controllerIndex]; sett == prodController->settlement)
 			{
-				if (isAutoControl && prodController->autoManagePolicy == settlementPolicy::none)
+				if (prodController->isAutoManaged && prodController->autoManagePolicy == settlementPolicy::none)
 					evaluatePolicies(prodController->settlement);
 				sett->aiProductionController = prodController;
 				break;

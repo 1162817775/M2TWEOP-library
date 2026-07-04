@@ -872,7 +872,7 @@ struct crossing
 	float field34;
 	float field38;
 	float field3C;
-	float field40;
+	void* field40;
 	int angle;
 	float field48;
 	float field4C;

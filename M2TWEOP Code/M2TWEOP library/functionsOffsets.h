@@ -398,11 +398,15 @@ public:
 		DWORD createMountedEngineRecord = NULL;
 		DWORD createAiProductionController = NULL;
 		DWORD getUnitSizeMultiplier = NULL;
+		DWORD getAreaHandle = NULL;
+		DWORD line2dGetClosest = NULL;
 
 		DWORD createPortAdd = NULL;
 		DWORD setDocks = NULL;
 		DWORD initPortRallyPoint = NULL;
 		DWORD addPortToCampaign = NULL;
+		DWORD fleeConstructor1 = NULL;
+		DWORD fleeConstructor2 = NULL;
 	}offsets;
 
 	static void initCodes(int gameVer);
