@@ -2349,6 +2349,9 @@ void __stdcall patchesForGame::onGameInit()
 	gameEvents::onGameInit();
 	*reinterpret_cast<bool*>(dataOffsets::offsets.bugReport) = true;
 	eopDu::fixCustomBattleGeneralEntries();
+	//gameHelpers::getOptions1()->microManageAllSettlements = 1;
+	gameHelpers::setNoAiLoose(m2tweopOptions::getNoAiMissileLooseFormation());
+	gameHelpers::setDisplayEnemyStats(m2tweopOptions::getDisplayEnemyStats());
 }
 
 void __stdcall patchesForGame::onUnloadCampaign()
@@ -2672,13 +2675,13 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 			&& record->gen->army
 			)
 		{
-			globalEopAiConfig::getInstance()->characterTurnStart(record->gen);
+			globalEopAiConfig::getInstance()->characterTurnStart(record->gen, false);
 		}
 	}
 	else if (eventCode == characterTurnStart)
 	{
-		if (const auto record = reinterpret_cast<characterRecord*>(vTab[1]);
-			record->gen
+		const auto record = reinterpret_cast<characterRecord*>(vTab[1]);
+		if (record->gen
 			&& record->faction->factionID == campaignHelpers::getCampaignData()->slaveFactionID
 			&& record->gen->getTypeID() == characterTypeStrat::general
 			&& record->gen->army
@@ -2697,6 +2700,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 				stratModelsChange::setCharacterModel(record->gen, randomModel);
 			}
 		}
+		//globalEopAiConfig::getInstance()->characterTurnStart(record->gen, true);
 	}
 	else if (eventCode == factionTurnEnd)
 	{

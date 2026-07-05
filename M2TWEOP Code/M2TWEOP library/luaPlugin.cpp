@@ -302,6 +302,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield useEopFrontiers useEopFrontiers
 	@tfield modelExists modelExists
 	@tfield ignoreOwnershipRecruitment ignoreOwnershipRecruitment
+	@tfield noAiMissileLooseFormation noAiMissileLooseFormation
 	@tfield setKhakiTextColor setKhakiTextColor
 	@tfield getMinorSettlementBalance getMinorSettlementBalance
 	@tfield generateSprite generateSprite
@@ -1234,6 +1235,15 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	tables.M2TWEOP.set_function("noMovementResetOnFlee", &m2tweopOptions::setNoMovementResetOnFlee);
 	
 	/***
+	Disable AI units going into loose formation while being shot at. Enabled by default in EOP.
+	@function M2TWEOP.noAiMissileLooseFormation 
+	@tparam bool set
+	@usage
+		M2TWEOP.noAiMissileLooseFormation(true)
+	*/
+	tables.M2TWEOP.set_function("noAiMissileLooseFormation", &gameHelpers::setNoAiLoose);
+	
+	/***
 	Always abort on LUA errors. Prevents savegame corruption.
 	@function M2TWEOP.alwaysAbortLua 
 	@tparam bool set
@@ -1241,6 +1251,15 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 		M2TWEOP.alwaysAbortLua(true)
 	*/
 	tables.M2TWEOP.set_function("alwaysAbortLua", &m2tweopOptions::setAlwaysAbortLua);
+	
+	/***
+	Display enemy stats such as kills post battle, instead of only player. Enabled by default in EOP.
+	@function M2TWEOP.displayEnemyStats 
+	@tparam bool set
+	@usage
+		M2TWEOP.displayEnemyStats(true)
+	*/
+	tables.M2TWEOP.set_function("displayEnemyStats", &gameHelpers::setDisplayEnemyStats);
 
 	/***
 	Set watchtower range. Default: 10.

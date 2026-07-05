@@ -1533,9 +1533,19 @@ void globalEopAiConfig::checkRegion(int regionId)
 	}
 }
 
-void globalEopAiConfig::characterTurnStart(character* currentChar)
+void globalEopAiConfig::characterTurnStart(character* currentChar, bool turnStart)
 {
+	if (m_Faction != currentChar->characterRecord->faction)
+	{
+		m_usedCharacters.clear();
+		m_usedArmies.clear();
+	}
 	m_Faction = currentChar->characterRecord->faction;
+	for (const auto &ch : m_usedCharacters)
+	{
+		if (ch == currentChar)
+			return;
+	}
 	if (!m_Faction || m_Faction->factionRecord->slave || m_Faction->isHorde || !currentChar->army || !currentChar->isGeneral() || currentChar->markedForDeath)
 		return; 
 	const auto army = currentChar->army;
@@ -1575,21 +1585,67 @@ void globalEopAiConfig::characterTurnStart(character* currentChar)
 	}
 	if (used)
 		return;
+	std::vector<character*> auxGenerals{};
+	if (army->charactersNum > 0)
+	{
+		for (int c = 0; c < army->charactersNum; ++c)
+		{
+			const auto aux = army->getCharacter(c);
+			if (aux->getTypeID() == characterTypeStrat::namedCharacter)
+			{
+				auxGenerals.push_back(aux);
+			}
+		}
+	}
 	for (const auto& nearArmy : moveData->armies)
 	{
+		bool alreadyUsed = false;
+		for (const auto& usedArmy : m_usedArmies)
+		{
+			if (usedArmy == nearArmy.army)
+			{
+				alreadyUsed = true;
+				break;
+			}
+		}
 		if (!nearArmy.army->gen
 			|| nearArmy.army->isAdmiral
 			|| nearArmy.army->faction->factionID != m_Faction->factionID
-			|| nearArmy.army->gen->markedForDeath)
+			|| nearArmy.army->gen->markedForDeath
+			|| alreadyUsed)
+		{
 			continue;
-		if (nearArmy.moveCost < 25.f && nearArmy.army->canReceiveMerge(army))
+		}
+		if (!auxGenerals.empty())
+		{
+			if (!alreadyUsed)
+			{
+				const auto gen = auxGenerals.back();
+				if (nearArmy.army->gen->getTypeID() == characterTypeStrat::general
+					&& nearArmy.army->canReceiveUnit(gen->bodyguards))
+				{
+					army->splitUnit(gen->bodyguards, nearArmy.army->getX(), nearArmy.army->getY());
+					if (gen->characterRecord && gen->characterRecord->fullName)
+						gameHelpers::logStringGame("Character: " + string(gen->characterRecord->fullName) + " leading another army!");
+					m_usedCharacters.push_back(gen);
+					m_usedArmies.push_back(nearArmy.army);
+				}
+				auxGenerals.pop_back();
+				break;
+			}
+		}
+		if (turnStart && nearArmy.moveCost > 75.f)
+			continue;
+		if (army->numOfUnits <= nearArmy.army->numOfUnits && nearArmy.army->canReceiveMerge(army))
 		{
 			const auto [xCoord, yCoord] = nearArmy.army->getCoords();
 			if (xCoord == -1)
 				continue;
-			if (army->moveTactical(xCoord, yCoord, true))
+			if (army->moveTactical(xCoord, yCoord, false))
 			{
-				gameHelpers::logStringGame("Character: " + string(currentChar->characterRecord->fullName) + " merged armies!");
+				m_usedCharacters.push_back(nearArmy.army->gen);
+				if (currentChar->characterRecord && currentChar->characterRecord->fullName)
+					gameHelpers::logStringGame("Character: " + string(currentChar->characterRecord->fullName) + " merged armies! + movecost: " + std::to_string(nearArmy.moveCost));
 				break;
 			}
 		}
@@ -1958,7 +2014,7 @@ void globalEopAiConfig::assignOrders(factionStruct* fac)
 	std::stable_sort(m_Orders.begin(), m_Orders.end(), C_ORDER_SORT);
 	for (const auto& order : m_Orders)
 	{
-		if (order->executed || order->priority < 1)
+		if (order->executed || order->priority < 100)
 			continue;
 #ifdef PRIORITY_DEBUG
 		gameHelpers::logStringGame("++++++++++++++++++++++++ ORDER +++++++++++++++++++++++++");
