@@ -191,6 +191,7 @@ public:
 	static uint32_t __fastcall onSetExtentsZoc();
 	static uint8_t __fastcall onSetExtentsZocAlpha(uint8_t oldAlpha);
 	static void __fastcall onDecideNeighbours(factionStruct* faction);
+	static void __fastcall onTechtreeSlots(settlementBuildings* buildings, settlementStruct* sett, void* package);
 	static void __fastcall onInitGsd(aiGlobalStrategyDirector* director);
 	static void __fastcall onInitGsd2(aiGlobalStrategyDirector* director);
 	static void __fastcall onSetBuildPolicies(aiProductionController* controller, int policy, int secondaryPolicy);

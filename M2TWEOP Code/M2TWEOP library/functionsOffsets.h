@@ -153,6 +153,7 @@ public:
 		DWORD createBuildingSett = NULL;
 		DWORD buildQueueConflictTest = NULL;
 		DWORD removeBuildingSelection = NULL;
+		DWORD regionCanHavePort = NULL;
 
 
 		DWORD autoResolveFunc = NULL;

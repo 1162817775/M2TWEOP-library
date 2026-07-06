@@ -6667,6 +6667,25 @@ void onSpearLocomotion::SetNewCode()
 	delete a;
 }
 
+onProcessCharge::onProcessCharge(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x7D1296;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x7D0A36;
+}
+
+void onProcessCharge::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->lea(ebp, dword_ptr(ebx, 0xC));
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
 onAttackSpear::onAttackSpear(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {
@@ -6691,6 +6710,33 @@ void onAttackSpear::SetNewCode()
 		a->mov(eax, 0x7D10B3);
 	else
 		a->mov(eax, 0x7D0853);
+	a->jmp(eax);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+onTechtreeSlots::onTechtreeSlots(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x5EF4D2;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x5EF0E2;
+}
+
+void onTechtreeSlots::SetNewCode()
+{
+	const auto a = new Assembler();
+	a->mov(edx, dword_ptr(esp, 0x234));
+	a->push(dword_ptr(esp, 0x238));
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	if (m_adress == 0x5EF4D2)
+		a->mov(eax, 0x5EF6D1);
+	else
+		a->mov(eax, 0x5EF2E1);
 	a->jmp(eax);
 	a->ret();
 	m_cheatBytes = static_cast<unsigned char*>(a->make());
