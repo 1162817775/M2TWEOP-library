@@ -1435,6 +1435,72 @@ int patchesForGame::onCheckSettHasBuilding(const settlementBuildings* buildings,
 	return 0;
 }
 
+void patchesForGame::onTechtreeSlots(settlementBuildings* buildings, settlementStruct* sett, void* package)
+{
+	if (!buildings->buildingsNum)
+	{
+		return;
+	}
+	const auto facId = sett->fac_creatorModNum;
+	edbEntry* entries[2048];
+	const auto edb = eopBuildings::getEdb();
+	const int total = GAME_FUNC(int(__thiscall*)(exportDescrBuildings*, int8_t, edbEntry**), getEntriesByFaction)(edb, static_cast<int8_t>(facId), entries);
+	if (total > 0)
+	{
+		std::vector<edbEntry*> buildingEntries;
+		buildingEntries.reserve(total);
+		for (int b = 0; b < total; ++b)
+		{
+			const auto currentEntry = entries[b];
+			if (GAME_FUNC(bool(__thiscall*)(edbEntry*, int8_t, int, int, bool), isLevelAvailableForLevel)(currentEntry, static_cast<int8_t>(facId), sett->level, 0, sett->isCastle))
+			{
+				buildingEntries.push_back(currentEntry);
+			}
+		}
+
+		bool temple = false, guild = false;
+		for (const auto& buildingEntry : buildingEntries)
+		{
+			if (buildingEntry->classification == 5)
+			{
+				if (guild)
+					continue;
+				guild = true;
+			}
+			if (buildingEntry->isTemple)
+			{
+				if (temple)
+					continue;
+				temple = true;
+			}
+			if (buildingEntry->isPort)
+			{
+				const auto region = stratMapHelpers::getRegion(sett->regionID);
+				if (!GAME_FUNC(bool(__thiscall*)(regionStruct*), regionCanHavePort)(region))
+					continue;
+			}
+			if (buildingEntry->buildingLevelCount > 0)
+			{
+				int highest = -1;
+				for (int l = 0; l < buildingEntry->buildingLevelCount; ++l)
+				{
+					if (GAME_FUNC(bool(__thiscall*)(edbEntry*, int8_t, int, int, bool), isLevelAvailableForLevel)(buildingEntry, static_cast<int8_t>(facId), sett->level, l, sett->isCastle))
+					{
+						highest = max(l, highest);
+					}
+				}
+				if (highest != -1)
+				{
+					if (const auto build = GAME_FUNC(building* (__thiscall*)(exportDescrBuildings*, settlementStruct*, edbEntry*, bool), createBuildInSett)(eopBuildings::getEdb(), sett, buildingEntry, false); build)
+					{
+						GAME_FUNC(void(__thiscall*)(building*, int, int, bool), upgradeBuildInSett)(build, highest, facId, false);
+					}
+				}
+			}
+		}
+	}
+}
+
 void patchesForGame::getPossibleConstructions(exportDescrBuildings* edb, settlementStruct* sett, void* data, void* caps,
 	void* bonus, const bool checkQueue, const bool forceTemple)
 {

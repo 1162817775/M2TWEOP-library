@@ -2617,12 +2617,38 @@ private:
 };
 
 
+class onTechtreeSlots
+	:public AATemplate
+{
+public:
+	onTechtreeSlots(MemWork* mem, LPVOID addr, int ver);
+	~onTechtreeSlots() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+
 class onSpearLocomotion
 	:public AATemplate
 {
 public:
 	onSpearLocomotion(MemWork* mem, LPVOID addr, int ver);
 	~onSpearLocomotion() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+
+class onProcessCharge
+	:public AATemplate
+{
+public:
+	onProcessCharge(MemWork* mem, LPVOID addr, int ver);
+	~onProcessCharge() = default;
 	
 	void SetNewCode();
 private:

@@ -686,22 +686,16 @@ namespace armyHelpers
 													Army Creation
     \*----------------------------------------------------------------------------------------------------------------*/
 #pragma region Army Creation
-    armyStruct* createArmy(character* character)
+    armyStruct* createArmy(character* thisChar)
     {
-        armyStruct* stack = nullptr;
-        factionStruct* fac = character->characterRecord->faction;
-        int isAdmiral = character->genType->type == 3 ? 1 : 0;
-        DWORD adrFunc = codes::offsets.createArmyFunc;
-        _asm
-        {
-            push isAdmiral
-            push character
-            mov ecx, fac
-            mov eax, adrFunc
-            call eax
-            mov stack, eax
-        }
-        return stack;
+    	if (thisChar->residence && thisChar->residence->army)
+    	{
+    		gameHelpers::logStringGame("armyHelpers::createArmy: character already has an army in residence.");
+			return nullptr;
+    	}
+        factionStruct* fac = thisChar->characterRecord->faction;
+        int isAdmiral = thisChar->genType->type == 3;
+    	return GAME_FUNC(armyStruct*(__thiscall*)(factionStruct*, character*, bool), createArmyFunc)(fac, thisChar, isAdmiral);
     }
 
     armyStruct* createArmyInSettlement(settlementStruct* sett)

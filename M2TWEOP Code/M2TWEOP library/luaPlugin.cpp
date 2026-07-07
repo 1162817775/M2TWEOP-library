@@ -298,6 +298,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield drawUnitCardOutline drawUnitCardOutline
 	@tfield noMovementResetOnFlee noMovementResetOnFlee
 	@tfield alwaysAbortLua alwaysAbortLua
+	@tfield displayEnemyStats displayEnemyStats
 	@tfield enableFamilyEventsWithoutTree enableFamilyEventsWithoutTree
 	@tfield useEopFrontiers useEopFrontiers
 	@tfield modelExists modelExists

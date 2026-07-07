@@ -403,6 +403,7 @@ void codes::initCodes(int gameVer)
 		offsets.fleeConstructor2 = 0x5BAF50;
 		offsets.getAreaHandle = 0x6426A0;
 		offsets.line2dGetClosest = 0xD72980;
+		offsets.regionCanHavePort = 0x4A0590;
 	}
 
 
@@ -809,5 +810,6 @@ void codes::initCodes(int gameVer)
 		offsets.fleeConstructor2 = 0x5BB430;
 		offsets.getAreaHandle = 0x642A50;
 		offsets.line2dGetClosest = 0xD6CD00;
+		offsets.regionCanHavePort = 0x4A0A30;
 	}
 }

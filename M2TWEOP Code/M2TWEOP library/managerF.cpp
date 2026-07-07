@@ -1366,6 +1366,18 @@ void managerF::execPatches()
 	//toSpearLocomotion->Enable();
 	//f1 << "Done" << '\n';
 	
+	//f1 << "Start applying onProcessCharge patch" << '\n';
+	//onProcessCharge* toProcessCharge = new onProcessCharge(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
+	//toProcessCharge->SetNewCode();
+	//toProcessCharge->Enable();
+	//f1 << "Done" << '\n';
+	
+	f1 << "Start applying onTechtreeSlots patch" << '\n';
+	onTechtreeSlots* toTechtreeSlots = new onTechtreeSlots(mem, (LPVOID)patchesForGame::onTechtreeSlots, globals::dataS.gameVersion);
+	toTechtreeSlots->SetNewCode();
+	toTechtreeSlots->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying onSetupBattleFromStrat patch" << '\n';
 	onSetupBattleFromStrat* toSetupBattleFromStrat = new onSetupBattleFromStrat(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
 	toSetupBattleFromStrat->SetNewCode();
