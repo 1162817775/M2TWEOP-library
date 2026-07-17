@@ -3121,6 +3121,7 @@ minHookFunctions::t_onCreateWife                         minHookFunctions::o_onC
 minHookFunctions::t_onCreateMessageAboutMarriage         minHookFunctions::o_onCreateMessageAboutMarriage = nullptr;
 minHookFunctions::t_onCreateCandidateMarrying            minHookFunctions::o_onCreateCandidateMarrying = nullptr;
 minHookFunctions::t_onDaughterReadyMarryHusband          minHookFunctions::o_onDaughterReadyMarryHusband = nullptr;
+minHookFunctions::t_onCalculationRatioForBirth           minHookFunctions::o_onCalculationRatioForBirth = nullptr;
 minHookFunctions::t_debugRenderLine                      minHookFunctions::o_debugRenderLine = nullptr;
 minHookFunctions::t_debugLineAdd                         minHookFunctions::o_debugLineAdd = nullptr;
 minHookFunctions::t_debugRenderPeg                       minHookFunctions::o_debugRenderPeg = nullptr;
@@ -3176,6 +3177,7 @@ void minHookFunctions::init()
 	MIN_HOOK(codes::offsets.displayDefenseStats,                     displayDefenseStats,                o_displayDefenseStats);
 	MIN_HOOK(codes::offsets.fleeConstructor1,						 fleeConstructor1,                   o_fleeConstructor1);
 	MIN_HOOK(codes::offsets.fleeConstructor2,                        fleeConstructor2,                   o_fleeConstructor2);
+	MIN_HOOK(codes::offsets.onCalculationRatioForBirth,              onCalculationRatioForBirth,         o_onCalculationRatioForBirth);
 }
 
 int __thiscall minHookFunctions::debugLineAdd(void* _this, vector3* start, vector3* end, color8888 color, float time, bool zbuffered)
@@ -3417,6 +3419,19 @@ void __cdecl minHookFunctions::onDaughterReadyMarryHusband(characterRecord* daug
 	o_onDaughterReadyMarryHusband(daughter, new_husband, mo);
 }
 
+float __fastcall minHookFunctions::onCalculationRatioForBirth(family* _this)
+{
+	int buffer = _this->faction->regionsNum;
+	_this->faction->regionsNum = gameEvents::onCalculationRatioForBirth(_this->faction, _this->faction->regionsNum);
+
+	float result = o_onCalculationRatioForBirth(_this);
+	_this->faction->regionsNum = buffer;
+
+//	gameHelpers::logStringGame("onCalculationRatioForBirth: facName: " + string(_this->faction->factionRecord->facName) + ", regionsNum: " + to_string(_this->faction->regionsNum) + ", buffer: " + to_string(buffer) + ", result: " + to_string(result));
+
+	return result;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// CALL GAME FUNCTIONS /////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3425,7 +3440,7 @@ characterRecord* minHookFunctions::createWife(characterRecord* husband)
 {
 	if (!husband->isMale || husband->spouse)
 	{
-		gameHelpers::logStringGame("characterRecord::createMessageMarriageProposal: your son is already married");
+		gameHelpers::logStringGame("characterRecord::createMessageMarriageProposal: son is already married");
 		return nullptr;
 	}
 
@@ -3441,7 +3456,7 @@ characterRecord* minHookFunctions::createHusband(characterRecord* daughter)
 {
 	if (daughter->isMale || daughter->spouse)
 	{
-		gameHelpers::logStringGame("characterRecord::createMessageMarriageProposal: the daughter is already married");
+		gameHelpers::logStringGame("characterRecord::createMessageMarriageProposal: daughter is already married");
 		return nullptr;
 	}
 

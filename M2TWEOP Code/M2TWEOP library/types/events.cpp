@@ -1006,6 +1006,27 @@ void onCharacterSwitchFaction(character* character, factionStruct* faction)
 	}
 }
 
+int onCalculationRatioForBirth(factionStruct* faction, int value)
+{
+	if (plugData::data.luaAll.onCalculationRatioForBirth != nullptr)
+	{
+		const auto funcResult = (*plugData::data.luaAll.onCalculationRatioForBirth)(faction, value);
+		if (!funcResult.valid())
+		{
+			const sol::error luaError = funcResult;
+			MessageBoxA(nullptr, luaError.what(), "Lua exception in onCalculationRatioForBirth() call!", NULL);
+		}
+		else
+		{
+			sol::optional<int>res = funcResult;
+			if (res)
+				return res.value();
+		}
+	}
+
+	return value;
+}
+
 void onLoadGamePl(const std::vector<std::string>* saveFiles)
 {
 	if (plugData::data.luaAll.onLoadSaveFile != nullptr)
@@ -4667,6 +4688,40 @@ void luaPlugin::onPluginLoadF()
 	*/
 	onCharacterSwitchFaction = new sol::function(luaState["onCharacterSwitchFaction"]);
 	checkLuaFunc(&onCharacterSwitchFaction);
+
+	/***
+	Called when a calculation ratio for birth or adoption.
+	
+	@function onCalculationRatioForBirth
+	@tparam factionStruct faction
+	@tparam int value(default - number of regions)
+	
+	@usage
+	local function getAdultDaughtersAndOldFamilyMembersNum(fac)
+		local value = 0;
+		for c = 0, fac.characterRecordNum-1 do
+			local character = fac:getCharacterRecord(c);
+			if not character.isMale and character.isAlive and character.isFamily and character.age >= 14 and not character.spouse then
+				value = value + 1;
+			elseif character.isMale and character.isAlive and character.isFamily and character.age >= 60 then
+				value = value + 1;
+			end
+		end
+		M2TWEOP.logGame("getAdultDaughtersAndOldFamilyMembersNum(value: "..value..")");
+		return value;
+	end
+
+	function onCalculationRatioForBirth(faction, value --[[default - number of regions--]])
+		if faction.name~="slave" then
+			local newValue = faction.settlementsNum + getAdultDaughtersAndOldFamilyMembersNum(faction);
+			M2TWEOP.logGame("onCalculationRatioForBirth(faction: "..faction.name..", value: "..value..", new value: "..newValue..")");
+			return newValue;
+		end
+		return value;
+	end
+	*/
+	onCalculationRatioForBirth = new sol::function(luaState["onCalculationRatioForBirth"]);
+	checkLuaFunc(&onCalculationRatioForBirth);
 
 
 	if (onPluginLoad != nullptr)

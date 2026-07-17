@@ -408,6 +408,7 @@ public:
 		DWORD addPortToCampaign = NULL;
 		DWORD fleeConstructor1 = NULL;
 		DWORD fleeConstructor2 = NULL;
+		DWORD onCalculationRatioForBirth = NULL;
 	}offsets;
 
 	static void initCodes(int gameVer);

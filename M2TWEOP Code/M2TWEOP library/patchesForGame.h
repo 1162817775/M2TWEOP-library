@@ -435,6 +435,10 @@ public:
 	static t_onDaughterReadyMarryHusband o_onDaughterReadyMarryHusband;
 	static void __cdecl onDaughterReadyMarryHusband(characterRecord* daughter, characterRecord* new_husband, marriageOption* mo);
 	static characterRecord* createHusband(characterRecord* husband);
+
+	using t_onCalculationRatioForBirth = float(__fastcall*)(family* _this);
+	static t_onCalculationRatioForBirth o_onCalculationRatioForBirth;
+	static float __fastcall onCalculationRatioForBirth(family* _this);
 };
 
 #define GET_VARIABLE_NAME(Variable) (#Variable)
