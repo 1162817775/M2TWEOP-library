@@ -177,6 +177,24 @@ struct marriageOption
 	struct characterRecord* spouse;
 };
 
+struct adoptionOption
+{
+	void* yesNoClass;
+	bool madeChoice;
+	bool accepted;
+	bool stub_2[2];
+	struct characterRecord* possibleSon;
+	struct characterRecord* father;
+	character* someGeneral;
+};
+
+struct family
+{
+	factionStruct* faction;
+	marriageOption* marriageOption;
+	adoptionOption* adoptionOption;
+};
+
 //faction
 struct factionStruct {
 	DWORD* vfTable;

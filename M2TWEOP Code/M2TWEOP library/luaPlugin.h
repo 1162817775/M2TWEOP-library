@@ -361,6 +361,7 @@ public:
 	sol::function* onCharacterDied = nullptr;
 	sol::function* onFactionDied = nullptr;
 	sol::function* onCharacterSwitchFaction = nullptr;
+	sol::function* onCalculationRatioForBirth = nullptr;
 	static void checkLuaFunc(sol::function** lRef);
 private:
 

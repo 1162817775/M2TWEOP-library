@@ -404,6 +404,7 @@ void codes::initCodes(int gameVer)
 		offsets.getAreaHandle = 0x6426A0;
 		offsets.line2dGetClosest = 0xD72980;
 		offsets.regionCanHavePort = 0x4A0590;
+		offsets.onCalculationRatioForBirth = 0x004e9f50;
 	}
 
 
@@ -811,5 +812,6 @@ void codes::initCodes(int gameVer)
 		offsets.getAreaHandle = 0x642A50;
 		offsets.line2dGetClosest = 0xD6CD00;
 		offsets.regionCanHavePort = 0x4A0A30;
+		offsets.onCalculationRatioForBirth = 0x004ea560;
 	}
 }

@@ -259,6 +259,7 @@ namespace gameEvents
 	void onCharacterDied(character* c);
 	void onFactionDied(factionStruct* faction);
 	void onCharacterSwitchFaction(character* character, factionStruct* faction);
+	int onCalculationRatioForBirth(factionStruct* faction, int value);
 	
 	template<EventType EvType> class Event :public EventBase
 	{
