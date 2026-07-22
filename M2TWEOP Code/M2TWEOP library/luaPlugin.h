@@ -12,6 +12,7 @@
 #include <string>
 #include "gameHelpers.h"
 #include "globals.h"
+#include <graphicsD3D.h>
 
 inline UINT getLuaExceptionMessageBoxFlags()
 {
@@ -27,7 +28,7 @@ if (!funcResult.valid())\
 {\
 	sol::error luaError = funcResult;\
 	gameHelpers::logStringGame(luaError.what());\
-	int result = MessageBoxA(NULL, luaError.what(), "Lua exception!", defaultFlags);\
+	int result = MessageBoxA(graphicsD3D::dataS.Window, luaError.what(), "Lua exception!", defaultFlags);\
 	if (plugData::data.luaAll.checkVar("TERMINATE_AT_LUA_EXCEPTION", 1) == true)\
 	{\
 		terminate();\
@@ -43,7 +44,7 @@ if (!funcResult.valid())\
 {\
 	sol::error luaError = funcResult;\
 	gameHelpers::logStringGame(luaError.what());\
-	int result = MessageBoxA(NULL, luaError.what(), "Lua exception!", defaultFlags);\
+	int result = MessageBoxA(graphicsD3D::dataS.Window, luaError.what(), "Lua exception!", defaultFlags);\
 	if (plugData::data.luaAll.checkVar("TERMINATE_AT_LUA_EXCEPTION", 1) == true)\
 	{\
 		terminate();\
