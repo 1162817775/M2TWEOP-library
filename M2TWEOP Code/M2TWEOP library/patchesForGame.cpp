@@ -3551,39 +3551,6 @@ void minHookFunctions::draw()
 			wt->faction->tilesFac->updateFromObject(wt);
 		}
 	}
-//	if (ImGui::Button("removeWatchtower"))
-//	{
-//		campaign* camp = gameHelpers::getGameDataAll()->campaignStruct;
-//
-//		for (int w = 0; w < camp->watchtowersNum; w++)
-//		{
-//			watchTowerStruct* wt = camp->getWatchTower(w);
-//			if (wt->xCoord == xLocCoord && wt->yCoord == yLocCoord)
-//			{
-//				GAME_FUNC(void(__thiscall*)(watchTowerStruct*, bool, factionStruct*, int), 
-//					changeWatchTowerFaction)(wt, 0, camp->getSlaveFaction(), 0);
-//
-//				GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*),
-//					0x004c98a0)(campaignHelpers::getStratPathFinding(), wt);
-//			}
-//		}
-//	}
-	if (ImGui::Button("moveCharacter"))
-	{
-		if (auto character = gameHelpers::getGameDataAll()->selectInfo->selectedCharacter->selectedCharacter; character)
-		{
-			int xCoord = rememberCoords.xCoord;
-			int yCoord = rememberCoords.yCoord;
-
-			coordPair coords{ xCoord, yCoord };
-			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*),
-				0x004cd440)(campaignHelpers::getStratPathFinding(), character, &coords);
-
-			character->regionID = stratMapHelpers::getTile(xCoord, yCoord)->regionId;
-
-			character->characterRecord->faction->tilesFac->updateFromObject(character);
-		}
-	}
 	if (ImGui::Button("moveSettlement"))
 	{
 		if (auto sett = gameHelpers::getGameDataAll()->selectInfo->getSelectedSettlement(); sett)
@@ -3688,6 +3655,53 @@ void minHookFunctions::draw()
 				0x005edd00)(sett, 0, true);
 		}
 	}
+	if (ImGui::Button("removeWatchtower"))
+	{
+		// variant 1   
+
+		if (!selectTile)
+			return;
+
+		watchTowerStruct* tarWt = selectTile->getWatchtower();
+		if (!tarWt)
+			return;
+
+		factionStruct* fac = tarWt->faction;
+		factionHelpers::removeWatchtower(fac, tarWt);
+	}
+	if (ImGui::Button("removeWatchtower 2"))
+	{
+		// variant 2 - does the same as variant 1   
+
+		if (!selectTile)
+			return;
+
+		watchTowerStruct* tarWt = selectTile->getWatchtower();
+		if (!tarWt)
+			return;
+
+		campaign* camp = gameHelpers::getGameDataAll()->campaignStruct;
+		for (int w = 0; w < camp->watchtowersNum; w++)
+		{
+			watchTowerStruct* wt = camp->getWatchTower(w);
+			if (wt == tarWt)
+			{
+				if (w != camp->watchtowersNum - 1)
+				{
+					camp->watchtowers[w] = camp->watchtowers[camp->watchtowersNum - 1];
+				}
+				camp->watchtowersNum--;
+				break;
+			}
+		}
+
+		selectTile->watchtower = false;
+		GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*), 0x004c98a0)(campaignHelpers::getStratPathFinding(), tarWt); // removeObject   
+
+		GAME_FUNC_RAW(void(__fastcall*)(watchTowerStruct*), 0x004dcd20)(tarWt); // removeWatchtower - remove watchtower from a faction
+		// The superfluous(last) watchtower is automatically removed from the campaignStruct. It is removed from the factionStruct after reloading the save(doesn't get saved in the save file).   
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////
 
 	ImGui::End();

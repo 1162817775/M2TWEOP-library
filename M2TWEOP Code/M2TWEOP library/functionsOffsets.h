@@ -114,6 +114,7 @@ public:
 		//create character
 		DWORD createCharacterFunc = NULL;
 		DWORD spawnCreatedObject = NULL;
+		DWORD removeObject = NULL;
 		DWORD doSomeWithCharacterFunc = NULL;
 
 		//create army

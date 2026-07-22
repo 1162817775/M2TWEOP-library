@@ -85,6 +85,7 @@ void codes::initCodes(int gameVer)
 
 		offsets.createCharacterFunc = 0x008b5d60;
 		offsets.spawnCreatedObject = 0x004cd240;
+		offsets.removeObject = 0x004c98a0;
 		offsets.doSomeWithCharacterFunc = 0x004bafa0;
 
 		offsets.createArmyFunc = 0x004f40d0;
@@ -494,6 +495,7 @@ void codes::initCodes(int gameVer)
 
 		offsets.createCharacterFunc = 0x008b6750;
 		offsets.spawnCreatedObject = 0x004cd800;
+		offsets.removeObject = 0x004c9e50;
 		offsets.doSomeWithCharacterFunc = 0x004bb530;
 
 		offsets.createArmyFunc = 0x004f46a0;
