@@ -756,6 +756,46 @@ namespace factionHelpers
 		return tower;
 	}
 
+	void removeWatchtower(factionStruct* fac, watchTowerStruct* tarWt)
+	{
+		if (!tarWt)
+			return;
+
+		campaign* camp = gameHelpers::getGameDataAll()->campaignStruct;
+		for (int w = 0; w < camp->watchtowersNum; w++)
+		{
+			watchTowerStruct* wt = camp->getWatchTower(w);
+			if (wt == tarWt)
+			{
+				for (int wf = 0; wf < fac->watchtowersNum; wf++)
+				{
+					watchTowerStruct* wtf = fac->getWatchtower(wf);
+					if (wtf == tarWt)
+					{
+						if (wf != fac->watchtowersNum - 1)
+						{
+							fac->watchTowers[wf] = fac->watchTowers[fac->watchtowersNum - 1];
+						}
+						fac->watchtowersNum--;
+
+						if (w != camp->watchtowersNum - 1)
+						{
+							camp->watchtowers[w] = camp->watchtowers[camp->watchtowersNum - 1];
+						}
+						camp->watchtowersNum--;
+ 
+						GAME_FUNC(void(__thiscall*)(stratPathFinding*, void*), removeObject)(campaignHelpers::getStratPathFinding(), wt);
+						const auto tile = stratMapHelpers::getTile(tarWt->xCoord, tarWt->yCoord);
+						tile->watchtower = false;
+
+						return;
+						// The superfluous(last) watchtower is automatically removed from the campaignStruct. It is removed from the factionStruct after reloading the save(doesn't get saved in the save file).   
+					}
+				}
+			}
+		}
+	}
+
 	void setFactionStanding(const factionStruct* fac1, const factionStruct* fac2, float standing)
 	{
 		const auto campaign = campaignHelpers::getCampaignData();
@@ -1244,6 +1284,15 @@ namespace factionHelpers
 			 fac:createWatchtower(193, 283)
 		*/
 		types.factionStruct.set_function("createWatchtower", &spawnWatchtower);
+
+		/***
+		Delete a specific watchtower.
+		@function factionStruct:deleteWatchtower
+		@tparam watchtowerStruct watchTower
+		@usage
+			 fac:deleteWatchtower(someWatchtower)
+		*/
+		types.factionStruct.set_function("deleteWatchtower", &removeWatchtower);
 
 		/***
 		Check if a faction has military access to another faction.

@@ -1027,6 +1027,35 @@ int onCalculationRatioForBirth(factionStruct* faction, int value)
 	return value;
 }
 
+std::string* onCreateTooltip(const char* str)
+{
+	std::string tmpS;
+	if (plugData::data.luaAll.onCreateTooltip != nullptr)
+	{
+
+		auto funcResult = (*plugData::data.luaAll.onCreateTooltip)(str);
+		if (!funcResult.valid())
+		{
+
+			sol::error luaError = funcResult;
+			MessageBoxA(NULL, luaError.what(), "Lua exception in onCreateTooltip() call!", NULL);
+		}
+		else
+		{
+			sol::optional<std::string>s = funcResult;
+			if (s)
+			{
+				tmpS = s.value();
+			}
+		}
+
+	}
+
+	std::string* retS = new std::string(tmpS);
+
+	return retS;
+}
+
 void onLoadGamePl(const std::vector<std::string>* saveFiles)
 {
 	if (plugData::data.luaAll.onLoadSaveFile != nullptr)
@@ -4695,7 +4724,8 @@ void luaPlugin::onPluginLoadF()
 	@function onCalculationRatioForBirth
 	@tparam factionStruct faction
 	@tparam int value(default - number of regions)
-	
+	@treturn int newValue
+
 	@usage
 	local function getAdultDaughtersAndOldFamilyMembersNum(fac)
 		local value = 0;
@@ -4722,6 +4752,27 @@ void luaPlugin::onPluginLoadF()
 	*/
 	onCalculationRatioForBirth = new sol::function(luaState["onCalculationRatioForBirth"]);
 	checkLuaFunc(&onCalculationRatioForBirth);
+
+	/***
+	Called when the game tooltip is created.
+	
+	@function onCreateTooltip
+	@tparam string text
+	@treturn string newText
+	
+	@usage
+	function onCreateTooltip(text)
+		local xCoord, yCoord = M2TWEOP.getGameTileCoordsWithCursor();
+		if(xCoord==400 and yCoord==52) or(xCoord==398 and yCoord==53) then
+			text = '   Великая Пирамида Гизы!\n\nПирамида Хеопса в Гизе, также называемая Великой пирамидой, является одной из семи чудес мира, а также самой большой египетской пирамиды и самой знаменитой пирамиды в мире. Это самый большой из трех пирамид в некрополе Гизе, недалеко от Каира в Египте.\n\nДвойной щелчок левой кнопкой мыши, чтобы узнать подробнее';
+		elseif STONE_FORT.quick_check[xCoord.."_"..yCoord] and text:find("крепость") then -- is stone fort script
+			text = text:gsub("крепость","каменная крепость");
+		end
+		return text;
+	end
+	*/
+	onCreateTooltip = new sol::function(luaState["onCreateTooltip"]);
+	checkLuaFunc(&onCreateTooltip);
 
 
 	if (onPluginLoad != nullptr)

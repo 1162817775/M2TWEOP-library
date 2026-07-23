@@ -114,6 +114,7 @@ public:
 		//create character
 		DWORD createCharacterFunc = NULL;
 		DWORD spawnCreatedObject = NULL;
+		DWORD removeObject = NULL;
 		DWORD doSomeWithCharacterFunc = NULL;
 
 		//create army
@@ -409,6 +410,7 @@ public:
 		DWORD fleeConstructor1 = NULL;
 		DWORD fleeConstructor2 = NULL;
 		DWORD onCalculationRatioForBirth = NULL;
+		DWORD onCreateTooltip = NULL;
 	}offsets;
 
 	static void initCodes(int gameVer);

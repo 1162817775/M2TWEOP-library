@@ -659,6 +659,7 @@ namespace factionHelpers
 	void setMilitaryAccess(const factionStruct* fac1, const factionStruct* fac2, bool set);
 	float getFactionStanding(const factionStruct* fac1, const factionStruct* fac2);
 	watchTowerStruct* spawnWatchtower(const factionStruct* fac, int x, int y);
+	void removeWatchtower(factionStruct* fac, watchTowerStruct* tarWt);
 	void setFactionStanding(const factionStruct* fac1, const factionStruct* fac2, float standing);
 	std::string getLocalizedFactionName(const factionStruct* fac);
 	void* disembark(armyStruct* army, int x, int y);
