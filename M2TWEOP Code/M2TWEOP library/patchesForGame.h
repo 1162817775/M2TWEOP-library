@@ -439,6 +439,10 @@ public:
 	using t_onCalculationRatioForBirth = float(__fastcall*)(family* _this);
 	static t_onCalculationRatioForBirth o_onCalculationRatioForBirth;
 	static float __fastcall onCalculationRatioForBirth(family* _this);
+
+	using t_onCreateTooltip = void(__thiscall*)(void* _this, void* p, UNICODE_STRING*** u);
+	static t_onCreateTooltip o_onCreateTooltip;
+	static void __thiscall onCreateTooltip(void* _this, void* p, UNICODE_STRING*** u);
 };
 
 #define GET_VARIABLE_NAME(Variable) (#Variable)

@@ -363,6 +363,7 @@ public:
 	sol::function* onFactionDied = nullptr;
 	sol::function* onCharacterSwitchFaction = nullptr;
 	sol::function* onCalculationRatioForBirth = nullptr;
+	sol::function* onCreateTooltip = nullptr;
 	static void checkLuaFunc(sol::function** lRef);
 private:
 

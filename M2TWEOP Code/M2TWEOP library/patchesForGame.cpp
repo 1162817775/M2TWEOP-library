@@ -3132,6 +3132,7 @@ minHookFunctions::t_displayArmourStats                   minHookFunctions::o_dis
 minHookFunctions::t_displayDefenseStats                  minHookFunctions::o_displayDefenseStats = nullptr;
 minHookFunctions::t_fleeConstructor                      minHookFunctions::o_fleeConstructor1 = nullptr;
 minHookFunctions::t_fleeConstructor                      minHookFunctions::o_fleeConstructor2 = nullptr;
+minHookFunctions::t_onCreateTooltip                      minHookFunctions::o_onCreateTooltip = nullptr;
 
 DWORD minHookFunctions::lastSoundClass = NULL;
 bool minHookFunctions::isUnlockWeaponLimit = false;
@@ -3178,6 +3179,7 @@ void minHookFunctions::init()
 	MIN_HOOK(codes::offsets.fleeConstructor1,						 fleeConstructor1,                   o_fleeConstructor1);
 	MIN_HOOK(codes::offsets.fleeConstructor2,                        fleeConstructor2,                   o_fleeConstructor2);
 	MIN_HOOK(codes::offsets.onCalculationRatioForBirth,              onCalculationRatioForBirth,         o_onCalculationRatioForBirth);
+	MIN_HOOK(codes::offsets.onCreateTooltip,                         onCreateTooltip,                    o_onCreateTooltip);
 }
 
 int __thiscall minHookFunctions::debugLineAdd(void* _this, vector3* start, vector3* end, color8888 color, float time, bool zbuffered)
@@ -3430,6 +3432,27 @@ float __fastcall minHookFunctions::onCalculationRatioForBirth(family* _this)
 //	gameHelpers::logStringGame("onCalculationRatioForBirth: facName: " + string(_this->faction->factionRecord->facName) + ", regionsNum: " + to_string(_this->faction->regionsNum) + ", buffer: " + to_string(buffer) + ", result: " + to_string(result));
 
 	return result;
+}
+
+void __thiscall minHookFunctions::onCreateTooltip(void* _this, void* p, UNICODE_STRING*** u)
+{
+	if (u)
+	{
+		auto uni = *u;
+		string str = gameStringHelpers::uniStringToStr(uni);
+		if (str.size() > 0)
+		{
+			string* newStrP = gameEvents::onCreateTooltip(str.c_str());
+			string newStr = *newStrP;
+			if (newStr != str)
+			{
+				gameStringHelpers::createUniString(uni, newStr.c_str());
+				u = &uni;
+			//	gameHelpers::logStringGame("onCreateTooltip:\n   str: " + str + "\n   newStr: " + newStr);
+			}
+		}
+	}
+	o_onCreateTooltip(_this, p, u);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
