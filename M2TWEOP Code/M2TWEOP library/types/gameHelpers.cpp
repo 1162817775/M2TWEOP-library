@@ -3588,6 +3588,19 @@ namespace gameHelpers
 		minHookFunctions::onPlayGameSound(minHookFunctions::lastSoundClass, value);
 	}
 
+	void resetTooltipText(const char* text)
+	{
+		minHookFunctions::resetTooltipText(text);
+	}
+
+	bool getTooltipActive()
+	{
+		if (!minHookFunctions::lastTooltipClass1)
+			return false;
+
+		return *reinterpret_cast<bool*>(minHookFunctions::lastTooltipClass1 + 0x68);
+	}
+
 	void fixReligionTrigger()
 	{
 		int8_t fixValue = -3;

@@ -407,6 +407,8 @@ void codes::initCodes(int gameVer)
 		offsets.regionCanHavePort = 0x4A0590;
 		offsets.onCalculationRatioForBirth = 0x004e9f50;
 		offsets.onCreateTooltip = 0x00b2fd20;
+		offsets.onCreateTooltipByCoords = 0x00c34be0;
+		offsets.resetTooltipTextAdd = 0x00b2fe30;
 	}
 
 
@@ -817,5 +819,7 @@ void codes::initCodes(int gameVer)
 		offsets.regionCanHavePort = 0x4A0A30;
 		offsets.onCalculationRatioForBirth = 0x004ea560;
 		offsets.onCreateTooltip = 0x00b2a030;
+		offsets.onCreateTooltipByCoords = 0x00c2efb0;
+		offsets.resetTooltipTextAdd = 0x00b2a140;
 	}
 }
