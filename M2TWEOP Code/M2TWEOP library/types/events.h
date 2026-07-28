@@ -261,6 +261,7 @@ namespace gameEvents
 	void onCharacterSwitchFaction(character* character, factionStruct* faction);
 	int onCalculationRatioForBirth(factionStruct* faction, int value);
 	std::string* onCreateTooltip(const char* str);
+	std::string* onCreateTooltipByCoords(int xCoord, int yCoord);
 	
 	template<EventType EvType> class Event :public EventBase
 	{

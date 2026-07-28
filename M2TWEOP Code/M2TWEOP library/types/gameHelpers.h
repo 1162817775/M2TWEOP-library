@@ -668,6 +668,8 @@ namespace gameHelpers
 	float getUnitSizeMultiplier();
 	int calculateMaxBodyguardSize(const character* general, const eduEntry* bgEntry);
 	void playGameSound(int value);
+	void resetTooltipText(const char* text);
+	bool getTooltipActive();
 
 	religionDatabase* getReligionDatabase();
 	gameDataAllStruct* getGameDataAll();

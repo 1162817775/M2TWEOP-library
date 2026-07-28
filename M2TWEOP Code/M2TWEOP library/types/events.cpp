@@ -1032,11 +1032,9 @@ std::string* onCreateTooltip(const char* str)
 	std::string tmpS;
 	if (plugData::data.luaAll.onCreateTooltip != nullptr)
 	{
-
 		auto funcResult = (*plugData::data.luaAll.onCreateTooltip)(str);
 		if (!funcResult.valid())
 		{
-
 			sol::error luaError = funcResult;
 			MessageBoxA(NULL, luaError.what(), "Lua exception in onCreateTooltip() call!", NULL);
 		}
@@ -1048,11 +1046,32 @@ std::string* onCreateTooltip(const char* str)
 				tmpS = s.value();
 			}
 		}
-
 	}
-
 	std::string* retS = new std::string(tmpS);
+	return retS;
+}
 
+std::string* onCreateTooltipByCoords(int xCoord, int yCoord)
+{
+	std::string tmpS;
+	if (plugData::data.luaAll.onCreateTooltipByCoords != nullptr)
+	{
+		auto funcResult = (*plugData::data.luaAll.onCreateTooltipByCoords)(xCoord, yCoord);
+		if (!funcResult.valid())
+		{
+			sol::error luaError = funcResult;
+			MessageBoxA(NULL, luaError.what(), "Lua exception in onCreateTooltipByCoords() call!", NULL);
+		}
+		else
+		{
+			sol::optional<std::string>s = funcResult;
+			if (s)
+			{
+				tmpS = s.value();
+			}
+		}
+	}
+	std::string* retS = new std::string(tmpS);
 	return retS;
 }
 
@@ -4754,7 +4773,7 @@ void luaPlugin::onPluginLoadF()
 	checkLuaFunc(&onCalculationRatioForBirth);
 
 	/***
-	Called when the game tooltip is created.
+	Called when the in-game tooltip is created(strat map objects, buttons, etc). Works only for "yellow" tooltips. Works only for existing tooltips.   
 	
 	@function onCreateTooltip
 	@tparam string text
@@ -4764,15 +4783,31 @@ void luaPlugin::onPluginLoadF()
 	function onCreateTooltip(text)
 		local xCoord, yCoord = M2TWEOP.getGameTileCoordsWithCursor();
 		if(xCoord==400 and yCoord==52) or(xCoord==398 and yCoord==53) then
-			text = '   Великая Пирамида Гизы!\n\nПирамида Хеопса в Гизе, также называемая Великой пирамидой, является одной из семи чудес мира, а также самой большой египетской пирамиды и самой знаменитой пирамиды в мире. Это самый большой из трех пирамид в некрополе Гизе, недалеко от Каира в Египте.\n\nДвойной щелчок левой кнопкой мыши, чтобы узнать подробнее';
-		elseif STONE_FORT.quick_check[xCoord.."_"..yCoord] and text:find("крепость") then -- is stone fort script
-			text = text:gsub("крепость","каменная крепость");
+			text = "newText";
 		end
 		return text;
 	end
 	*/
 	onCreateTooltip = new sol::function(luaState["onCreateTooltip"]);
 	checkLuaFunc(&onCreateTooltip);
+
+	/***
+	Called when checking the conditions for creating a tooltip based on the coordinates of the campaign map. Works only for "yellow" tooltips. Use this to create a new tooltip at specific coordinates.   
+	
+	@function onCreateTooltipByCoords
+	@tparam int xCoord
+	@tparam int yCoord
+	@treturn string text
+	
+	@usage
+	function onCreateTooltipByCoords(x,y)
+		if x==223 and y==181 then
+			return "text";
+		end
+	end
+	*/
+	onCreateTooltipByCoords = new sol::function(luaState["onCreateTooltipByCoords"]);
+	checkLuaFunc(&onCreateTooltipByCoords);
 
 
 	if (onPluginLoad != nullptr)

@@ -440,9 +440,17 @@ public:
 	static t_onCalculationRatioForBirth o_onCalculationRatioForBirth;
 	static float __fastcall onCalculationRatioForBirth(family* _this);
 
-	using t_onCreateTooltip = void(__thiscall*)(void* _this, void* p, UNICODE_STRING*** u);
+	using t_onCreateTooltip = void(__thiscall*)(DWORD _this, void* p, UNICODE_STRING*** u);
 	static t_onCreateTooltip o_onCreateTooltip;
-	static void __thiscall onCreateTooltip(void* _this, void* p, UNICODE_STRING*** u);
+	static void __thiscall onCreateTooltip(DWORD _this, void* p, UNICODE_STRING*** u);
+	static DWORD lastTooltipClass1;
+	static void* lastTooltipClass2;
+	static UNICODE_STRING*** lastTooltipUniString;
+	static void resetTooltipText(const char* text);
+
+	using t_onCreateTooltipByCoords = void(__thiscall*)(void* _this, coordPair* coords, UNICODE_STRING**& u1, UNICODE_STRING**& u2);
+	static t_onCreateTooltipByCoords o_onCreateTooltipByCoords;
+	static void __thiscall onCreateTooltipByCoords(void* _this, coordPair* coords, UNICODE_STRING**& u1, UNICODE_STRING**& u2);
 };
 
 #define GET_VARIABLE_NAME(Variable) (#Variable)

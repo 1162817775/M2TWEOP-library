@@ -411,6 +411,8 @@ public:
 		DWORD fleeConstructor2 = NULL;
 		DWORD onCalculationRatioForBirth = NULL;
 		DWORD onCreateTooltip = NULL;
+		DWORD onCreateTooltipByCoords = NULL;
+		DWORD resetTooltipTextAdd = NULL;
 	}offsets;
 
 	static void initCodes(int gameVer);

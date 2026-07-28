@@ -314,6 +314,8 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield setGroundTypeMoveCost setGroundTypeMoveCost
 	@tfield openGateOnStratMap openGateOnStratMap
 	@tfield playGameSound playGameSound
+	@tfield resetTooltipText resetTooltipText
+	@tfield getTooltipActive getTooltipActive
 	@table M2TWEOP
 	*/
 	
@@ -679,6 +681,24 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	M2TWEOP.playGameSound(196);
 	*/
 	tables.M2TWEOP.set_function("playGameSound", &gameHelpers::playGameSound);
+
+	/***
+	Reset current game tooltip text.   
+	@function M2TWEOP.resetTooltipText
+	@tparam string text
+	@usage
+	M2TWEOP.resetTooltipText("new text");
+	*/
+	tables.M2TWEOP.set_function("resetTooltipText", &gameHelpers::resetTooltipText);
+
+	/***
+	Get game tooltip activity.   
+	@function M2TWEOP.getTooltipActive
+	@treturn bool isActive true = active, false = not active
+	@usage
+	isActive = M2TWEOP.getTooltipActive();
+	*/
+	tables.M2TWEOP.set_function("getTooltipActive", &gameHelpers::getTooltipActive);
 
 	/***
 	Gets a struct containing color information about the settlement info scroll.

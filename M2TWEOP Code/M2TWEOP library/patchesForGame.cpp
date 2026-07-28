@@ -3133,12 +3133,16 @@ minHookFunctions::t_displayDefenseStats                  minHookFunctions::o_dis
 minHookFunctions::t_fleeConstructor                      minHookFunctions::o_fleeConstructor1 = nullptr;
 minHookFunctions::t_fleeConstructor                      minHookFunctions::o_fleeConstructor2 = nullptr;
 minHookFunctions::t_onCreateTooltip                      minHookFunctions::o_onCreateTooltip = nullptr;
+minHookFunctions::t_onCreateTooltipByCoords              minHookFunctions::o_onCreateTooltipByCoords = nullptr;
 
 DWORD minHookFunctions::lastSoundClass = NULL;
 bool minHookFunctions::isUnlockWeaponLimit = false;
 oneTile* minHookFunctions::selectTile = nullptr;
 bool minHookFunctions::openConsole = false;
 coordPair minHookFunctions::rememberCoords{ 0, 0 };
+DWORD minHookFunctions::lastTooltipClass1 = NULL;
+void* minHookFunctions::lastTooltipClass2 = NULL;
+UNICODE_STRING*** minHookFunctions::lastTooltipUniString = NULL;
 
 
 static string pointerToString(LPVOID ppPointer)
@@ -3180,6 +3184,7 @@ void minHookFunctions::init()
 	MIN_HOOK(codes::offsets.fleeConstructor2,                        fleeConstructor2,                   o_fleeConstructor2);
 	MIN_HOOK(codes::offsets.onCalculationRatioForBirth,              onCalculationRatioForBirth,         o_onCalculationRatioForBirth);
 	MIN_HOOK(codes::offsets.onCreateTooltip,                         onCreateTooltip,                    o_onCreateTooltip);
+	MIN_HOOK(codes::offsets.onCreateTooltipByCoords,                 onCreateTooltipByCoords,            o_onCreateTooltipByCoords);
 }
 
 int __thiscall minHookFunctions::debugLineAdd(void* _this, vector3* start, vector3* end, color8888 color, float time, bool zbuffered)
@@ -3429,16 +3434,18 @@ float __fastcall minHookFunctions::onCalculationRatioForBirth(family* _this)
 	float result = o_onCalculationRatioForBirth(_this);
 	_this->faction->regionsNum = buffer;
 
-//	gameHelpers::logStringGame("onCalculationRatioForBirth: facName: " + string(_this->faction->factionRecord->facName) + ", regionsNum: " + to_string(_this->faction->regionsNum) + ", buffer: " + to_string(buffer) + ", result: " + to_string(result));
-
 	return result;
 }
 
-void __thiscall minHookFunctions::onCreateTooltip(void* _this, void* p, UNICODE_STRING*** u)
+void __thiscall minHookFunctions::onCreateTooltip(DWORD _this, void* p, UNICODE_STRING*** u)
 {
 	if (u)
 	{
-		auto uni = *u;
+		lastTooltipClass1    = _this;
+		lastTooltipClass2    = p;
+		lastTooltipUniString = u;
+
+		UNICODE_STRING** uni = *u;
 		string str = gameStringHelpers::uniStringToStr(uni);
 		if (str.size() > 0)
 		{
@@ -3448,13 +3455,25 @@ void __thiscall minHookFunctions::onCreateTooltip(void* _this, void* p, UNICODE_
 			{
 				gameStringHelpers::createUniString(uni, newStr.c_str());
 				u = &uni;
-			//	gameHelpers::logStringGame("onCreateTooltip:\n   str: " + str + "\n   newStr: " + newStr);
 			}
 		}
 	}
 	o_onCreateTooltip(_this, p, u);
 }
 
+void __thiscall minHookFunctions::onCreateTooltipByCoords(void* _this, coordPair* coords, UNICODE_STRING**& u1, UNICODE_STRING**& u2)
+{
+	if (oneTile* tile = stratMapHelpers::getTile(coords->xCoord, coords->yCoord); tile && !tile->object)
+	{
+		string* newStrP = gameEvents::onCreateTooltipByCoords(coords->xCoord, coords->yCoord);
+		string newStr = *newStrP;
+		if (newStr.size() > 0)
+		{
+			gameStringHelpers::createUniString(u1, newStr.c_str());
+		}
+	}
+	o_onCreateTooltipByCoords(_this, coords, u1, u2);
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// CALL GAME FUNCTIONS /////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3489,6 +3508,15 @@ characterRecord* minHookFunctions::createHusband(characterRecord* daughter)
 	onDaughterReadyMarryHusband(daughter, new_husband, mo);
 
 	return new_husband;
+}
+
+void minHookFunctions::resetTooltipText(const char* text)
+{
+	if (!lastTooltipClass1 || !lastTooltipClass2 || !lastTooltipUniString)
+		return;
+
+	gameStringHelpers::createUniString(*lastTooltipUniString, text);
+	GAME_FUNC(void(__thiscall*)(DWORD, void*, UNICODE_STRING**&), resetTooltipTextAdd)(lastTooltipClass1, lastTooltipClass2, *lastTooltipUniString);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3724,7 +3752,6 @@ void minHookFunctions::draw()
 		GAME_FUNC_RAW(void(__fastcall*)(watchTowerStruct*), 0x004dcd20)(tarWt); // removeWatchtower - remove watchtower from a faction
 		// The superfluous(last) watchtower is automatically removed from the campaignStruct. It is removed from the factionStruct after reloading the save(doesn't get saved in the save file).   
 	}
-
 	/////////////////////////////////////////////////////////////////////////////////
 
 	ImGui::End();
