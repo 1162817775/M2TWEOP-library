@@ -3550,42 +3550,7 @@ void minHookFunctions::draw()
 
 
 	/////////////////////////////////////////////////////////////////////////////////
-	if (ImGui::Button("createPort") && selectTile && selectTile->settlement)
-	{
-		settlementStruct* sett = selectTile->getSettlement();
-		if (sett)
-		{
-			string text = "createPort: " + string(sett->name);
-			portBuildingStruct* port = sett->createPort(rememberCoords.xCoord, rememberCoords.yCoord, true);
-			if (port)
-			{
-				ImGui::InsertNotification({ ImGuiToastType_Success, 5000, text.c_str() });
-			}
-			else
-			{
-				ImGui::InsertNotification({ ImGuiToastType_Error, 5000, text.c_str() });
-			}
-		}
-	}
 
-	if (ImGui::Button("createWife"))
-	{
-		if (auto character = gameHelpers::getGameDataAll()->selectInfo->selectedCharacter->selectedCharacter; character)
-		{
-			createWife(character->characterRecord);
-		}
-	}
-	if (ImGui::Button("createHusband"))
-	{
-		if (auto character = gameHelpers::getGameDataAll()->selectInfo->selectedCharacter->selectedCharacter; character)
-		{
-			characterRecord* daughter = character->characterRecord->childs[0];
-			if (daughter)
-			{
-				createHusband(daughter);
-			}
-		}
-	}
 	if (ImGui::Button("moveWatchtower") && selectTile)
 	{
 		if (auto wt = selectTile->getWatchtower(); wt)
@@ -3706,52 +3671,7 @@ void minHookFunctions::draw()
 				0x005edd00)(sett, 0, true);
 		}
 	}
-	if (ImGui::Button("removeWatchtower"))
-	{
-		// variant 1   
 
-		if (!selectTile)
-			return;
-
-		watchTowerStruct* tarWt = selectTile->getWatchtower();
-		if (!tarWt)
-			return;
-
-		factionStruct* fac = tarWt->faction;
-		factionHelpers::removeWatchtower(fac, tarWt);
-	}
-	if (ImGui::Button("removeWatchtower 2"))
-	{
-		// variant 2 - does the same as variant 1   
-
-		if (!selectTile)
-			return;
-
-		watchTowerStruct* tarWt = selectTile->getWatchtower();
-		if (!tarWt)
-			return;
-
-		campaign* camp = gameHelpers::getGameDataAll()->campaignStruct;
-		for (int w = 0; w < camp->watchtowersNum; w++)
-		{
-			watchTowerStruct* wt = camp->getWatchTower(w);
-			if (wt == tarWt)
-			{
-				if (w != camp->watchtowersNum - 1)
-				{
-					camp->watchtowers[w] = camp->watchtowers[camp->watchtowersNum - 1];
-				}
-				camp->watchtowersNum--;
-				break;
-			}
-		}
-
-		selectTile->watchtower = false;
-		GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*), 0x004c98a0)(campaignHelpers::getStratPathFinding(), tarWt); // removeObject   
-
-		GAME_FUNC_RAW(void(__fastcall*)(watchTowerStruct*), 0x004dcd20)(tarWt); // removeWatchtower - remove watchtower from a faction
-		// The superfluous(last) watchtower is automatically removed from the campaignStruct. It is removed from the factionStruct after reloading the save(doesn't get saved in the save file).   
-	}
 	/////////////////////////////////////////////////////////////////////////////////
 
 	ImGui::End();
@@ -3760,15 +3680,6 @@ void minHookFunctions::draw()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
 
 
 

@@ -1047,6 +1047,11 @@ std::string* onCreateTooltip(const char* str)
 			}
 		}
 	}
+	else
+	{
+		std::string retS(str);
+		return &retS;
+	}
 	std::string* retS = new std::string(tmpS);
 	return retS;
 }
