@@ -138,6 +138,7 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.onMaybeWillSpyOpenGates = 0x004c0bf0;
 		offsets.onCharacterSwitchFaction = 0x005A1C20;
 		offsets.playGameSoundAdd = 0x00a68a10;
+		offsets.plusMinusFix = 0x1342b60;
 
 		offsets.onCreateWife = 0x005a6480;
 		offsets.onCreateMessageAboutMarriage = 0x00c4ef40;
@@ -282,6 +283,7 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.onMaybeWillSpyOpenGates = 0x004c1180;
 		offsets.onCharacterSwitchFaction = 0x005A2100;
 		offsets.playGameSoundAdd = 0x00a69a60;
+		offsets.plusMinusFix = 0x12fdb40;
 
 		offsets.onCreateWife = 0x005a6960;
 		offsets.onCreateMessageAboutMarriage = 0x00c49340;

@@ -415,6 +415,7 @@ public:
 		DWORD resetTooltipTextAdd = NULL;
 		DWORD createArmyByCoords = NULL;
 		DWORD attachFortArmy = NULL;
+		DWORD onCreateCapabilityUnicodeString = NULL;
 	}offsets;
 
 	static void initCodes(int gameVer);
