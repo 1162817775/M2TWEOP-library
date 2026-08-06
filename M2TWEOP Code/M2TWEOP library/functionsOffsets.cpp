@@ -409,6 +409,8 @@ void codes::initCodes(int gameVer)
 		offsets.onCreateTooltip = 0x00b2fd20;
 		offsets.onCreateTooltipByCoords = 0x00c34be0;
 		offsets.resetTooltipTextAdd = 0x00b2fe30;
+		offsets.createArmyByCoords = 0x004f3ff0;
+		offsets.attachFortArmy = 0x004c1450;
 	}
 
 
@@ -821,5 +823,7 @@ void codes::initCodes(int gameVer)
 		offsets.onCreateTooltip = 0x00b2a030;
 		offsets.onCreateTooltipByCoords = 0x00c2efb0;
 		offsets.resetTooltipTextAdd = 0x00b2a140;
+		offsets.createArmyByCoords = 0x004f45c0;
+		offsets.attachFortArmy = 0x004c19e0;
 	}
 }

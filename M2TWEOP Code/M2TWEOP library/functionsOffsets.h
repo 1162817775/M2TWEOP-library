@@ -413,6 +413,8 @@ public:
 		DWORD onCreateTooltip = NULL;
 		DWORD onCreateTooltipByCoords = NULL;
 		DWORD resetTooltipTextAdd = NULL;
+		DWORD createArmyByCoords = NULL;
+		DWORD attachFortArmy = NULL;
 	}offsets;
 
 	static void initCodes(int gameVer);
