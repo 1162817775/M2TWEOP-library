@@ -3134,6 +3134,7 @@ minHookFunctions::t_fleeConstructor                      minHookFunctions::o_fle
 minHookFunctions::t_fleeConstructor                      minHookFunctions::o_fleeConstructor2 = nullptr;
 minHookFunctions::t_onCreateTooltip                      minHookFunctions::o_onCreateTooltip = nullptr;
 minHookFunctions::t_onCreateTooltipByCoords              minHookFunctions::o_onCreateTooltipByCoords = nullptr;
+minHookFunctions::t_onCreateCapabilityUnicodeString      minHookFunctions::o_onCreateCapabilityUnicodeString = nullptr;
 
 DWORD minHookFunctions::lastSoundClass = NULL;
 bool minHookFunctions::isUnlockWeaponLimit = false;
@@ -3185,6 +3186,7 @@ void minHookFunctions::init()
 	MIN_HOOK(codes::offsets.onCalculationRatioForBirth,              onCalculationRatioForBirth,         o_onCalculationRatioForBirth);
 	MIN_HOOK(codes::offsets.onCreateTooltip,                         onCreateTooltip,                    o_onCreateTooltip);
 	MIN_HOOK(codes::offsets.onCreateTooltipByCoords,                 onCreateTooltipByCoords,            o_onCreateTooltipByCoords);
+	MIN_HOOK(codes::offsets.onCreateCapabilityUnicodeString,         onCreateCapabilityUnicodeString,    o_onCreateCapabilityUnicodeString);
 }
 
 int __thiscall minHookFunctions::debugLineAdd(void* _this, vector3* start, vector3* end, color8888 color, float time, bool zbuffered)
@@ -3474,6 +3476,28 @@ void __thiscall minHookFunctions::onCreateTooltipByCoords(void* _this, coordPair
 	}
 	o_onCreateTooltipByCoords(_this, coords, u1, u2);
 }
+
+UNICODE_STRING**& __thiscall minHookFunctions::onCreateCapabilityUnicodeString(buildingLevelCapability* _this, void* param_1, settlementStruct* settlement)
+{
+	if (_this->bonus < 0)
+	{
+		BYTE plus = 0x20;
+		const DWORD add = dataOffsets::offsets.plusMinusFix + 0x3;
+		MemWork::WriteData(&plus, add, 1);
+	}
+
+	UNICODE_STRING**& result = o_onCreateCapabilityUnicodeString(_this, param_1, settlement);
+
+	if (_this->bonus < 0)
+	{
+		BYTE plus = 0x2B;
+		const DWORD add = dataOffsets::offsets.plusMinusFix + 0x3;
+		MemWork::WriteData(&plus, add, 1);
+	}
+
+	return result;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// CALL GAME FUNCTIONS /////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////

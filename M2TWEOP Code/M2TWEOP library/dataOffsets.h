@@ -66,6 +66,7 @@ public:
 		DWORD onMaybeWillSpyOpenGates = NULL;
 		DWORD onCharacterSwitchFaction = NULL;
 		DWORD playGameSoundAdd = NULL;
+		DWORD plusMinusFix = NULL;
 
 		DWORD onCreateWife = NULL;
 		DWORD onCreateMessageAboutMarriage = NULL;

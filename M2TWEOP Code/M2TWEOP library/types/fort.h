@@ -68,6 +68,7 @@ public :
 			return getCharacter(0);
 		return nullptr;
 	}
+	armyStruct* createArmyInFort();
 };
 
 class eopFortData

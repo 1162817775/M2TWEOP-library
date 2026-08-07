@@ -244,6 +244,7 @@ namespace fortHelpers
 		@tfield changeOwner changeOwner
 		@tfield isAllyToFaction isAllyToFaction
 		@tfield isEnemyToFaction isEnemyToFaction
+		@tfield createArmyInFort createArmyInFort
 		
 		@table fortStruct
 		*/
@@ -336,6 +337,18 @@ namespace fortHelpers
 		*/
 		luaType.fortStruct.set_function("isEnemyToFaction", &fortStruct::isEnemyToFaction);
     	
+		/***
+		Create an army in a fort (don't need a character). Used to add units to an empty fort.
+		@function fortStruct:createArmyInFort
+		@treturn armyStruct newArmy
+		@usage
+			local newArmy = myFort:createArmyInFort()
+			if newArmy then
+				local newUnit = newArmy:createUnit("Knights Templar",0,0,0)
+			end
+		*/
+		luaType.fortStruct.set_function("createArmyInFort", &fortStruct::createArmyInFort);
+    	
     }
 }
 
@@ -373,6 +386,18 @@ character* fortStruct::getCharacter(const int index)
 {
 	const auto tile = stratMapHelpers::getTile(xCoord, yCoord);
 	return tile->getTileCharacterAtIndex(index);
+}
+
+armyStruct* fortStruct::createArmyInFort()
+{
+	if (army)
+		return army;
+
+	armyStruct* newArmy = GAME_FUNC(armyStruct*(__thiscall*)(factionStruct*, UINT32*, bool), createArmyByCoords)(faction, &xCoord, false);
+	if (newArmy)
+		GAME_FUNC(void(__thiscall*)(fortStruct*, armyStruct*), attachFortArmy)(this, newArmy);
+
+	return newArmy;
 }
 
 eopFortData* eopFortDataDb::getFortData(const int x, const int y)

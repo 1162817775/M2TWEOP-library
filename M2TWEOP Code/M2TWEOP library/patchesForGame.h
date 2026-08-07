@@ -451,6 +451,10 @@ public:
 	using t_onCreateTooltipByCoords = void(__thiscall*)(void* _this, coordPair* coords, UNICODE_STRING**& u1, UNICODE_STRING**& u2);
 	static t_onCreateTooltipByCoords o_onCreateTooltipByCoords;
 	static void __thiscall onCreateTooltipByCoords(void* _this, coordPair* coords, UNICODE_STRING**& u1, UNICODE_STRING**& u2);
+
+	using t_onCreateCapabilityUnicodeString = UNICODE_STRING**&(__thiscall*)(buildingLevelCapability* _this, void* param_1, settlementStruct* settlement);
+	static t_onCreateCapabilityUnicodeString o_onCreateCapabilityUnicodeString;
+	static UNICODE_STRING**& __thiscall onCreateCapabilityUnicodeString(buildingLevelCapability* _this, void* param_1, settlementStruct* settlement);
 };
 
 #define GET_VARIABLE_NAME(Variable) (#Variable)
