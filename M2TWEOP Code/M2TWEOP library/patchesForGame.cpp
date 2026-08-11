@@ -3405,8 +3405,6 @@ void __cdecl minHookFunctions::onPlayGameSound(DWORD _this, int sound)
 
 	lastSoundClass = _this;
 
-	gameHelpers::logStringGame("onPlayGameSound: " + to_string(sound));
-
 	o_onPlayGameSound(_this, sound);
 }
 
