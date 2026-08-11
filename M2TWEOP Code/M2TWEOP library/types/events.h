@@ -262,6 +262,7 @@ namespace gameEvents
 	int onCalculationRatioForBirth(factionStruct* faction, int value);
 	std::string* onCreateTooltip(const char* str);
 	std::string* onCreateTooltipByCoords(int xCoord, int yCoord);
+	void onBlockadePort(character* admiral, portBuildingStruct* port);
 	
 	template<EventType EvType> class Event :public EventBase
 	{

@@ -1080,6 +1080,14 @@ std::string* onCreateTooltipByCoords(int xCoord, int yCoord)
 	return retS;
 }
 
+void onBlockadePort(character* admiral, portBuildingStruct* port)
+{
+	if (plugData::data.luaAll.onBlockadePort != nullptr)
+	{
+		tryLua((*plugData::data.luaAll.onBlockadePort)(admiral, port))
+	}
+}
+
 void onLoadGamePl(const std::vector<std::string>* saveFiles)
 {
 	if (plugData::data.luaAll.onLoadSaveFile != nullptr)
@@ -4813,6 +4821,21 @@ void luaPlugin::onPluginLoadF()
 	*/
 	onCreateTooltipByCoords = new sol::function(luaState["onCreateTooltipByCoords"]);
 	checkLuaFunc(&onCreateTooltipByCoords);
+
+	/***
+	Called when the port is blocked.   
+	
+	@function onBlockadePort
+	@tparam character admiral
+	@tparam portStruct port
+	
+	@usage
+	function onBlockadePort(admiral,port)
+	--something here
+	end
+	*/
+	onBlockadePort = new sol::function(luaState["onBlockadePort"]);
+	checkLuaFunc(&onBlockadePort);
 
 
 	if (onPluginLoad != nullptr)

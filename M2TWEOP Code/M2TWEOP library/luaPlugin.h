@@ -365,6 +365,7 @@ public:
 	sol::function* onCalculationRatioForBirth = nullptr;
 	sol::function* onCreateTooltip = nullptr;
 	sol::function* onCreateTooltipByCoords = nullptr;
+	sol::function* onBlockadePort = nullptr;
 	static void checkLuaFunc(sol::function** lRef);
 private:
 
