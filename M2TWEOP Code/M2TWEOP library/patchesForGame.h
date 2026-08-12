@@ -320,7 +320,6 @@ public:
 	static void __thiscall onFactionSymbolSelect();
 	static void __thiscall onCharacterDied(character* character);
 	static void __thiscall onFactionDied(factionStruct* faction);
-	static void __thiscall onCharacterSwitchFaction(character* character);
 };
 
 class consolePatches
@@ -455,6 +454,11 @@ public:
 	using t_onCreateCapabilityUnicodeString = UNICODE_STRING**&(__thiscall*)(buildingLevelCapability* _this, void* param_1, settlementStruct* settlement);
 	static t_onCreateCapabilityUnicodeString o_onCreateCapabilityUnicodeString;
 	static UNICODE_STRING**& __thiscall onCreateCapabilityUnicodeString(buildingLevelCapability* _this, void* param_1, settlementStruct* settlement);
+
+	using t_onBlockadePort = void(__thiscall*)(character* _this, portBuildingStruct* port);
+	static t_onBlockadePort o_onBlockadePort;
+	static void __thiscall onBlockadePort(character* _this, portBuildingStruct* port);
+	static void createBlockadePortMessage(armyStruct* fleet, settlementStruct* settlement);
 };
 
 #define GET_VARIABLE_NAME(Variable) (#Variable)

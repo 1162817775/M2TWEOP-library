@@ -416,6 +416,8 @@ public:
 		DWORD createArmyByCoords = NULL;
 		DWORD attachFortArmy = NULL;
 		DWORD onCreateCapabilityUnicodeString = NULL;
+		DWORD onBlockadePort = NULL;
+		DWORD createBlockadePortMessageAdd = NULL;
 	}offsets;
 
 	static void initCodes(int gameVer);

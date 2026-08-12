@@ -412,6 +412,8 @@ void codes::initCodes(int gameVer)
 		offsets.createArmyByCoords = 0x004f3ff0;
 		offsets.attachFortArmy = 0x004c1450;
 		offsets.onCreateCapabilityUnicodeString = 0x005f5f70;
+		offsets.onBlockadePort = 0x0059d610;
+		offsets.createBlockadePortMessageAdd = 0x00c5aba0;
 	}
 
 
@@ -827,5 +829,7 @@ void codes::initCodes(int gameVer)
 		offsets.createArmyByCoords = 0x004f45c0;
 		offsets.attachFortArmy = 0x004c19e0;
 		offsets.onCreateCapabilityUnicodeString = 0x005f6360;
+		offsets.onBlockadePort = 0x0059db00;
+		offsets.createBlockadePortMessageAdd = 0x00c54fa0;
 	}
 }

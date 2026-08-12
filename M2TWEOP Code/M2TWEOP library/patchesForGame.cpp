@@ -3135,6 +3135,7 @@ minHookFunctions::t_fleeConstructor                      minHookFunctions::o_fle
 minHookFunctions::t_onCreateTooltip                      minHookFunctions::o_onCreateTooltip = nullptr;
 minHookFunctions::t_onCreateTooltipByCoords              minHookFunctions::o_onCreateTooltipByCoords = nullptr;
 minHookFunctions::t_onCreateCapabilityUnicodeString      minHookFunctions::o_onCreateCapabilityUnicodeString = nullptr;
+minHookFunctions::t_onBlockadePort                       minHookFunctions::o_onBlockadePort = nullptr;
 
 DWORD minHookFunctions::lastSoundClass = NULL;
 bool minHookFunctions::isUnlockWeaponLimit = false;
@@ -3187,6 +3188,7 @@ void minHookFunctions::init()
 	MIN_HOOK(codes::offsets.onCreateTooltip,                         onCreateTooltip,                    o_onCreateTooltip);
 	MIN_HOOK(codes::offsets.onCreateTooltipByCoords,                 onCreateTooltipByCoords,            o_onCreateTooltipByCoords);
 	MIN_HOOK(codes::offsets.onCreateCapabilityUnicodeString,         onCreateCapabilityUnicodeString,    o_onCreateCapabilityUnicodeString);
+	MIN_HOOK(codes::offsets.onBlockadePort,                          onBlockadePort,                     o_onBlockadePort);
 }
 
 int __thiscall minHookFunctions::debugLineAdd(void* _this, vector3* start, vector3* end, color8888 color, float time, bool zbuffered)
@@ -3498,6 +3500,14 @@ UNICODE_STRING**& __thiscall minHookFunctions::onCreateCapabilityUnicodeString(b
 	return result;
 }
 
+void __thiscall minHookFunctions::onBlockadePort(character* _this, portBuildingStruct* port)
+{
+	o_onBlockadePort(_this, port);
+	gameEvents::onBlockadePort(_this, port);
+	if (port->fac->isPlayerControlled == 1)
+		createBlockadePortMessage(_this->army, port->settlement);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// CALL GAME FUNCTIONS /////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3541,6 +3551,11 @@ void minHookFunctions::resetTooltipText(const char* text)
 
 	gameStringHelpers::createUniString(*lastTooltipUniString, text);
 	GAME_FUNC(void(__thiscall*)(DWORD, void*, UNICODE_STRING**&), resetTooltipTextAdd)(lastTooltipClass1, lastTooltipClass2, *lastTooltipUniString);
+}
+
+void minHookFunctions::createBlockadePortMessage(armyStruct* fleet, settlementStruct* settlement)
+{
+	GAME_FUNC(void(__cdecl*)(armyStruct*, settlementStruct*), createBlockadePortMessageAdd)(fleet, settlement);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3695,6 +3710,30 @@ void minHookFunctions::draw()
 				0x005edd00)(sett, 0, true);
 		}
 	}
+
+	if (ImGui::Button("createBlockadePortMessage"))
+	{
+		if (auto sett = gameHelpers::getGameDataAll()->selectInfo->getSelectedSettlement(); sett)
+		{
+			if (auto fleet = stratMapHelpers::getTile(rememberCoords.xCoord, rememberCoords.yCoord)->getCharacter(); fleet && fleet->army)
+			{
+			//	blockadePort(fleet, sett->port);
+				createBlockadePortMessage(fleet->army, sett);
+			}
+		}
+	}
+	if (ImGui::Button("blockadePort"))
+	{
+		if (auto sett = gameHelpers::getGameDataAll()->selectInfo->getSelectedSettlement(); sett && sett->port)
+		{
+			if (auto fleet = stratMapHelpers::getTile(rememberCoords.xCoord, rememberCoords.yCoord)->getCharacter(); fleet && fleet->army)
+			{
+			//	void __thiscall FUN_004c1a20(int param_1,char param_2,int param_3,int param_4)
+				GAME_FUNC_RAW(void(__thiscall*)(portBuildingStruct*, bool, factionStruct*, armyStruct*), 0x004c1a20)(sett->port, false, fleet->army->faction, fleet->army);
+			}
+		}
+	}
+
 
 	/////////////////////////////////////////////////////////////////////////////////
 
