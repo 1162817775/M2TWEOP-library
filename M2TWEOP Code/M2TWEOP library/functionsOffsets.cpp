@@ -414,6 +414,8 @@ void codes::initCodes(int gameVer)
 		offsets.onCreateCapabilityUnicodeString = 0x005f5f70;
 		offsets.onBlockadePort = 0x0059d610;
 		offsets.createBlockadePortMessageAdd = 0x00c5aba0;
+		offsets.onHudElementClicked = 0x00c3b3f0;
+		offsets.onSetElementPosition = 0x00b544c0;
 	}
 
 
@@ -831,5 +833,7 @@ void codes::initCodes(int gameVer)
 		offsets.onCreateCapabilityUnicodeString = 0x005f6360;
 		offsets.onBlockadePort = 0x0059db00;
 		offsets.createBlockadePortMessageAdd = 0x00c54fa0;
+		offsets.onHudElementClicked = 0x00c357c0;
+		offsets.onSetElementPosition = 0x00b4e810;
 	}
 }

@@ -3136,6 +3136,8 @@ minHookFunctions::t_onCreateTooltip                      minHookFunctions::o_onC
 minHookFunctions::t_onCreateTooltipByCoords              minHookFunctions::o_onCreateTooltipByCoords = nullptr;
 minHookFunctions::t_onCreateCapabilityUnicodeString      minHookFunctions::o_onCreateCapabilityUnicodeString = nullptr;
 minHookFunctions::t_onBlockadePort                       minHookFunctions::o_onBlockadePort = nullptr;
+minHookFunctions::t_onHudElementClicked                  minHookFunctions::o_onHudElementClicked = nullptr;
+minHookFunctions::t_onSetElementPosition                 minHookFunctions::o_onSetElementPosition = nullptr;
 
 DWORD minHookFunctions::lastSoundClass = NULL;
 bool minHookFunctions::isUnlockWeaponLimit = false;
@@ -3145,6 +3147,9 @@ coordPair minHookFunctions::rememberCoords{ 0, 0 };
 DWORD minHookFunctions::lastTooltipClass1 = NULL;
 void* minHookFunctions::lastTooltipClass2 = NULL;
 UNICODE_STRING*** minHookFunctions::lastTooltipUniString = NULL;
+int minHookFunctions::arrowClick = 0;
+int minHookFunctions::arrowRememberY = 0;
+bool minHookFunctions::arrowChange = false;
 
 
 static string pointerToString(LPVOID ppPointer)
@@ -3189,6 +3194,8 @@ void minHookFunctions::init()
 	MIN_HOOK(codes::offsets.onCreateTooltipByCoords,                 onCreateTooltipByCoords,            o_onCreateTooltipByCoords);
 	MIN_HOOK(codes::offsets.onCreateCapabilityUnicodeString,         onCreateCapabilityUnicodeString,    o_onCreateCapabilityUnicodeString);
 	MIN_HOOK(codes::offsets.onBlockadePort,                          onBlockadePort,                     o_onBlockadePort);
+	MIN_HOOK(codes::offsets.onHudElementClicked,                     onHudElementClicked,                o_onHudElementClicked);
+	MIN_HOOK(codes::offsets.onSetElementPosition,                    onSetElementPosition,               o_onSetElementPosition);
 }
 
 int __thiscall minHookFunctions::debugLineAdd(void* _this, vector3* start, vector3* end, color8888 color, float time, bool zbuffered)
@@ -3508,6 +3515,68 @@ void __thiscall minHookFunctions::onBlockadePort(character* _this, portBuildingS
 		createBlockadePortMessage(_this->army, port->settlement);
 }
 
+void __thiscall minHookFunctions::onHudElementClicked(int* param_1, int param_2, int param_3)
+{
+	if (param_3 != 1)
+	{
+		o_onHudElementClicked(param_1, param_2, param_3);
+		return;
+	}
+
+	if (param_2 == param_1[0x7d]) // more   
+	{
+		if (auto sett = gameHelpers::getGameDataAll()->selectInfo->getSelectedSettlement(); sett && sett->buildingsNum > 24 )
+		{
+			arrowClick++;
+			coordPair position{ 273, 53 };
+			position.yCoord -= 126 * arrowClick;
+
+			o_onSetElementPosition(param_1[0x76], &position, 1);
+
+			double b = ceil(static_cast<double>(sett->buildingsNum) / 12.0);
+			double c = static_cast<double>(arrowClick);
+			if (c < b - 1)
+				return;
+
+			arrowClick     = 0;
+			arrowRememberY = position.yCoord;
+			arrowChange    = true;
+		}
+	}
+
+	else if (param_2 == param_1[0x7e]) // less   
+	{
+		if (auto sett = gameHelpers::getGameDataAll()->selectInfo->getSelectedSettlement(); sett && sett->buildingsNum > 24 )
+		{
+			arrowClick++;
+			coordPair position{ 273, arrowRememberY };
+			position.yCoord += 126 * arrowClick;
+	
+			o_onSetElementPosition(param_1[0x76], &position, 1);
+	
+			double b = ceil(static_cast<double>(sett->buildingsNum) / 12.0);
+			double c = static_cast<double>(arrowClick);
+			if (c < b - 1)
+				return;
+
+			arrowClick     = 0;
+			arrowRememberY = 0;
+		}
+	}
+
+	o_onHudElementClicked(param_1, param_2, param_3);
+}
+
+void __thiscall minHookFunctions::onSetElementPosition(int param_1, coordPair* coords, int param_3)
+{
+	if (arrowChange)
+	{
+		coords->yCoord = arrowRememberY;
+		arrowChange    = false;
+	}
+	o_onSetElementPosition(param_1, coords, param_3);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// CALL GAME FUNCTIONS /////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3733,7 +3802,6 @@ void minHookFunctions::draw()
 			}
 		}
 	}
-
 
 	/////////////////////////////////////////////////////////////////////////////////
 

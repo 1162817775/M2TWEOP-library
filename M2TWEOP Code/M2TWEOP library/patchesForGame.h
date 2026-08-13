@@ -459,6 +459,17 @@ public:
 	static t_onBlockadePort o_onBlockadePort;
 	static void __thiscall onBlockadePort(character* _this, portBuildingStruct* port);
 	static void createBlockadePortMessage(armyStruct* fleet, settlementStruct* settlement);
+
+	using t_onHudElementClicked = void(__thiscall*)(int* param_1, int param_2, int param_3);
+	static t_onHudElementClicked o_onHudElementClicked;
+	static void __thiscall onHudElementClicked(int* param_1, int param_2, int param_3);
+
+	using t_onSetElementPosition = void(__thiscall*)(int param_1, coordPair* coords, int param_3);
+	static t_onSetElementPosition o_onSetElementPosition;
+	static void __thiscall onSetElementPosition(int param_1, coordPair* coords, int param_3);
+	static int arrowClick;
+	static int arrowRememberY;
+	static bool arrowChange;
 };
 
 #define GET_VARIABLE_NAME(Variable) (#Variable)

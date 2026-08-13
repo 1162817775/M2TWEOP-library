@@ -418,6 +418,9 @@ public:
 		DWORD onCreateCapabilityUnicodeString = NULL;
 		DWORD onBlockadePort = NULL;
 		DWORD createBlockadePortMessageAdd = NULL;
+		DWORD onHudElementClicked = NULL;
+		DWORD onSetElementPosition = NULL;
+
 	}offsets;
 
 	static void initCodes(int gameVer);
