@@ -674,11 +674,14 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	tables.M2TWEOP.set_function("openGateOnStratMap", &m2tweopOptions::openGateOnStratMap);
 
 	/***
-	Enables the specified game sound event (see soundEvents.lua).   
+	Enables the specified game sound event (see SOUND_EVENTS in soundEvents.lua).   
 	@function M2TWEOP.playGameSound
 	@tparam int sound event
 	@usage
 	M2TWEOP.playGameSound(196);
+
+	require('soundEvents')
+	M2TWEOP.playGameSound(SOUND_EVENTS.STRAT_DESTROY_BUILDING);
 	*/
 	tables.M2TWEOP.set_function("playGameSound", &gameHelpers::playGameSound);
 

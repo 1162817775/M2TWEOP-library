@@ -34,13 +34,13 @@ public:
 		DWORD createPoArray = NULL;
 		DWORD deletePoArray = NULL;
 		DWORD debugLineAddFinal = NULL;
-		DWORD debugLineAdd = NULL;
-		DWORD debugRenderPeg = NULL;
-		DWORD debugRenderCircle = NULL;
-		DWORD displayMissileStats = NULL;
-		DWORD displayMeleeStats = NULL;
-		DWORD displayArmourStats = NULL;
-		DWORD displayDefenseStats = NULL;
+		DWORD a_debugLineAdd = NULL;
+		DWORD a_debugRenderPeg = NULL;
+		DWORD a_debugRenderCircle = NULL;
+		DWORD a_displayMissileStats = NULL;
+		DWORD a_displayMeleeStats = NULL;
+		DWORD a_displayArmourStats = NULL;
+		DWORD a_displayDefenseStats = NULL;
 
 		DWORD allocMemFunc = NULL;
 		
@@ -61,7 +61,7 @@ public:
 		DWORD createCADTargetFort = NULL;
 		DWORD createCADTargetSettlement = NULL;
 		DWORD saveGame = NULL;
-		DWORD debugRenderLine = NULL;
+		DWORD a_debugRenderLine = NULL;
 
 
 		DWORD createSiegeSettlementGarrisonedFunc = NULL;
@@ -403,23 +403,33 @@ public:
 		DWORD getAreaHandle = NULL;
 		DWORD line2dGetClosest = NULL;
 
+		DWORD a_onUnitCreate = NULL;
+		DWORD a_onMaybeWillSpyOpenGates = NULL;
+		DWORD a_onCharacterSwitchFaction = NULL;
+		DWORD playGameSoundAdd = NULL;
+		DWORD playCharacterVoiceAdd = NULL;
+		DWORD a_onCreateWife = NULL;
+		DWORD a_onCreateMessageAboutMarriage = NULL;
+		DWORD a_onCreateCandidateMarrying = NULL;
+		DWORD a_onDaughterReadyMarryHusband = NULL;
+		DWORD marriageOptionClassConstructor = NULL;
 		DWORD createPortAdd = NULL;
 		DWORD setDocks = NULL;
 		DWORD initPortRallyPoint = NULL;
 		DWORD addPortToCampaign = NULL;
-		DWORD fleeConstructor1 = NULL;
-		DWORD fleeConstructor2 = NULL;
-		DWORD onCalculationRatioForBirth = NULL;
-		DWORD onCreateTooltip = NULL;
-		DWORD onCreateTooltipByCoords = NULL;
+		DWORD a_fleeConstructor1 = NULL;
+		DWORD a_fleeConstructor2 = NULL;
+		DWORD a_onCalculationRatioForBirth = NULL;
+		DWORD a_onCreateTooltip = NULL;
+		DWORD a_onCreateTooltipByCoords = NULL;
 		DWORD resetTooltipTextAdd = NULL;
 		DWORD createArmyByCoords = NULL;
 		DWORD attachFortArmy = NULL;
-		DWORD onCreateCapabilityUnicodeString = NULL;
-		DWORD onBlockadePort = NULL;
+		DWORD a_onCreateCapabilityUnicodeString = NULL;
+		DWORD a_onBlockadePort = NULL;
 		DWORD createBlockadePortMessageAdd = NULL;
-		DWORD onHudElementClicked = NULL;
-		DWORD onSetElementPosition = NULL;
+		DWORD a_onHudElementClicked = NULL;
+		DWORD a_onSetElementPosition = NULL;
 
 	}offsets;
 
