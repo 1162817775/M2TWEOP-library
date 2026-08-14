@@ -3117,6 +3117,7 @@ minHookFunctions::t_onUnitCreate                         minHookFunctions::o_onU
 minHookFunctions::t_onMaybeWillSpyOpenGates              minHookFunctions::o_onMaybeWillSpyOpenGates = nullptr;
 minHookFunctions::t_onCharacterSwitchFaction             minHookFunctions::o_onCharacterSwitchFaction = nullptr;
 minHookFunctions::t_onPlayGameSound                      minHookFunctions::o_onPlayGameSound = nullptr;
+minHookFunctions::t_onPlayCharacterVoice                 minHookFunctions::o_onPlayCharacterVoice = nullptr;
 minHookFunctions::t_onCreateWife                         minHookFunctions::o_onCreateWife = nullptr;
 minHookFunctions::t_onCreateMessageAboutMarriage         minHookFunctions::o_onCreateMessageAboutMarriage = nullptr;
 minHookFunctions::t_onCreateCandidateMarrying            minHookFunctions::o_onCreateCandidateMarrying = nullptr;
@@ -3148,7 +3149,7 @@ DWORD minHookFunctions::lastTooltipClass1 = NULL;
 void* minHookFunctions::lastTooltipClass2 = NULL;
 UNICODE_STRING*** minHookFunctions::lastTooltipUniString = NULL;
 int minHookFunctions::arrowClick = 0;
-int minHookFunctions::arrowRememberY = 0;
+int minHookFunctions::arrowRememberY = 53;
 bool minHookFunctions::arrowChange = false;
 
 
@@ -3171,31 +3172,32 @@ MH_STATUS minHookFunctions::hook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOrigi
 
 void minHookFunctions::init()
 {
-	MIN_HOOK(dataOffsets::offsets.onUnitCreate,                      onUnitCreate,                       o_onUnitCreate);
-	MIN_HOOK(dataOffsets::offsets.onMaybeWillSpyOpenGates,           onMaybeWillSpyOpenGates,            o_onMaybeWillSpyOpenGates);
-	MIN_HOOK(dataOffsets::offsets.onCharacterSwitchFaction,          onCharacterSwitchFaction,           o_onCharacterSwitchFaction);
-	MIN_HOOK(dataOffsets::offsets.playGameSoundAdd,                  onPlayGameSound,                    o_onPlayGameSound);
-	MIN_HOOK(dataOffsets::offsets.onCreateWife,                      onCreateWife,                       o_onCreateWife);
-	MIN_HOOK(dataOffsets::offsets.onCreateMessageAboutMarriage,      onCreateMessageAboutMarriage,       o_onCreateMessageAboutMarriage);
-	MIN_HOOK(dataOffsets::offsets.onCreateCandidateMarrying,         onCreateCandidateMarrying,          o_onCreateCandidateMarrying);
-	MIN_HOOK(dataOffsets::offsets.onDaughterReadyMarryHusband,       onDaughterReadyMarryHusband,        o_onDaughterReadyMarryHusband);
-	MIN_HOOK(codes::offsets.debugRenderLine,                         debugRenderLine,                    o_debugRenderLine);
-	MIN_HOOK(codes::offsets.debugLineAdd,                            debugLineAdd,                       o_debugLineAdd);
-	MIN_HOOK(codes::offsets.debugRenderPeg,                          debugRenderPeg,                     o_debugRenderPeg);
-	MIN_HOOK(codes::offsets.debugRenderCircle,                       debugRenderCircle,                  o_debugRenderCircle);
-	MIN_HOOK(codes::offsets.displayMissileStats,                     displayMissileStats,                o_displayMissileStats);
-	MIN_HOOK(codes::offsets.displayMeleeStats,                       displayMeleeStats,                  o_displayMeleeStats);
-	MIN_HOOK(codes::offsets.displayArmourStats,                      displayArmourStats,                 o_displayArmourStats);
-	MIN_HOOK(codes::offsets.displayDefenseStats,                     displayDefenseStats,                o_displayDefenseStats);
-	MIN_HOOK(codes::offsets.fleeConstructor1,						 fleeConstructor1,                   o_fleeConstructor1);
-	MIN_HOOK(codes::offsets.fleeConstructor2,                        fleeConstructor2,                   o_fleeConstructor2);
-	MIN_HOOK(codes::offsets.onCalculationRatioForBirth,              onCalculationRatioForBirth,         o_onCalculationRatioForBirth);
-	MIN_HOOK(codes::offsets.onCreateTooltip,                         onCreateTooltip,                    o_onCreateTooltip);
-	MIN_HOOK(codes::offsets.onCreateTooltipByCoords,                 onCreateTooltipByCoords,            o_onCreateTooltipByCoords);
-	MIN_HOOK(codes::offsets.onCreateCapabilityUnicodeString,         onCreateCapabilityUnicodeString,    o_onCreateCapabilityUnicodeString);
-	MIN_HOOK(codes::offsets.onBlockadePort,                          onBlockadePort,                     o_onBlockadePort);
-	MIN_HOOK(codes::offsets.onHudElementClicked,                     onHudElementClicked,                o_onHudElementClicked);
-	MIN_HOOK(codes::offsets.onSetElementPosition,                    onSetElementPosition,               o_onSetElementPosition);
+	MIN_HOOK(a_onUnitCreate,                         onUnitCreate,                       o_onUnitCreate);
+	MIN_HOOK(a_onMaybeWillSpyOpenGates,              onMaybeWillSpyOpenGates,            o_onMaybeWillSpyOpenGates);
+	MIN_HOOK(a_onCharacterSwitchFaction,             onCharacterSwitchFaction,           o_onCharacterSwitchFaction);
+	MIN_HOOK(playGameSoundAdd,                       onPlayGameSound,                    o_onPlayGameSound);
+//	MIN_HOOK(playCharacterVoiceAdd,                  onPlayCharacterVoice,               o_onPlayCharacterVoice);
+	MIN_HOOK(a_onCreateWife,                         onCreateWife,                       o_onCreateWife);
+	MIN_HOOK(a_onCreateMessageAboutMarriage,         onCreateMessageAboutMarriage,       o_onCreateMessageAboutMarriage);
+	MIN_HOOK(a_onCreateCandidateMarrying,            onCreateCandidateMarrying,          o_onCreateCandidateMarrying);
+	MIN_HOOK(a_onDaughterReadyMarryHusband,          onDaughterReadyMarryHusband,        o_onDaughterReadyMarryHusband);
+	MIN_HOOK(a_debugRenderLine,                      debugRenderLine,                    o_debugRenderLine);
+	MIN_HOOK(a_debugLineAdd,                         debugLineAdd,                       o_debugLineAdd);
+	MIN_HOOK(a_debugRenderPeg,                       debugRenderPeg,                     o_debugRenderPeg);
+	MIN_HOOK(a_debugRenderCircle,                    debugRenderCircle,                  o_debugRenderCircle);
+	MIN_HOOK(a_displayMissileStats,                  displayMissileStats,                o_displayMissileStats);
+	MIN_HOOK(a_displayMeleeStats,                    displayMeleeStats,                  o_displayMeleeStats);
+	MIN_HOOK(a_displayArmourStats,                   displayArmourStats,                 o_displayArmourStats);
+	MIN_HOOK(a_displayDefenseStats,                  displayDefenseStats,                o_displayDefenseStats);
+	MIN_HOOK(a_fleeConstructor1,                     fleeConstructor1,                   o_fleeConstructor1);
+	MIN_HOOK(a_fleeConstructor2,                     fleeConstructor2,                   o_fleeConstructor2);
+	MIN_HOOK(a_onCalculationRatioForBirth,           onCalculationRatioForBirth,         o_onCalculationRatioForBirth);
+	MIN_HOOK(a_onCreateTooltip,                      onCreateTooltip,                    o_onCreateTooltip);
+	MIN_HOOK(a_onCreateTooltipByCoords,              onCreateTooltipByCoords,            o_onCreateTooltipByCoords);
+	MIN_HOOK(a_onCreateCapabilityUnicodeString,      onCreateCapabilityUnicodeString,    o_onCreateCapabilityUnicodeString);
+	MIN_HOOK(a_onBlockadePort,                       onBlockadePort,                     o_onBlockadePort);
+	MIN_HOOK(a_onHudElementClicked,                  onHudElementClicked,                o_onHudElementClicked);
+	MIN_HOOK(a_onSetElementPosition,                 onSetElementPosition,               o_onSetElementPosition);
 }
 
 int __thiscall minHookFunctions::debugLineAdd(void* _this, vector3* start, vector3* end, color8888 color, float time, bool zbuffered)
@@ -3415,6 +3417,11 @@ void __cdecl minHookFunctions::onPlayGameSound(DWORD _this, int sound)
 	o_onPlayGameSound(_this, sound);
 }
 
+void __cdecl minHookFunctions::onPlayCharacterVoice(int sound, character* character, bool b)
+{
+	o_onPlayCharacterVoice(sound, character, b);
+}
+
 //### Add a Lua event function, for example to override a spouse. 
 characterRecord* __thiscall minHookFunctions::onCreateWife(characterRecord* husband)
 {
@@ -3525,7 +3532,7 @@ void __thiscall minHookFunctions::onHudElementClicked(int* param_1, int param_2,
 
 	if (param_2 == param_1[0x7d]) // more   
 	{
-		if (auto sett = gameHelpers::getGameDataAll()->selectInfo->getSelectedSettlement(); sett && sett->buildingsNum > 24 )
+		if (auto sett = gameHelpers::getGameDataAll()->selectInfo->getSelectedSettlement(); sett /*&& sett->buildingsNum > 24*/)
 		{
 			arrowClick++;
 			coordPair position{ 273, 53 };
@@ -3546,11 +3553,12 @@ void __thiscall minHookFunctions::onHudElementClicked(int* param_1, int param_2,
 
 	else if (param_2 == param_1[0x7e]) // less   
 	{
-		if (auto sett = gameHelpers::getGameDataAll()->selectInfo->getSelectedSettlement(); sett && sett->buildingsNum > 24 )
+		if (auto sett = gameHelpers::getGameDataAll()->selectInfo->getSelectedSettlement(); sett /*&& sett->buildingsNum > 24*/)
 		{
 			arrowClick++;
 			coordPair position{ 273, arrowRememberY };
 			position.yCoord += 126 * arrowClick;
+			position.yCoord = min(position.yCoord, 53);
 	
 			o_onSetElementPosition(param_1[0x76], &position, 1);
 	
@@ -3560,11 +3568,14 @@ void __thiscall minHookFunctions::onHudElementClicked(int* param_1, int param_2,
 				return;
 
 			arrowClick     = 0;
-			arrowRememberY = 0;
+			arrowRememberY = 53;
 		}
 	}
 
 	o_onHudElementClicked(param_1, param_2, param_3);
+
+	arrowClick     = 0;
+	arrowChange    = false;
 }
 
 void __thiscall minHookFunctions::onSetElementPosition(int param_1, coordPair* coords, int param_3)
@@ -3591,7 +3602,7 @@ characterRecord* minHookFunctions::createWife(characterRecord* husband)
 
 	characterRecord* new_wife = onCreateWife(husband);
 	marriageOption* mo = techFuncs::createGameClass<marriageOption>();
-	GAME_FUNC_RAW(void(__thiscall*)(marriageOption*, characterRecord*, characterRecord*), dataOffsets::offsets.marriageOptionClassConstructor)(mo, new_wife, husband);
+	GAME_FUNC(void(__thiscall*)(marriageOption*, characterRecord*, characterRecord*), marriageOptionClassConstructor)(mo, new_wife, husband);
 	onCreateMessageAboutMarriage(husband, new_wife, mo); 
 
 	return new_wife;
@@ -3607,7 +3618,7 @@ characterRecord* minHookFunctions::createHusband(characterRecord* daughter)
 
 	characterRecord* new_husband = onCreateCandidateMarrying(daughter);
 	marriageOption* mo = techFuncs::createGameClass<marriageOption>();
-	GAME_FUNC_RAW(void(__thiscall*)(marriageOption*, characterRecord*, characterRecord*), dataOffsets::offsets.marriageOptionClassConstructor)(mo, new_husband, daughter);
+	GAME_FUNC(void(__thiscall*)(marriageOption*, characterRecord*, characterRecord*), marriageOptionClassConstructor)(mo, new_husband, daughter);
 	onDaughterReadyMarryHusband(daughter, new_husband, mo);
 
 	return new_husband;
@@ -3631,6 +3642,7 @@ void minHookFunctions::createBlockadePortMessage(armyStruct* fleet, settlementSt
 //////////////////////////////////////////////////// TESTS ////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+int buffer_sound = 0;
 //### Don't pay attention to this mess, I'll finish some things and clean this up a bit later. (^_^)   
 void minHookFunctions::draw()
 {
@@ -3667,8 +3679,7 @@ void minHookFunctions::draw()
 				changeWatchTowerFaction)(wt, 0, gameHelpers::getGameDataAll()->campaignStruct->getSlaveFaction(), 0);
 
 			coordPair coords{ 448, 217 };
-			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*),
-				0x004cd440)(campaignHelpers::getStratPathFinding(), wt, &coords);
+			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*), 0x004cd440)(campaignHelpers::getStratPathFinding(), wt, &coords);//disk
 
 			wt->regionID = stratMapHelpers::getTile(448, 217)->regionId;
 
@@ -3683,11 +3694,9 @@ void minHookFunctions::draw()
 			int yCoord = rememberCoords.yCoord;
 
 			coordPair coords{ xCoord, yCoord };
-			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*),
-				0x004cd440)(campaignHelpers::getStratPathFinding(), sett, &coords);
+			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*), 0x004cd440)(campaignHelpers::getStratPathFinding(), sett, &coords);//disk
 
-			GAME_FUNC(void(__thiscall*)(stratPathFinding*, settlementStruct*),
-				areaOfInfluence)(campaignHelpers::getStratPathFinding(), sett);
+			GAME_FUNC(void(__thiscall*)(stratPathFinding*, settlementStruct*), areaOfInfluence)(campaignHelpers::getStratPathFinding(), sett);
 
 			GAME_FUNC(char(__thiscall*)(settlementStruct*), residenceTileCharacterCheck)(sett);
 
@@ -3709,8 +3718,7 @@ void minHookFunctions::draw()
 			int yCoord = rememberCoords.yCoord;
 
 			coordPair coords{ xCoord, yCoord };
-			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*),
-				0x004cd440)(campaignHelpers::getStratPathFinding(), fort, &coords);
+			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*), 0x004cd440)(campaignHelpers::getStratPathFinding(), fort, &coords);//disk
 
 			fort->regionID = stratMapHelpers::getTile(xCoord, yCoord)->regionId;
 
@@ -3729,7 +3737,7 @@ void minHookFunctions::draw()
 			int portDockDifferenceY = port->yCoord - port->dockY;
 
 			coordPair coords{ xCoord, yCoord };
-			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*), 0x004cd440)(campaignHelpers::getStratPathFinding(), port, &coords);
+			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*), 0x004cd440)(campaignHelpers::getStratPathFinding(), port, &coords);//disk
 
 			port->rallyCoordX = xCoord;
 			port->rallyCoordY = yCoord;
@@ -3744,7 +3752,7 @@ void minHookFunctions::draw()
 
 			//dock
 			coordPair coordsD{ port->dockX, port->dockY };
-			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*), 0x004cd440)(campaignHelpers::getStratPathFinding(), port->portDock, &coordsD);
+			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*), 0x004cd440)(campaignHelpers::getStratPathFinding(), port->portDock, &coordsD);//disk
 		
 			port->portDock->rallyCoordX = port->dockX;
 			port->portDock->rallyCoordY = port->dockY;
@@ -3765,8 +3773,7 @@ void minHookFunctions::draw()
 			int yCoord = rememberCoords.yCoord;
 
 			coordPair coords{ xCoord, yCoord };
-			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*),
-				0x004cd440)(campaignHelpers::getStratPathFinding(), resource, &coords);
+			GAME_FUNC_RAW(void(__thiscall*)(stratPathFinding*, void*, coordPair*), 0x004cd440)(campaignHelpers::getStratPathFinding(), resource, &coords);//disk
 
 			resource->regionID = stratMapHelpers::getTile(xCoord, yCoord)->regionId;
 		}
@@ -3775,11 +3782,9 @@ void minHookFunctions::draw()
 	{
 		if (auto sett = gameHelpers::getGameDataAll()->selectInfo->getSelectedSettlement(); sett)
 		{
-			GAME_FUNC_RAW(void(__thiscall*)(settlementStruct*, int /*breaches*/, bool /*gatehouse*/),
-				0x005edd00)(sett, 0, true);
+			GAME_FUNC_RAW(void(__thiscall*)(settlementStruct*, int /*breaches*/, bool /*gatehouse*/), 0x005edd00)(sett, 0, true);//disk
 		}
 	}
-
 	if (ImGui::Button("createBlockadePortMessage"))
 	{
 		if (auto sett = gameHelpers::getGameDataAll()->selectInfo->getSelectedSettlement(); sett)
@@ -3797,9 +3802,16 @@ void minHookFunctions::draw()
 		{
 			if (auto fleet = stratMapHelpers::getTile(rememberCoords.xCoord, rememberCoords.yCoord)->getCharacter(); fleet && fleet->army)
 			{
-			//	void __thiscall FUN_004c1a20(int param_1,char param_2,int param_3,int param_4)
-				GAME_FUNC_RAW(void(__thiscall*)(portBuildingStruct*, bool, factionStruct*, armyStruct*), 0x004c1a20)(sett->port, false, fleet->army->faction, fleet->army);
+				GAME_FUNC_RAW(void(__thiscall*)(portBuildingStruct*, bool, factionStruct*, armyStruct*), 0x004c1a20)(sett->port, false, fleet->army->faction, fleet->army);//disk
 			}
+		}
+	}
+	ImGui::InputInt("sound", &buffer_sound);
+	if (ImGui::Button("playCharacterVoice"))
+	{
+		if (auto character = selectTile->getCharacter(); character)
+		{
+			onPlayCharacterVoice(buffer_sound, character, false);
 		}
 	}
 

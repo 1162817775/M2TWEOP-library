@@ -417,6 +417,10 @@ public:
 	static void __cdecl onPlayGameSound(DWORD _this, int sound);
 	static DWORD lastSoundClass;
 
+	using t_onPlayCharacterVoice = void(__cdecl*)(int sound, character* character, bool b);
+	static t_onPlayCharacterVoice o_onPlayCharacterVoice;
+	static void __cdecl onPlayCharacterVoice(int sound, character* character, bool b);
+
 	using t_onCreateWife = characterRecord*(__thiscall*)(characterRecord* husband);
 	static t_onCreateWife o_onCreateWife;
 	static characterRecord* __thiscall onCreateWife(characterRecord* husband);
@@ -473,7 +477,8 @@ public:
 };
 
 #define GET_VARIABLE_NAME(Variable) (#Variable)
-#define MIN_HOOK(pTarget, pDetour, ppOriginal) minHookFunctions::hook((LPVOID)pTarget, (LPVOID)pDetour, reinterpret_cast<void**>(&ppOriginal), GET_VARIABLE_NAME(pDetour))
+#define MIN_HOOK(pTarget, pDetour, ppOriginal) minHookFunctions::hook((LPVOID)codes::offsets.pTarget, (LPVOID)pDetour, reinterpret_cast<void**>(&ppOriginal), GET_VARIABLE_NAME(pDetour))
+#define MIN_HOOK_RAW(pTarget, pDetour, ppOriginal) minHookFunctions::hook((LPVOID)pTarget, (LPVOID)pDetour, reinterpret_cast<void**>(&ppOriginal), GET_VARIABLE_NAME(pDetour))
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////

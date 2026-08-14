@@ -62,18 +62,7 @@ public:
 		DWORD weaponLimit8 = NULL;
 		DWORD weaponLimit9 = NULL;
 		DWORD weaponLimit10 = NULL;
-		DWORD onUnitCreate = NULL;
-		DWORD onMaybeWillSpyOpenGates = NULL;
-		DWORD onCharacterSwitchFaction = NULL;
-		DWORD playGameSoundAdd = NULL;
 		DWORD plusMinusFix = NULL;
-
-		DWORD onCreateWife = NULL;
-		DWORD onCreateMessageAboutMarriage = NULL;
-		DWORD onCreateCandidateMarrying = NULL;
-		DWORD onDaughterReadyMarryHusband = NULL;
-		DWORD marriageOptionClassConstructor = NULL;
-
 
 		DWORD unitTypesStart = NULL;
 		//if on strat map then not 0
