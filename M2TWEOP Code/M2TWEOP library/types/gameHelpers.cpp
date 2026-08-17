@@ -3601,6 +3601,11 @@ namespace gameHelpers
 		return *reinterpret_cast<bool*>(minHookFunctions::lastTooltipClass1 + 0x68);
 	}
 
+	void setAdvancedSettlementInfoScrollFrameSize(int width, int height)
+	{
+		minHookFunctions::setAdvancedSettlementInfoScrollFrameSize(width, height);
+	}
+
 	void fixReligionTrigger()
 	{
 		int8_t fixValue = -3;

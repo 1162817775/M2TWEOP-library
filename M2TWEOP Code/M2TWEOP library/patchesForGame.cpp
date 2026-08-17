@@ -3113,32 +3113,34 @@ int __fastcall consolePatches::onReadLogonOrLogoff(int isLogonNow)
 ///////////////////////////////////////////// MIN HOOK FUNCTIONS //////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-minHookFunctions::t_onUnitCreate                         minHookFunctions::o_onUnitCreate = nullptr;
-minHookFunctions::t_onMaybeWillSpyOpenGates              minHookFunctions::o_onMaybeWillSpyOpenGates = nullptr;
-minHookFunctions::t_onCharacterSwitchFaction             minHookFunctions::o_onCharacterSwitchFaction = nullptr;
-minHookFunctions::t_onPlayGameSound                      minHookFunctions::o_onPlayGameSound = nullptr;
-minHookFunctions::t_onPlayCharacterVoice                 minHookFunctions::o_onPlayCharacterVoice = nullptr;
-minHookFunctions::t_onCreateWife                         minHookFunctions::o_onCreateWife = nullptr;
-minHookFunctions::t_onCreateMessageAboutMarriage         minHookFunctions::o_onCreateMessageAboutMarriage = nullptr;
-minHookFunctions::t_onCreateCandidateMarrying            minHookFunctions::o_onCreateCandidateMarrying = nullptr;
-minHookFunctions::t_onDaughterReadyMarryHusband          minHookFunctions::o_onDaughterReadyMarryHusband = nullptr;
-minHookFunctions::t_onCalculationRatioForBirth           minHookFunctions::o_onCalculationRatioForBirth = nullptr;
-minHookFunctions::t_debugRenderLine                      minHookFunctions::o_debugRenderLine = nullptr;
-minHookFunctions::t_debugLineAdd                         minHookFunctions::o_debugLineAdd = nullptr;
-minHookFunctions::t_debugRenderPeg                       minHookFunctions::o_debugRenderPeg = nullptr;
-minHookFunctions::t_debugRenderCircle                    minHookFunctions::o_debugRenderCircle = nullptr;
-minHookFunctions::t_displayMissileStats                  minHookFunctions::o_displayMissileStats = nullptr;
-minHookFunctions::t_displayMeleeStats                    minHookFunctions::o_displayMeleeStats = nullptr;
-minHookFunctions::t_displayArmourStats                   minHookFunctions::o_displayArmourStats = nullptr;
-minHookFunctions::t_displayDefenseStats                  minHookFunctions::o_displayDefenseStats = nullptr;
-minHookFunctions::t_fleeConstructor                      minHookFunctions::o_fleeConstructor1 = nullptr;
-minHookFunctions::t_fleeConstructor                      minHookFunctions::o_fleeConstructor2 = nullptr;
-minHookFunctions::t_onCreateTooltip                      minHookFunctions::o_onCreateTooltip = nullptr;
-minHookFunctions::t_onCreateTooltipByCoords              minHookFunctions::o_onCreateTooltipByCoords = nullptr;
-minHookFunctions::t_onCreateCapabilityUnicodeString      minHookFunctions::o_onCreateCapabilityUnicodeString = nullptr;
-minHookFunctions::t_onBlockadePort                       minHookFunctions::o_onBlockadePort = nullptr;
-minHookFunctions::t_onHudElementClicked                  minHookFunctions::o_onHudElementClicked = nullptr;
-minHookFunctions::t_onSetElementPosition                 minHookFunctions::o_onSetElementPosition = nullptr;
+minHookFunctions::t_onUnitCreate                           minHookFunctions::o_onUnitCreate = nullptr;
+minHookFunctions::t_onMaybeWillSpyOpenGates                minHookFunctions::o_onMaybeWillSpyOpenGates = nullptr;
+minHookFunctions::t_onCharacterSwitchFaction               minHookFunctions::o_onCharacterSwitchFaction = nullptr;
+minHookFunctions::t_onCreateWife                           minHookFunctions::o_onCreateWife = nullptr;
+minHookFunctions::t_onCreateMessageAboutMarriage           minHookFunctions::o_onCreateMessageAboutMarriage = nullptr;
+minHookFunctions::t_onCreateCandidateMarrying              minHookFunctions::o_onCreateCandidateMarrying = nullptr;
+minHookFunctions::t_onDaughterReadyMarryHusband            minHookFunctions::o_onDaughterReadyMarryHusband = nullptr;
+minHookFunctions::t_onCalculationRatioForBirth             minHookFunctions::o_onCalculationRatioForBirth = nullptr;
+minHookFunctions::t_debugRenderLine                        minHookFunctions::o_debugRenderLine = nullptr;
+minHookFunctions::t_debugLineAdd                           minHookFunctions::o_debugLineAdd = nullptr;
+minHookFunctions::t_debugRenderPeg                         minHookFunctions::o_debugRenderPeg = nullptr;
+minHookFunctions::t_debugRenderCircle                      minHookFunctions::o_debugRenderCircle = nullptr;
+minHookFunctions::t_displayMissileStats                    minHookFunctions::o_displayMissileStats = nullptr;
+minHookFunctions::t_displayMeleeStats                      minHookFunctions::o_displayMeleeStats = nullptr;
+minHookFunctions::t_displayArmourStats                     minHookFunctions::o_displayArmourStats = nullptr;
+minHookFunctions::t_displayDefenseStats                    minHookFunctions::o_displayDefenseStats = nullptr;
+minHookFunctions::t_fleeConstructor                        minHookFunctions::o_fleeConstructor1 = nullptr;
+minHookFunctions::t_fleeConstructor                        minHookFunctions::o_fleeConstructor2 = nullptr;
+minHookFunctions::t_onBlockadePort                         minHookFunctions::o_onBlockadePort = nullptr;
+minHookFunctions::t_onCreateTooltip                        minHookFunctions::o_onCreateTooltip = nullptr;
+minHookFunctions::t_onCreateTooltipByCoords                minHookFunctions::o_onCreateTooltipByCoords = nullptr;
+minHookFunctions::t_onCreateCapabilityUnicodeString        minHookFunctions::o_onCreateCapabilityUnicodeString = nullptr;
+minHookFunctions::t_onPlayGameSound                        minHookFunctions::o_onPlayGameSound = nullptr;
+minHookFunctions::t_onPlayCharacterVoice                   minHookFunctions::o_onPlayCharacterVoice = nullptr;
+minHookFunctions::t_onHudElementClicked                    minHookFunctions::o_onHudElementClicked = nullptr;
+minHookFunctions::t_onSetElementPosition                   minHookFunctions::o_onSetElementPosition = nullptr;
+minHookFunctions::t_onCreateAdvancedSettlementInfoScroll   minHookFunctions::o_onCreateAdvancedSettlementInfoScroll = nullptr;
+minHookFunctions::t_onResetUnitRecruitAndRetrainScroll     minHookFunctions::o_onResetUnitRecruitAndRetrainScroll = nullptr;
 
 DWORD minHookFunctions::lastSoundClass = NULL;
 bool minHookFunctions::isUnlockWeaponLimit = false;
@@ -3151,6 +3153,10 @@ UNICODE_STRING*** minHookFunctions::lastTooltipUniString = NULL;
 int minHookFunctions::arrowClick = 0;
 int minHookFunctions::arrowRememberY = 53;
 bool minHookFunctions::arrowChange = false;
+int minHookFunctions::hudBuildings = NULL;
+advancedSettlementInfoScroll* minHookFunctions::advancedSettlementInfoScrollClass = NULL;
+DWORD minHookFunctions::unitRecruitAndRetrainScrollClass = NULL;
+bool minHookFunctions::isBlockSlider = false;
 
 
 static string pointerToString(LPVOID ppPointer)
@@ -3172,32 +3178,34 @@ MH_STATUS minHookFunctions::hook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOrigi
 
 void minHookFunctions::init()
 {
-	MIN_HOOK(a_onUnitCreate,                         onUnitCreate,                       o_onUnitCreate);
-	MIN_HOOK(a_onMaybeWillSpyOpenGates,              onMaybeWillSpyOpenGates,            o_onMaybeWillSpyOpenGates);
-	MIN_HOOK(a_onCharacterSwitchFaction,             onCharacterSwitchFaction,           o_onCharacterSwitchFaction);
-	MIN_HOOK(playGameSoundAdd,                       onPlayGameSound,                    o_onPlayGameSound);
-//	MIN_HOOK(playCharacterVoiceAdd,                  onPlayCharacterVoice,               o_onPlayCharacterVoice);
-	MIN_HOOK(a_onCreateWife,                         onCreateWife,                       o_onCreateWife);
-	MIN_HOOK(a_onCreateMessageAboutMarriage,         onCreateMessageAboutMarriage,       o_onCreateMessageAboutMarriage);
-	MIN_HOOK(a_onCreateCandidateMarrying,            onCreateCandidateMarrying,          o_onCreateCandidateMarrying);
-	MIN_HOOK(a_onDaughterReadyMarryHusband,          onDaughterReadyMarryHusband,        o_onDaughterReadyMarryHusband);
-	MIN_HOOK(a_debugRenderLine,                      debugRenderLine,                    o_debugRenderLine);
-	MIN_HOOK(a_debugLineAdd,                         debugLineAdd,                       o_debugLineAdd);
-	MIN_HOOK(a_debugRenderPeg,                       debugRenderPeg,                     o_debugRenderPeg);
-	MIN_HOOK(a_debugRenderCircle,                    debugRenderCircle,                  o_debugRenderCircle);
-	MIN_HOOK(a_displayMissileStats,                  displayMissileStats,                o_displayMissileStats);
-	MIN_HOOK(a_displayMeleeStats,                    displayMeleeStats,                  o_displayMeleeStats);
-	MIN_HOOK(a_displayArmourStats,                   displayArmourStats,                 o_displayArmourStats);
-	MIN_HOOK(a_displayDefenseStats,                  displayDefenseStats,                o_displayDefenseStats);
-	MIN_HOOK(a_fleeConstructor1,                     fleeConstructor1,                   o_fleeConstructor1);
-	MIN_HOOK(a_fleeConstructor2,                     fleeConstructor2,                   o_fleeConstructor2);
-	MIN_HOOK(a_onCalculationRatioForBirth,           onCalculationRatioForBirth,         o_onCalculationRatioForBirth);
-	MIN_HOOK(a_onCreateTooltip,                      onCreateTooltip,                    o_onCreateTooltip);
-	MIN_HOOK(a_onCreateTooltipByCoords,              onCreateTooltipByCoords,            o_onCreateTooltipByCoords);
-	MIN_HOOK(a_onCreateCapabilityUnicodeString,      onCreateCapabilityUnicodeString,    o_onCreateCapabilityUnicodeString);
-	MIN_HOOK(a_onBlockadePort,                       onBlockadePort,                     o_onBlockadePort);
-	MIN_HOOK(a_onHudElementClicked,                  onHudElementClicked,                o_onHudElementClicked);
-	MIN_HOOK(a_onSetElementPosition,                 onSetElementPosition,               o_onSetElementPosition);
+	MIN_HOOK(a_onUnitCreate,                           onUnitCreate,                           o_onUnitCreate);
+	MIN_HOOK(a_onMaybeWillSpyOpenGates,                onMaybeWillSpyOpenGates,                o_onMaybeWillSpyOpenGates);
+	MIN_HOOK(a_onCharacterSwitchFaction,               onCharacterSwitchFaction,               o_onCharacterSwitchFaction);
+	MIN_HOOK(a_onCreateWife,                           onCreateWife,                           o_onCreateWife);
+	MIN_HOOK(a_onCreateMessageAboutMarriage,           onCreateMessageAboutMarriage,           o_onCreateMessageAboutMarriage);
+	MIN_HOOK(a_onCreateCandidateMarrying,              onCreateCandidateMarrying,              o_onCreateCandidateMarrying);
+	MIN_HOOK(a_onDaughterReadyMarryHusband,            onDaughterReadyMarryHusband,            o_onDaughterReadyMarryHusband);
+	MIN_HOOK(a_debugRenderLine,                        debugRenderLine,                        o_debugRenderLine);
+	MIN_HOOK(a_debugLineAdd,                           debugLineAdd,                           o_debugLineAdd);
+	MIN_HOOK(a_debugRenderPeg,                         debugRenderPeg,                         o_debugRenderPeg);
+	MIN_HOOK(a_debugRenderCircle,                      debugRenderCircle,                      o_debugRenderCircle);
+	MIN_HOOK(a_displayMissileStats,                    displayMissileStats,                    o_displayMissileStats);
+	MIN_HOOK(a_displayMeleeStats,                      displayMeleeStats,                      o_displayMeleeStats);
+	MIN_HOOK(a_displayArmourStats,                     displayArmourStats,                     o_displayArmourStats);
+	MIN_HOOK(a_displayDefenseStats,                    displayDefenseStats,                    o_displayDefenseStats);
+	MIN_HOOK(a_fleeConstructor1,                       fleeConstructor1,                       o_fleeConstructor1);
+	MIN_HOOK(a_fleeConstructor2,                       fleeConstructor2,                       o_fleeConstructor2);
+	MIN_HOOK(a_onCalculationRatioForBirth,             onCalculationRatioForBirth,             o_onCalculationRatioForBirth);
+	MIN_HOOK(a_onBlockadePort,                         onBlockadePort,                         o_onBlockadePort);
+	MIN_HOOK(a_onCreateTooltip,                        onCreateTooltip,                        o_onCreateTooltip);
+	MIN_HOOK(a_onCreateTooltipByCoords,                onCreateTooltipByCoords,                o_onCreateTooltipByCoords);
+	MIN_HOOK(a_onCreateCapabilityUnicodeString,        onCreateCapabilityUnicodeString,        o_onCreateCapabilityUnicodeString);
+	MIN_HOOK(playGameSoundAdd,                         onPlayGameSound,                        o_onPlayGameSound);
+//	MIN_HOOK(playCharacterVoiceAdd,                    onPlayCharacterVoice,                   o_onPlayCharacterVoice);
+	MIN_HOOK(a_onHudElementClicked,                    onHudElementClicked,                    o_onHudElementClicked);
+	MIN_HOOK(a_onSetElementPosition,                   onSetElementPosition,                   o_onSetElementPosition);
+	MIN_HOOK(a_onCreateAdvancedSettlementInfoScroll,   onCreateAdvancedSettlementInfoScroll,   o_onCreateAdvancedSettlementInfoScroll);
+	MIN_HOOK(a_onResetUnitRecruitAndRetrainScroll,     onResetUnitRecruitAndRetrainScroll,     o_onResetUnitRecruitAndRetrainScroll);
 }
 
 int __thiscall minHookFunctions::debugLineAdd(void* _this, vector3* start, vector3* end, color8888 color, float time, bool zbuffered)
@@ -3407,21 +3415,6 @@ void __thiscall minHookFunctions::onCharacterSwitchFaction(character* _this, fac
 	o_onCharacterSwitchFaction(_this, faction, param_2, param_3);
 }
 
-//### Add a Lua event function, for example to override sound events? 
-void __cdecl minHookFunctions::onPlayGameSound(DWORD _this, int sound)
-{
-	if (!_this) return;
-
-	lastSoundClass = _this;
-
-	o_onPlayGameSound(_this, sound);
-}
-
-void __cdecl minHookFunctions::onPlayCharacterVoice(int sound, character* character, bool b)
-{
-	o_onPlayCharacterVoice(sound, character, b);
-}
-
 //### Add a Lua event function, for example to override a spouse. 
 characterRecord* __thiscall minHookFunctions::onCreateWife(characterRecord* husband)
 {
@@ -3454,6 +3447,18 @@ float __fastcall minHookFunctions::onCalculationRatioForBirth(family* _this)
 
 	return result;
 }
+
+void __thiscall minHookFunctions::onBlockadePort(character* _this, portBuildingStruct* port)
+{
+	o_onBlockadePort(_this, port);
+	gameEvents::onBlockadePort(_this, port);
+	if (port->fac->isPlayerControlled == 1)
+		createBlockadePortMessage(_this->army, port->settlement);
+}
+
+/////////////////////////
+///=== UI ELEMENTS ===///
+/////////////////////////
 
 void __thiscall minHookFunctions::onCreateTooltip(DWORD _this, void* p, UNICODE_STRING*** u)
 {
@@ -3514,16 +3519,50 @@ UNICODE_STRING**& __thiscall minHookFunctions::onCreateCapabilityUnicodeString(b
 	return result;
 }
 
-void __thiscall minHookFunctions::onBlockadePort(character* _this, portBuildingStruct* port)
+//### Add a Lua event function, for example to override sound events? 
+void __cdecl minHookFunctions::onPlayGameSound(DWORD _this, int sound)
 {
-	o_onBlockadePort(_this, port);
-	gameEvents::onBlockadePort(_this, port);
-	if (port->fac->isPlayerControlled == 1)
-		createBlockadePortMessage(_this->army, port->settlement);
+	if (!_this) return;
+
+	lastSoundClass = _this;
+
+//	gameHelpers::logStringGame("onPlayGameSound: " + to_string(sound));
+
+	//addUnitToQueue || removeUnit   || draggingUnit   || buildings
+	if (sound == 151 || sound == 152 || sound == 132 /*|| sound == 145 || sound == 146*/)
+	{
+		isBlockSlider = true;
+	}
+	/*//settlementSelected
+	else if (sound == 178)
+	{
+		isBlockSlider = false;
+		if (unitRecruitAndRetrainScrollClass)
+		{
+			o_onResetUnitRecruitAndRetrainScroll(unitRecruitAndRetrainScrollClass);
+		}
+		if (hudBuildings)
+		{
+			coordPair position{ 273, 53 };
+			o_onSetElementPosition(hudBuildings, &position, 1);
+		}
+	}*/
+	else //if (sound == 113)
+	{
+		isBlockSlider = false;
+	}
+
+	o_onPlayGameSound(_this, sound);
+}
+
+void __cdecl minHookFunctions::onPlayCharacterVoice(int sound, character* character, bool b)
+{
+	o_onPlayCharacterVoice(sound, character, b);
 }
 
 void __thiscall minHookFunctions::onHudElementClicked(int* param_1, int param_2, int param_3)
 {
+	hudBuildings = param_1[0x76];
 	if (param_3 != 1)
 	{
 		o_onHudElementClicked(param_1, param_2, param_3);
@@ -3588,6 +3627,20 @@ void __thiscall minHookFunctions::onSetElementPosition(int param_1, coordPair* c
 	o_onSetElementPosition(param_1, coords, param_3);
 }
 
+advancedSettlementInfoScroll* __thiscall minHookFunctions::onCreateAdvancedSettlementInfoScroll(advancedSettlementInfoScroll* _this, int width, int height)
+{
+	advancedSettlementInfoScrollClass = o_onCreateAdvancedSettlementInfoScroll(_this, width, height);
+	return advancedSettlementInfoScrollClass;
+}
+
+void __fastcall minHookFunctions::onResetUnitRecruitAndRetrainScroll(DWORD _this)
+{
+	unitRecruitAndRetrainScrollClass = _this;
+	if (isBlockSlider)
+		return;
+	o_onResetUnitRecruitAndRetrainScroll(_this);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// CALL GAME FUNCTIONS /////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3636,6 +3689,14 @@ void minHookFunctions::resetTooltipText(const char* text)
 void minHookFunctions::createBlockadePortMessage(armyStruct* fleet, settlementStruct* settlement)
 {
 	GAME_FUNC(void(__cdecl*)(armyStruct*, settlementStruct*), createBlockadePortMessageAdd)(fleet, settlement);
+}
+
+void minHookFunctions::setAdvancedSettlementInfoScrollFrameSize(int width, int height)
+{
+	if (!advancedSettlementInfoScrollClass || !advancedSettlementInfoScrollClass->elements || !advancedSettlementInfoScrollClass->elements->frame)
+		return;
+	advancedSettlementInfoScrollClass->elements->frame->width  = width;
+	advancedSettlementInfoScrollClass->elements->frame->height = height;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3813,6 +3874,15 @@ void minHookFunctions::draw()
 		{
 			onPlayCharacterVoice(buffer_sound, character, false);
 		}
+	}
+	if (advancedSettlementInfoScrollClass && advancedSettlementInfoScrollClass->elements && advancedSettlementInfoScrollClass->elements->frame)
+	{
+		ImGui::Text("setAdvancedSettlementInfoScrollFrameSize");
+		ImGui::PushItemWidth(100);
+		ImGui::InputInt("width",  &advancedSettlementInfoScrollClass->elements->frame->width);
+		ImGui::SameLine();
+		ImGui::InputInt("height", &advancedSettlementInfoScrollClass->elements->frame->height);
+		ImGui::PopItemWidth();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////

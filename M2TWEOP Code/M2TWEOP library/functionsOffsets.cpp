@@ -426,6 +426,8 @@ void codes::initCodes(int gameVer)
 		offsets.createBlockadePortMessageAdd = 0x00c5aba0;
 		offsets.a_onHudElementClicked = 0x00c3b3f0;
 		offsets.a_onSetElementPosition = 0x00b544c0;
+		offsets.a_onCreateAdvancedSettlementInfoScroll = 0x00c15200;
+		offsets.a_onResetUnitRecruitAndRetrainScroll = 0x00c1c960;
 	}
 
 
@@ -855,5 +857,7 @@ void codes::initCodes(int gameVer)
 		offsets.createBlockadePortMessageAdd = 0x00c54fa0;
 		offsets.a_onHudElementClicked = 0x00c357c0;
 		offsets.a_onSetElementPosition = 0x00b4e810;
+		offsets.a_onCreateAdvancedSettlementInfoScroll = 0x00c0f5d0;
+		offsets.a_onResetUnitRecruitAndRetrainScroll = 0x00c16d20;
 	}
 }
