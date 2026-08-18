@@ -704,6 +704,18 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	tables.M2TWEOP.set_function("getTooltipActive", &gameHelpers::getTooltipActive);
 
 	/***
+	Change the frame size in the "advanced_settlement_info_scroll" scroll. By default: 442 x 358.   
+	@function M2TWEOP.setAdvancedSettlementInfoScrollFrameSize
+	@tparam int height
+	@tparam int width
+	@usage
+	function onCampaignMapLoaded()
+		M2TWEOP.setAdvancedSettlementInfoScrollFrameSize(442, 479);
+	end
+	*/
+	tables.M2TWEOP.set_function("setAdvancedSettlementInfoScrollFrameSize", &gameHelpers::setAdvancedSettlementInfoScrollFrameSize);
+
+	/***
 	Gets a struct containing color information about the settlement info scroll.
 	@function M2TWEOP.getSettlementInfoScroll
 	@treturn settlementInfoScroll infoScroll

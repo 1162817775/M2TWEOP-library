@@ -344,6 +344,26 @@ struct color8888
 	}
 };
 
+struct frameStruct
+{
+	int field_4[4];
+	int	width;
+	int	height;
+};
+struct advancedElementsStruct
+{
+	int field_2[2];
+	frameStruct* frame;
+};
+struct advancedSettlementInfoScroll
+{
+	int field_4[4];
+	int	width;
+	int	height;
+	int field_13[13];
+	advancedElementsStruct* elements;
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// MIN HOOK FUNCTIONS //////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -412,15 +432,6 @@ public:
 	static t_onCharacterSwitchFaction o_onCharacterSwitchFaction;
 	static void __thiscall onCharacterSwitchFaction(character* _this, factionStruct* faction, int param_2, int param_3);
 
-	using t_onPlayGameSound = void(__cdecl*)(DWORD _this, int sound);
-	static t_onPlayGameSound o_onPlayGameSound;
-	static void __cdecl onPlayGameSound(DWORD _this, int sound);
-	static DWORD lastSoundClass;
-
-	using t_onPlayCharacterVoice = void(__cdecl*)(int sound, character* character, bool b);
-	static t_onPlayCharacterVoice o_onPlayCharacterVoice;
-	static void __cdecl onPlayCharacterVoice(int sound, character* character, bool b);
-
 	using t_onCreateWife = characterRecord*(__thiscall*)(characterRecord* husband);
 	static t_onCreateWife o_onCreateWife;
 	static characterRecord* __thiscall onCreateWife(characterRecord* husband);
@@ -443,6 +454,11 @@ public:
 	static t_onCalculationRatioForBirth o_onCalculationRatioForBirth;
 	static float __fastcall onCalculationRatioForBirth(family* _this);
 
+	using t_onBlockadePort = void(__thiscall*)(character* _this, portBuildingStruct* port);
+	static t_onBlockadePort o_onBlockadePort;
+	static void __thiscall onBlockadePort(character* _this, portBuildingStruct* port);
+	static void createBlockadePortMessage(armyStruct* fleet, settlementStruct* settlement);
+
 	using t_onCreateTooltip = void(__thiscall*)(DWORD _this, void* p, UNICODE_STRING*** u);
 	static t_onCreateTooltip o_onCreateTooltip;
 	static void __thiscall onCreateTooltip(DWORD _this, void* p, UNICODE_STRING*** u);
@@ -459,10 +475,14 @@ public:
 	static t_onCreateCapabilityUnicodeString o_onCreateCapabilityUnicodeString;
 	static UNICODE_STRING**& __thiscall onCreateCapabilityUnicodeString(buildingLevelCapability* _this, void* param_1, settlementStruct* settlement);
 
-	using t_onBlockadePort = void(__thiscall*)(character* _this, portBuildingStruct* port);
-	static t_onBlockadePort o_onBlockadePort;
-	static void __thiscall onBlockadePort(character* _this, portBuildingStruct* port);
-	static void createBlockadePortMessage(armyStruct* fleet, settlementStruct* settlement);
+	using t_onPlayGameSound = void(__cdecl*)(DWORD _this, int sound);
+	static t_onPlayGameSound o_onPlayGameSound;
+	static void __cdecl onPlayGameSound(DWORD _this, int sound);
+	static DWORD lastSoundClass;
+
+	using t_onPlayCharacterVoice = void(__cdecl*)(int sound, character* character, bool b);
+	static t_onPlayCharacterVoice o_onPlayCharacterVoice;
+	static void __cdecl onPlayCharacterVoice(int sound, character* character, bool b);
 
 	using t_onHudElementClicked = void(__thiscall*)(int* param_1, int param_2, int param_3);
 	static t_onHudElementClicked o_onHudElementClicked;
@@ -474,6 +494,19 @@ public:
 	static int arrowClick;
 	static int arrowRememberY;
 	static bool arrowChange;
+	static int hudBuildings;
+
+	using t_onCreateAdvancedSettlementInfoScroll = advancedSettlementInfoScroll*(__thiscall*)(advancedSettlementInfoScroll* _this, int width, int height);
+	static t_onCreateAdvancedSettlementInfoScroll o_onCreateAdvancedSettlementInfoScroll;
+	static advancedSettlementInfoScroll* __thiscall onCreateAdvancedSettlementInfoScroll(advancedSettlementInfoScroll* _this, int width, int height);
+	static advancedSettlementInfoScroll* advancedSettlementInfoScrollClass;
+	static void setAdvancedSettlementInfoScrollFrameSize(int width, int height);
+
+	using t_onResetUnitRecruitAndRetrainScroll = void(__fastcall*)(DWORD _this);
+	static t_onResetUnitRecruitAndRetrainScroll o_onResetUnitRecruitAndRetrainScroll;
+	static void __fastcall onResetUnitRecruitAndRetrainScroll(DWORD _this);
+	static DWORD unitRecruitAndRetrainScrollClass;
+	static bool isBlockSlider;
 };
 
 #define GET_VARIABLE_NAME(Variable) (#Variable)

@@ -670,6 +670,7 @@ namespace gameHelpers
 	void playGameSound(int value);
 	void resetTooltipText(const char* text);
 	bool getTooltipActive();
+	void setAdvancedSettlementInfoScrollFrameSize(int width, int height);
 
 	religionDatabase* getReligionDatabase();
 	gameDataAllStruct* getGameDataAll();

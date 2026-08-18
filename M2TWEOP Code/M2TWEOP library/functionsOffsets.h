@@ -430,7 +430,8 @@ public:
 		DWORD createBlockadePortMessageAdd = NULL;
 		DWORD a_onHudElementClicked = NULL;
 		DWORD a_onSetElementPosition = NULL;
-
+		DWORD a_onCreateAdvancedSettlementInfoScroll = NULL;
+		DWORD a_onResetUnitRecruitAndRetrainScroll = NULL;
 	}offsets;
 
 	static void initCodes(int gameVer);
