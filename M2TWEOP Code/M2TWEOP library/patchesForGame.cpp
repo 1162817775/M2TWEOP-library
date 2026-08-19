@@ -3132,6 +3132,7 @@ minHookFunctions::t_displayDefenseStats                    minHookFunctions::o_d
 minHookFunctions::t_fleeConstructor                        minHookFunctions::o_fleeConstructor1 = nullptr;
 minHookFunctions::t_fleeConstructor                        minHookFunctions::o_fleeConstructor2 = nullptr;
 minHookFunctions::t_onBlockadePort                         minHookFunctions::o_onBlockadePort = nullptr;
+minHookFunctions::t_onQuickLoading                         minHookFunctions::o_onQuickLoading = nullptr;
 minHookFunctions::t_onCreateTooltip                        minHookFunctions::o_onCreateTooltip = nullptr;
 minHookFunctions::t_onCreateTooltipByCoords                minHookFunctions::o_onCreateTooltipByCoords = nullptr;
 minHookFunctions::t_onCreateCapabilityUnicodeString        minHookFunctions::o_onCreateCapabilityUnicodeString = nullptr;
@@ -3141,6 +3142,10 @@ minHookFunctions::t_onHudElementClicked                    minHookFunctions::o_o
 minHookFunctions::t_onSetElementPosition                   minHookFunctions::o_onSetElementPosition = nullptr;
 minHookFunctions::t_onCreateAdvancedSettlementInfoScroll   minHookFunctions::o_onCreateAdvancedSettlementInfoScroll = nullptr;
 minHookFunctions::t_onResetUnitRecruitAndRetrainScroll     minHookFunctions::o_onResetUnitRecruitAndRetrainScroll = nullptr;
+minHookFunctions::t_onTraitsListConstructor1               minHookFunctions::o_onTraitsListConstructor1 = nullptr;
+minHookFunctions::t_onTraitsListConstructor2               minHookFunctions::o_onTraitsListConstructor2 = nullptr;
+minHookFunctions::t_onReinitNamedCharacterInfoScroll       minHookFunctions::o_onReinitNamedCharacterInfoScroll = nullptr;
+minHookFunctions::t_onResetTraitsListHeight                minHookFunctions::o_onResetTraitsListHeight = nullptr;
 
 DWORD minHookFunctions::lastSoundClass = NULL;
 bool minHookFunctions::isUnlockWeaponLimit = false;
@@ -3157,6 +3162,8 @@ int minHookFunctions::hudBuildings = NULL;
 advancedSettlementInfoScroll* minHookFunctions::advancedSettlementInfoScrollClass = NULL;
 DWORD minHookFunctions::unitRecruitAndRetrainScrollClass = NULL;
 bool minHookFunctions::isBlockSlider = false;
+int minHookFunctions::traitsChildWindowHeight = 92;
+bool minHookFunctions::isReset = false;
 
 
 static string pointerToString(LPVOID ppPointer)
@@ -3197,6 +3204,7 @@ void minHookFunctions::init()
 	MIN_HOOK(a_fleeConstructor2,                       fleeConstructor2,                       o_fleeConstructor2);
 	MIN_HOOK(a_onCalculationRatioForBirth,             onCalculationRatioForBirth,             o_onCalculationRatioForBirth);
 	MIN_HOOK(a_onBlockadePort,                         onBlockadePort,                         o_onBlockadePort);
+	MIN_HOOK(a_onQuickLoading,                         onQuickLoading,                         o_onQuickLoading);
 	MIN_HOOK(a_onCreateTooltip,                        onCreateTooltip,                        o_onCreateTooltip);
 	MIN_HOOK(a_onCreateTooltipByCoords,                onCreateTooltipByCoords,                o_onCreateTooltipByCoords);
 	MIN_HOOK(a_onCreateCapabilityUnicodeString,        onCreateCapabilityUnicodeString,        o_onCreateCapabilityUnicodeString);
@@ -3206,6 +3214,10 @@ void minHookFunctions::init()
 	MIN_HOOK(a_onSetElementPosition,                   onSetElementPosition,                   o_onSetElementPosition);
 	MIN_HOOK(a_onCreateAdvancedSettlementInfoScroll,   onCreateAdvancedSettlementInfoScroll,   o_onCreateAdvancedSettlementInfoScroll);
 	MIN_HOOK(a_onResetUnitRecruitAndRetrainScroll,     onResetUnitRecruitAndRetrainScroll,     o_onResetUnitRecruitAndRetrainScroll);
+	MIN_HOOK(a_onTraitsListConstructor1,               onTraitsListConstructor1,               o_onTraitsListConstructor1);
+	MIN_HOOK(a_onTraitsListConstructor2,               onTraitsListConstructor2,               o_onTraitsListConstructor2);
+	MIN_HOOK(a_onReinitNamedCharacterInfoScroll,       onReinitNamedCharacterInfoScroll,       o_onReinitNamedCharacterInfoScroll);
+	MIN_HOOK(a_onResetTraitsListHeight,                onResetTraitsListHeight,                o_onResetTraitsListHeight);
 }
 
 int __thiscall minHookFunctions::debugLineAdd(void* _this, vector3* start, vector3* end, color8888 color, float time, bool zbuffered)
@@ -3456,6 +3468,61 @@ void __thiscall minHookFunctions::onBlockadePort(character* _this, portBuildingS
 		createBlockadePortMessage(_this->army, port->settlement);
 }
 
+static std::optional<filesystem::path> findNewestFileWithExtension(const string& folder_path, const string& extension)
+{
+	std::optional<filesystem::path> newest_file;
+	if (extension.empty() || extension[0] != '.') 
+	{
+		return newest_file;
+	}
+	filesystem::file_time_type newest_time{};
+	bool first = true;
+	for (const auto& entry : filesystem::directory_iterator(folder_path))
+	{
+		if (!entry.is_regular_file()) 
+		{
+			continue;
+		}
+		const auto& path = entry.path();
+		if (path.extension() != extension) 
+		{
+			continue;
+		}
+		auto time = filesystem::last_write_time(path);
+		if (first || time > newest_time) 
+		{
+			newest_time = time;
+			newest_file = path;
+			first = false;
+		}
+	}
+	return newest_file;
+}
+
+void __cdecl minHookFunctions::onQuickLoading(UNICODE_STRING**& savePath)
+{
+	string save = techFuncs::uniToAnsi(savePath);
+	filesystem::path filePath = save;
+	string ext = filePath.extension().string();
+	if (ext != ".sav")
+	{
+		const std::string folder = globals::dataS.modPath + "\\saves";
+		auto result = findNewestFileWithExtension(folder, ".sav");
+		if (result)
+		{
+			auto newSave = result->string();
+			log("minHookFunctions::onQuickLoading: fix save: old: " + save + " --> new: " + newSave);
+			gameStringHelpers::createUniString(savePath, newSave.c_str());
+		}
+		else
+		{
+			log("[error] minHookFunctions::onQuickLoading: failed to load save file: " + save);
+			return;
+		}
+	}
+	o_onQuickLoading(savePath);
+}
+
 /////////////////////////
 ///=== UI ELEMENTS ===///
 /////////////////////////
@@ -3526,7 +3593,7 @@ void __cdecl minHookFunctions::onPlayGameSound(DWORD _this, int sound)
 
 	lastSoundClass = _this;
 
-//	gameHelpers::logStringGame("onPlayGameSound: " + to_string(sound));
+//	log("onPlayGameSound: " + to_string(sound));
 
 	//addUnitToQueue || removeUnit   || draggingUnit   || buildings
 	if (sound == 151 || sound == 152 || sound == 132 /*|| sound == 145 || sound == 146*/)
@@ -3641,6 +3708,49 @@ void __fastcall minHookFunctions::onResetUnitRecruitAndRetrainScroll(DWORD _this
 	o_onResetUnitRecruitAndRetrainScroll(_this);
 }
 
+int* __thiscall minHookFunctions::onTraitsListConstructor1(int* _this, int width, int height)
+{
+	if (height == 92 && height != traitsChildWindowHeight)
+	{
+		height = traitsChildWindowHeight;
+		log("minHookFunctions::onTraitsListConstructor1(set new height: " + to_string(height) + ")");
+	}
+	return o_onTraitsListConstructor1(_this, width, height);
+}
+
+int* __thiscall minHookFunctions::onTraitsListConstructor2(int* _this, int width, int height)
+{
+	if (height == 92 && height != traitsChildWindowHeight)
+	{
+		height = traitsChildWindowHeight;
+		log("minHookFunctions::onTraitsListConstructor2(set new height: " + to_string(height) + ")");
+	}
+	return o_onTraitsListConstructor2(_this, width, height);
+}
+
+void __fastcall minHookFunctions::onReinitNamedCharacterInfoScroll(int param_1)
+{
+	if (traitsChildWindowHeight != 92 && *(int*)(*(int*)(param_1 + 0x34c) + 0x48) == *(int*)(param_1 + 0x330))
+	{
+		isReset = true;
+	//	//get address onResetTraitsListHeight
+	//	int address = **(int**)(param_1 + 0x33c) + 0x34;
+	//	log("minHookFunctions::onReinitNamedCharacterInfoScroll(onResetTraitsListHeight address: " + to_string(address) + ")");
+	}
+	o_onReinitNamedCharacterInfoScroll(param_1);
+}
+
+void __thiscall minHookFunctions::onResetTraitsListHeight(int _this, int height)
+{
+	if (isReset && height != traitsChildWindowHeight)
+	{
+		isReset = false;
+		height = traitsChildWindowHeight;
+	//	log("minHookFunctions::onResetTraitsListHeight(set new height: " + to_string(traitsChildWindowHeight) + ")");
+	}
+	o_onResetTraitsListHeight(_this, height);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// CALL GAME FUNCTIONS /////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3649,7 +3759,7 @@ characterRecord* minHookFunctions::createWife(characterRecord* husband)
 {
 	if (!husband->isMale || husband->spouse)
 	{
-		gameHelpers::logStringGame("characterRecord::createMessageMarriageProposal: son is already married");
+		log("characterRecord::createMessageMarriageProposal: son is already married");
 		return nullptr;
 	}
 
@@ -3665,7 +3775,7 @@ characterRecord* minHookFunctions::createHusband(characterRecord* daughter)
 {
 	if (daughter->isMale || daughter->spouse)
 	{
-		gameHelpers::logStringGame("characterRecord::createMessageMarriageProposal: daughter is already married");
+		log("characterRecord::createMessageMarriageProposal: daughter is already married");
 		return nullptr;
 	}
 
@@ -3704,6 +3814,7 @@ void minHookFunctions::setAdvancedSettlementInfoScrollFrameSize(int width, int h
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int buffer_sound = 0;
+int buffer_line = 3;
 //### Don't pay attention to this mess, I'll finish some things and clean this up a bit later. (^_^)   
 void minHookFunctions::draw()
 {
@@ -3883,6 +3994,15 @@ void minHookFunctions::draw()
 		ImGui::SameLine();
 		ImGui::InputInt("height", &advancedSettlementInfoScrollClass->elements->frame->height);
 		ImGui::PopItemWidth();
+	}
+	ImGui::InputInt("line", &buffer_line);
+	if (ImGui::Button("setMercenariesNumberOfLines"))
+	{
+		gameHelpers::setMercsScrollNumOfLines(buffer_line);
+	}
+	if (ImGui::Button("setMercsScrollParameters"))
+	{
+		gameHelpers::setMercsScrollParameters(14, 7, 4, 2, 142);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////

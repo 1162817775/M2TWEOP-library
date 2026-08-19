@@ -428,6 +428,11 @@ void codes::initCodes(int gameVer)
 		offsets.a_onSetElementPosition = 0x00b544c0;
 		offsets.a_onCreateAdvancedSettlementInfoScroll = 0x00c15200;
 		offsets.a_onResetUnitRecruitAndRetrainScroll = 0x00c1c960;
+		offsets.a_onQuickLoading = 0x00c81450;
+		offsets.a_onTraitsListConstructor1 = 0x00bbfef0;
+		offsets.a_onTraitsListConstructor2 = 0x00bc0240;
+		offsets.a_onReinitNamedCharacterInfoScroll = 0x00bc2590;
+		offsets.a_onResetTraitsListHeight = 0x00aecde0;
 	}
 
 
@@ -859,5 +864,10 @@ void codes::initCodes(int gameVer)
 		offsets.a_onSetElementPosition = 0x00b4e810;
 		offsets.a_onCreateAdvancedSettlementInfoScroll = 0x00c0f5d0;
 		offsets.a_onResetUnitRecruitAndRetrainScroll = 0x00c16d20;
+		offsets.a_onQuickLoading = 0x00c7b960;
+		offsets.a_onTraitsListConstructor1 = 0x00bba250;
+		offsets.a_onTraitsListConstructor2 = 0x00bba5a0;
+		offsets.a_onReinitNamedCharacterInfoScroll = 0x00bbc8f0;
+		offsets.a_onResetTraitsListHeight = 0x00ae70e0;
 	}
 }

@@ -134,6 +134,12 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.weaponLimit10 = 0x008EE174;
 		offsets.removeSiegeBug = 0x59B084;
 		offsets.plusMinusFix = 0x1342b60;
+		offsets.mercsScroll_1 = 0x00BC32B9;
+		offsets.mercsScroll_2 = 0x00BC32B7;
+		offsets.mercsScroll_3 = 0x00BC335A;
+		offsets.mercsScroll_4 = 0x00BC3358;
+		offsets.mercsScroll_5 = 0x00BC1289;
+		offsets.mercsScroll_6 = 0x00BC284B;
 
 		offsets.rad2tab = 0x165DBE0;
 		offsets.debugLines = 0x2CBDA24;
@@ -269,6 +275,12 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.weaponLimit10 = 0x008EEBF4;
 		offsets.removeSiegeBug = 0x59B574;
 		offsets.plusMinusFix = 0x12fdb40;
+		offsets.mercsScroll_1 = 0x00BBD619;
+		offsets.mercsScroll_2 = 0x00BBD617;
+		offsets.mercsScroll_3 = 0x00BBD6BA;
+		offsets.mercsScroll_4 = 0x00BBD6B8;
+		offsets.mercsScroll_5 = 0x00BBB5E9;
+		offsets.mercsScroll_6 = 0x00BBCBAB;
 
 		offsets.rad2tab = 0x1615CF0;
 		offsets.debugLines = 0x2C749CC;

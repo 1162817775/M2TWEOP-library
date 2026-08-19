@@ -671,6 +671,8 @@ namespace gameHelpers
 	void resetTooltipText(const char* text);
 	bool getTooltipActive();
 	void setAdvancedSettlementInfoScrollFrameSize(int width, int height);
+	void setMercsScrollNumOfLines(int line);
+	void setMercsScrollParameters(int maxSlots, int maxSlotsInLine, int maxSlots2, int maxSlotsInLine2, int traitsHeight);
 
 	religionDatabase* getReligionDatabase();
 	gameDataAllStruct* getGameDataAll();
