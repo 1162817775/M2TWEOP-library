@@ -673,6 +673,7 @@ namespace gameHelpers
 	void setAdvancedSettlementInfoScrollFrameSize(int width, int height);
 	void setMercsScrollNumOfLines(int line);
 	void setMercsScrollParameters(int maxSlots, int maxSlotsInLine, int maxSlots2, int maxSlotsInLine2, int traitsHeight);
+	void setEnemyArmyUnitsScrollParameters(int maxSlots, int maxSlotsInLine, int iconWidth, int iconHeight);
 
 	religionDatabase* getReligionDatabase();
 	gameDataAllStruct* getGameDataAll();

@@ -140,6 +140,18 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.mercsScroll_4 = 0x00BC3358;
 		offsets.mercsScroll_5 = 0x00BC1289;
 		offsets.mercsScroll_6 = 0x00BC284B;
+		offsets.unitScroll_1 = 0x00BC0E99;
+		offsets.unitScroll_2 = 0x00BC0E9B;
+		offsets.unitScroll_3 = 0x00BC0E9D;
+		offsets.unitScroll_4 = 0x00BC0E9F;
+	    offsets.unitScroll_5 = 0x00C0C9BC;
+		offsets.unitScroll_6 = 0x00C0C9BE;
+		offsets.unitScroll_7 = 0x00C0C9C0;
+		offsets.unitScroll_8 = 0x00C0C9C2;
+	    offsets.unitScroll_9 = 0x00C0C9F9;
+		offsets.unitScroll_10 = 0x00C0C9FB;
+		offsets.unitScroll_11 = 0x00C0C9FD;
+		offsets.unitScroll_12 = 0x00C0C9FF;
 
 		offsets.rad2tab = 0x165DBE0;
 		offsets.debugLines = 0x2CBDA24;
@@ -281,6 +293,19 @@ void dataOffsets::initDataOffsets(int gameVer)
 		offsets.mercsScroll_4 = 0x00BBD6B8;
 		offsets.mercsScroll_5 = 0x00BBB5E9;
 		offsets.mercsScroll_6 = 0x00BBCBAB;
+		offsets.unitScroll_1 = 0x00BBB1F9;
+		offsets.unitScroll_2 = 0x00BBB1FB;
+		offsets.unitScroll_3 = 0x00BBB1FD;
+		offsets.unitScroll_4 = 0x00BBB1FF;
+		offsets.unitScroll_5 = 0x00C06D6C;
+		offsets.unitScroll_6 = 0x00C06D6E;
+		offsets.unitScroll_7 = 0x00C06D70;
+		offsets.unitScroll_8 = 0x00C06D72;
+		offsets.unitScroll_9 = 0x00C06DA9;
+		offsets.unitScroll_10 = 0x00C06DAB;
+		offsets.unitScroll_11 = 0x00C06DAD;
+		offsets.unitScroll_12 = 0x00C06DAF;
+
 
 		offsets.rad2tab = 0x1615CF0;
 		offsets.debugLines = 0x2C749CC;

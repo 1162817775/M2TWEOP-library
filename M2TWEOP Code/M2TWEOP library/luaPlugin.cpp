@@ -742,6 +742,20 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	tables.M2TWEOP.set_function("setMercsScrollParameters", &gameHelpers::setMercsScrollParameters);
 
 	/***
+	Set parameters for the enemy army units scroll. By default: 18, 9, 42, 56.   
+	@function M2TWEOP.setEnemyArmyUnitsScrollParameters
+	@tparam int maxSlots
+	@tparam int maxSlotsInLine
+	@tparam int iconWidth
+	@tparam int iconHeight
+	@usage
+	function onPluginLoad()
+		M2TWEOP.setEnemyArmyUnitsScrollParameters(20, 10, 39, 55); 
+	end
+	*/
+	tables.M2TWEOP.set_function("setEnemyArmyUnitsScrollParameters", &gameHelpers::setEnemyArmyUnitsScrollParameters);
+
+	/***
 	Gets a struct containing color information about the settlement info scroll.
 	@function M2TWEOP.getSettlementInfoScroll
 	@treturn settlementInfoScroll infoScroll
