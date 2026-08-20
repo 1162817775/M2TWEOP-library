@@ -716,6 +716,46 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	tables.M2TWEOP.set_function("setAdvancedSettlementInfoScrollFrameSize", &gameHelpers::setAdvancedSettlementInfoScrollFrameSize);
 
 	/***
+	//Set the number of lines in the mercenaries menu. By default: 3.   
+	@function M2TWEOP.setMercsScrollNumOfLines
+	@tparam int numOfLines 1-3
+	@usage
+	function onPluginLoad()
+		M2TWEOP.setMercsScrollNumOfLines(1);
+	end
+	*/
+	tables.M2TWEOP.set_function("setMercsScrollNumOfLines", &gameHelpers::setMercsScrollNumOfLines);
+
+	/***
+	Set parameters for the mercenary scroll. By default: 18, 6, 9, 3, 92.   
+	@function M2TWEOP.setMercsScrollParameters
+	@tparam int maxSlots on the left
+	@tparam int maxSlotsInLine on the left
+	@tparam int maxSlots on the right
+	@tparam int maxSlotsInLine on the right
+	@tparam int traitsListHeight
+	@usage
+	function onPluginLoad()
+		M2TWEOP.setMercsScrollParameters(14, 7, 4, 2, 142);
+	end
+	*/
+	tables.M2TWEOP.set_function("setMercsScrollParameters", &gameHelpers::setMercsScrollParameters);
+
+	/***
+	Set parameters for the enemy army units scroll. By default: 18, 9, 42, 56.   
+	@function M2TWEOP.setEnemyArmyUnitsScrollParameters
+	@tparam int maxSlots
+	@tparam int maxSlotsInLine
+	@tparam int iconWidth
+	@tparam int iconHeight
+	@usage
+	function onPluginLoad()
+		M2TWEOP.setEnemyArmyUnitsScrollParameters(20, 10, 39, 55); 
+	end
+	*/
+	tables.M2TWEOP.set_function("setEnemyArmyUnitsScrollParameters", &gameHelpers::setEnemyArmyUnitsScrollParameters);
+
+	/***
 	Gets a struct containing color information about the settlement info scroll.
 	@function M2TWEOP.getSettlementInfoScroll
 	@treturn settlementInfoScroll infoScroll

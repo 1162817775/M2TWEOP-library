@@ -63,6 +63,24 @@ public:
 		DWORD weaponLimit9 = NULL;
 		DWORD weaponLimit10 = NULL;
 		DWORD plusMinusFix = NULL;
+		DWORD mercsScroll_1 = NULL;
+		DWORD mercsScroll_2 = NULL;
+		DWORD mercsScroll_3 = NULL;
+		DWORD mercsScroll_4 = NULL;
+		DWORD mercsScroll_5 = NULL;
+		DWORD mercsScroll_6 = NULL;
+		DWORD unitScroll_1 = NULL;
+		DWORD unitScroll_2 = NULL;
+		DWORD unitScroll_3 = NULL;
+		DWORD unitScroll_4 = NULL;
+	    DWORD unitScroll_5 = NULL;
+		DWORD unitScroll_6 = NULL;
+		DWORD unitScroll_7 = NULL;
+		DWORD unitScroll_8 = NULL;
+	    DWORD unitScroll_9 = NULL;
+		DWORD unitScroll_10 = NULL;
+		DWORD unitScroll_11 = NULL;
+		DWORD unitScroll_12 = NULL;
 
 		DWORD unitTypesStart = NULL;
 		//if on strat map then not 0

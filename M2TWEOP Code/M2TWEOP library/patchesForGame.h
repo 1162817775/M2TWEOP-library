@@ -374,6 +374,7 @@ public:
 	static void init();
 	static MH_STATUS hook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal, std::string function);
 	static void draw();
+	static void log(std::string text) { gameHelpers::logStringGame(text); };
 
 
 	static bool openConsole;
@@ -459,6 +460,10 @@ public:
 	static void __thiscall onBlockadePort(character* _this, portBuildingStruct* port);
 	static void createBlockadePortMessage(armyStruct* fleet, settlementStruct* settlement);
 
+	using t_onQuickLoading = void(__cdecl*)(UNICODE_STRING**& savePath);
+	static t_onQuickLoading o_onQuickLoading;
+	static void __cdecl onQuickLoading(UNICODE_STRING**& savePath);
+
 	using t_onCreateTooltip = void(__thiscall*)(DWORD _this, void* p, UNICODE_STRING*** u);
 	static t_onCreateTooltip o_onCreateTooltip;
 	static void __thiscall onCreateTooltip(DWORD _this, void* p, UNICODE_STRING*** u);
@@ -507,6 +512,24 @@ public:
 	static void __fastcall onResetUnitRecruitAndRetrainScroll(DWORD _this);
 	static DWORD unitRecruitAndRetrainScrollClass;
 	static bool isBlockSlider;
+
+	using t_onTraitsListConstructor1 = int*(__thiscall*)(int* _this, int width, int height);
+	static t_onTraitsListConstructor1 o_onTraitsListConstructor1;
+	static int* __thiscall onTraitsListConstructor1(int* _this, int width, int height);
+
+	using t_onTraitsListConstructor2 = int*(__thiscall*)(int* _this, int width, int height);
+	static t_onTraitsListConstructor2 o_onTraitsListConstructor2;
+	static int* __thiscall onTraitsListConstructor2(int* _this, int width, int height);
+	static int traitsChildWindowHeight;
+
+	using t_onReinitNamedCharacterInfoScroll = void(__fastcall*)(int param_1);
+	static t_onReinitNamedCharacterInfoScroll o_onReinitNamedCharacterInfoScroll;
+	static void __fastcall onReinitNamedCharacterInfoScroll(int param_1);
+
+	using t_onResetTraitsListHeight = void(__thiscall*)(int _this, int height);
+	static t_onResetTraitsListHeight o_onResetTraitsListHeight;
+	static void __thiscall onResetTraitsListHeight(int _this, int height);
+	static bool isReset;
 };
 
 #define GET_VARIABLE_NAME(Variable) (#Variable)

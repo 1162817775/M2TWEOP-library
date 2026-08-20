@@ -3606,6 +3606,74 @@ namespace gameHelpers
 		minHookFunctions::setAdvancedSettlementInfoScrollFrameSize(width, height);
 	}
 
+	//Set the number of lines in the mercenaries menu.  
+	void setMercsScrollNumOfLines(int line)
+	{
+	    //if line == 3 - default
+		BYTE fix1 = 0x12;
+		BYTE fix2 = 0x09;
+		int  fix3 = 0x5C;
+		minHookFunctions::traitsChildWindowHeight = 92;
+
+		if (line == 2)
+		{
+			fix1 = 0x0C;
+			fix2 = 0x06;
+			fix3 = 0x8E;
+			minHookFunctions::traitsChildWindowHeight = 142;
+		}
+		else if (line == 1)
+		{
+			fix1 = 0x06;
+			fix2 = 0x03;
+			fix3 = 0xC0;
+			minHookFunctions::traitsChildWindowHeight = 192;
+		}
+
+		//Max slots available for hiring
+		MemWork::WriteData(&fix1, dataOffsets::offsets.mercsScroll_1, 1);
+		//Max slots available for the selected units
+		MemWork::WriteData(&fix2, dataOffsets::offsets.mercsScroll_3, 1);
+		//adding units
+		MemWork::WriteData(&fix2, dataOffsets::offsets.mercsScroll_5, 1);
+		//fort scroll open
+		MemWork::WriteData(&fix3, dataOffsets::offsets.mercsScroll_6, 4);
+	}
+
+	void setMercsScrollParameters(int maxSlots, int maxSlotsInLine, int maxSlots2, int maxSlotsInLine2, int traitsHeight)
+	{
+		minHookFunctions::traitsChildWindowHeight = traitsHeight;
+		//Max slots available for hiring
+		MemWork::WriteData(&maxSlots,        dataOffsets::offsets.mercsScroll_1, 1);
+		MemWork::WriteData(&maxSlotsInLine,  dataOffsets::offsets.mercsScroll_2, 1);
+		//Max slots available for the selected units
+		MemWork::WriteData(&maxSlots2,       dataOffsets::offsets.mercsScroll_3, 1);
+		MemWork::WriteData(&maxSlotsInLine2, dataOffsets::offsets.mercsScroll_4, 1);
+		//adding units
+		MemWork::WriteData(&maxSlots2,       dataOffsets::offsets.mercsScroll_5, 1);
+		//fort scroll open
+		MemWork::WriteData(&traitsHeight,    dataOffsets::offsets.mercsScroll_6, 4);
+	}
+
+	void setEnemyArmyUnitsScrollParameters(int maxSlots, int maxSlotsInLine, int iconWidth, int iconHeight)
+	{
+		//"enemy_army_unit_display_1", "enemy_army_unit_display_2", "enemy_army_unit_display_3"
+		MemWork::WriteData(&iconHeight,     dataOffsets::offsets.unitScroll_1,  1);
+		MemWork::WriteData(&iconWidth,      dataOffsets::offsets.unitScroll_2,  1);
+		MemWork::WriteData(&maxSlotsInLine, dataOffsets::offsets.unitScroll_3,  1);
+		MemWork::WriteData(&maxSlots,       dataOffsets::offsets.unitScroll_4,  1);
+		//"enemy_garrison_display"
+		MemWork::WriteData(&iconHeight,     dataOffsets::offsets.unitScroll_5,  1);
+		MemWork::WriteData(&iconWidth,      dataOffsets::offsets.unitScroll_6,  1);
+		MemWork::WriteData(&maxSlotsInLine, dataOffsets::offsets.unitScroll_7,  1);
+		MemWork::WriteData(&maxSlots,       dataOffsets::offsets.unitScroll_8,  1);
+		//"enemy_agents_display"
+		MemWork::WriteData(&iconHeight,     dataOffsets::offsets.unitScroll_9,  1);
+		MemWork::WriteData(&iconWidth,      dataOffsets::offsets.unitScroll_10, 1);
+		MemWork::WriteData(&maxSlotsInLine, dataOffsets::offsets.unitScroll_11, 1);
+		MemWork::WriteData(&maxSlotsInLine, dataOffsets::offsets.unitScroll_12, 1);
+	}
+
 	void fixReligionTrigger()
 	{
 		int8_t fixValue = -3;

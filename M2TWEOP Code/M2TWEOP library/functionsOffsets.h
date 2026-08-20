@@ -432,6 +432,11 @@ public:
 		DWORD a_onSetElementPosition = NULL;
 		DWORD a_onCreateAdvancedSettlementInfoScroll = NULL;
 		DWORD a_onResetUnitRecruitAndRetrainScroll = NULL;
+		DWORD a_onQuickLoading = NULL;
+		DWORD a_onTraitsListConstructor1 = NULL;
+		DWORD a_onTraitsListConstructor2 = NULL;
+		DWORD a_onReinitNamedCharacterInfoScroll = NULL;
+		DWORD a_onResetTraitsListHeight = NULL;
 	}offsets;
 
 	static void initCodes(int gameVer);
