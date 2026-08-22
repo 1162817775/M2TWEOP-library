@@ -2592,6 +2592,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 
 	const int gameVersion = gameHelpers::getGameVersion();
 	const DWORD scrollOpenedCode = gameVersion == 1 ? 0x013719FC : 0x0132C9D4;
+	const DWORD scrollClosedCode = gameVersion == 1 ? 0x01371AB4 : 0x0132CA8C;
 	const DWORD factionTurnStartCode = gameVersion == 1 ? 0x0136931C : 0x013242F4;
 	const DWORD preFactionTurnStartCode = gameVersion == 1 ? 0x013693EC : 0x013243C4;
 	const DWORD gameReloaded = gameVersion == 1 ? 0x013319E4 : 0x012EC9C4;
@@ -2647,6 +2648,19 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 				gameUiHelpers::removeToolTipsSett();
 			}
 		}*/
+		else if (strcmp(str, "own_named_character_info_scroll") == 0 || strcmp(str, "fort_info_scroll") == 0)
+		{
+			minHookFunctions::isMercenaryScrollOpen = true;
+		}
+	}
+	else if (eventCode == scrollClosedCode)
+	{
+		char* str = reinterpret_cast<char*>(vTab[1]);
+		if (strcmp(str, "own_named_character_info_scroll") == 0 || strcmp(str, "fort_info_scroll") == 0)
+		{
+			minHookFunctions::bufferPosY.clear();
+			minHookFunctions::isMercenaryScrollOpen = false;
+		}
 	}
 	else if (eventCode == factionTurnStartCode)
 	{
@@ -3146,6 +3160,9 @@ minHookFunctions::t_onTraitsListConstructor1               minHookFunctions::o_o
 minHookFunctions::t_onTraitsListConstructor2               minHookFunctions::o_onTraitsListConstructor2 = nullptr;
 minHookFunctions::t_onReinitNamedCharacterInfoScroll       minHookFunctions::o_onReinitNamedCharacterInfoScroll = nullptr;
 minHookFunctions::t_onResetTraitsListHeight                minHookFunctions::o_onResetTraitsListHeight = nullptr;
+minHookFunctions::t_onMercenaryScrollInit                  minHookFunctions::o_onMercenaryScrollInit = nullptr;
+minHookFunctions::t_onSetSliderState                       minHookFunctions::o_onSetSliderState = nullptr;
+minHookFunctions::t_onElementReset                         minHookFunctions::o_onElementReset = nullptr;
 
 DWORD minHookFunctions::lastSoundClass = NULL;
 bool minHookFunctions::isUnlockWeaponLimit = false;
@@ -3163,7 +3180,13 @@ advancedSettlementInfoScroll* minHookFunctions::advancedSettlementInfoScrollClas
 DWORD minHookFunctions::unitRecruitAndRetrainScrollClass = NULL;
 bool minHookFunctions::isBlockSlider = false;
 int minHookFunctions::traitsChildWindowHeight = 92;
+int minHookFunctions::mercsMaxSlots = 18;
+int minHookFunctions::mercsNumOfLine = 3;
 bool minHookFunctions::isReset = false;
+mercenaryScroll* minHookFunctions::lastMercScroll = NULL;
+sliderStruct* minHookFunctions::lastSliderStruct = NULL;
+bool minHookFunctions::isMercenaryScrollOpen = false;
+map<int, int> minHookFunctions::bufferPosY;
 
 
 static string pointerToString(LPVOID ppPointer)
@@ -3218,6 +3241,9 @@ void minHookFunctions::init()
 	MIN_HOOK(a_onTraitsListConstructor2,               onTraitsListConstructor2,               o_onTraitsListConstructor2);
 	MIN_HOOK(a_onReinitNamedCharacterInfoScroll,       onReinitNamedCharacterInfoScroll,       o_onReinitNamedCharacterInfoScroll);
 	MIN_HOOK(a_onResetTraitsListHeight,                onResetTraitsListHeight,                o_onResetTraitsListHeight);
+	MIN_HOOK(a_onMercenaryScrollInit,                  onMercenaryScrollInit,                  o_onMercenaryScrollInit);
+	MIN_HOOK(a_onSetSliderState,                       onSetSliderState,                       o_onSetSliderState);
+	MIN_HOOK(a_onElementReset,                         onElementReset,                         o_onElementReset);
 }
 
 int __thiscall minHookFunctions::debugLineAdd(void* _this, vector3* start, vector3* end, color8888 color, float time, bool zbuffered)
@@ -3751,6 +3777,74 @@ void __thiscall minHookFunctions::onResetTraitsListHeight(int _this, int height)
 	o_onResetTraitsListHeight(_this, height);
 }
 
+void __thiscall minHookFunctions::onMercenaryScrollInit(mercenaryScroll* _this, int param_2, int param_3, int param_4, int param_5, int param_6)
+{
+	o_onMercenaryScrollInit(_this, param_2, param_3, param_4, param_5, param_6);
+	lastMercScroll = _this;
+}
+
+void __thiscall minHookFunctions::onSetSliderState(sliderStruct* _this, int sliderState, char param_3)
+{
+	lastSliderStruct = _this;
+	if (sliderState == 0 || !lastMercScroll || lastMercScroll->slider != _this)
+	{
+		return o_onSetSliderState(_this, sliderState, param_3);
+	}
+
+	if (_this->currentState != sliderState && checkActive() && lastMercScroll->slider == _this)
+	{
+	//	int indent = /*493 - 348*/145 / _this->maxState;
+		int indent = 38 * mercsNumOfLine / _this->maxState;
+		if (sliderState < _this->currentState)
+		{
+			_this->yPosThumb -= indent;
+			_this->yPosThumb = max(_this->yPosThumb, _this->yPos);
+			for (int i = 0; i < lastMercScroll->mercsNum; i++)
+			{
+				lastMercScroll->mercs[i]->posY += 57;
+				bufferPosY[i] = lastMercScroll->mercs[i]->posY;
+			}
+		}
+		else
+		{
+			_this->yPosThumb += indent;
+			_this->yPosThumb = min(_this->yPosThumb, _this->yPos + _this->length);
+			for (int i = 0; i < lastMercScroll->mercsNum; i++)
+			{
+				lastMercScroll->mercs[i]->posY -= 57;
+				bufferPosY[i] = lastMercScroll->mercs[i]->posY;
+			}
+		}
+		_this->currentState = sliderState;
+	//	log("onSetSliderState: lastMercScroll->mercs[1]->posY: " + to_string(lastMercScroll->mercs[1]->posY));
+	}
+}
+
+bool minHookFunctions::checkSetPosY(void* pointer)
+{
+	if (!checkActive() || lastMercScroll->mercsNum <= mercsMaxSlots || lastMercScroll->slider->currentState == 0 || bufferPosY.size() < lastMercScroll->mercsNum)
+		return false;
+
+//	log("checkSetPosY");
+	for (int i = 0; i < lastMercScroll->mercsNum; i++)
+	{
+		if (pointer == lastMercScroll->mercs[i])
+		{
+		//	log("checkSetPosY(i: " + to_string(i) + ", posY: " + to_string(lastMercScroll->mercs[i]->posY) + ")");
+			lastMercScroll->mercs[i]->posY = bufferPosY[i];
+			return true;
+		}
+	}
+	return false;
+}
+
+void __fastcall minHookFunctions::onElementReset(void* param_1)
+{
+	if (checkSetPosY(param_1))
+		return;
+	o_onElementReset(param_1);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// CALL GAME FUNCTIONS /////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3833,6 +3927,10 @@ void minHookFunctions::draw()
 		rememberCoords.yCoord = selectTile->getTileY();
 	}
 	ImGui::Separator();
+	if (lastSliderStruct)
+	{
+		ImGui::Text(("cursorCoords:   " + to_string(lastSliderStruct->cursorPosX) + ", " + to_string(lastSliderStruct->cursorPosY)).c_str());
+	}
 	if (selectTile)
 	{
 		ImGui::Text(("selectCoords:   " + to_string(selectTile->getTileX()) + ", " + to_string(selectTile->getTileY())).c_str());

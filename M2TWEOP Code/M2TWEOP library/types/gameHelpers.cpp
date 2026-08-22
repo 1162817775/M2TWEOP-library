@@ -3613,22 +3613,22 @@ namespace gameHelpers
 		BYTE fix1 = 0x12;
 		BYTE fix2 = 0x09;
 		int  fix3 = 0x5C;
-		minHookFunctions::traitsChildWindowHeight = 92;
 
 		if (line == 2)
 		{
 			fix1 = 0x0C;
 			fix2 = 0x06;
 			fix3 = 0x8E;
-			minHookFunctions::traitsChildWindowHeight = 142;
 		}
 		else if (line == 1)
 		{
 			fix1 = 0x06;
 			fix2 = 0x03;
 			fix3 = 0xC0;
-			minHookFunctions::traitsChildWindowHeight = 192;
 		}
+		minHookFunctions::traitsChildWindowHeight = fix3;
+		minHookFunctions::mercsMaxSlots           = fix1;
+		minHookFunctions::mercsNumOfLine          = line;
 
 		//Max slots available for hiring
 		MemWork::WriteData(&fix1, dataOffsets::offsets.mercsScroll_1, 1);
@@ -3643,6 +3643,8 @@ namespace gameHelpers
 	void setMercsScrollParameters(int maxSlots, int maxSlotsInLine, int maxSlots2, int maxSlotsInLine2, int traitsHeight)
 	{
 		minHookFunctions::traitsChildWindowHeight = traitsHeight;
+		minHookFunctions::mercsMaxSlots           = maxSlots;
+		minHookFunctions::mercsNumOfLine          = maxSlots / maxSlotsInLine;
 		//Max slots available for hiring
 		MemWork::WriteData(&maxSlots,        dataOffsets::offsets.mercsScroll_1, 1);
 		MemWork::WriteData(&maxSlotsInLine,  dataOffsets::offsets.mercsScroll_2, 1);
