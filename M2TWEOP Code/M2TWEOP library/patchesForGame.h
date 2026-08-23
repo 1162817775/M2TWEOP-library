@@ -346,7 +346,9 @@ struct color8888
 
 struct frameStruct
 {
-	int field_4[4];
+	int field_2[2];
+	int posX;
+	int posY;
 	int	width;
 	int	height;
 };
@@ -362,6 +364,58 @@ struct advancedSettlementInfoScroll
 	int	height;
 	int field_13[13];
 	advancedElementsStruct* elements;
+};
+
+struct tableStruct
+{
+	int field_18[18];
+	frameStruct* frame;
+};
+struct sliderStruct
+{
+	int field_5[5];
+	int length; //0x0014 
+	int field_8[8];
+	int cursorPosX; //0x0038
+	int cursorPosY;
+	int xPos;
+	int yPos;
+	tableStruct* table;
+	int field_118[118];
+	int minState;
+	int maxState;
+	int currentState; //0x022C 
+	int field_16[16];
+	int cursorPosX_2; //0x0270
+	int cursorPosY_2; //0x0274 
+	int xPosThumb; //0x0278 
+	int yPosThumb; //0x027C 
+	int field_99[99];
+};
+struct mercenaryIcon
+{
+	int field_14[14];
+	int cursorPosX; //0x0038
+	int cursorPosY;
+	int posX;
+	int posY;
+};
+struct mercenaryScroll
+{
+	int field_4[4];
+	int	width; //0x0010
+	int	height;
+	int field_8[8];
+	int cursorPosX; //0x0038
+	int cursorPosY;
+	int sizeX;
+	int sizeY;
+	int field_0048;
+	mercenaryIcon** mercs;
+	int field_0050;
+	int mercsNum;
+	int field_43[43];
+	sliderStruct* slider; //0x0104
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -521,6 +575,8 @@ public:
 	static t_onTraitsListConstructor2 o_onTraitsListConstructor2;
 	static int* __thiscall onTraitsListConstructor2(int* _this, int width, int height);
 	static int traitsChildWindowHeight;
+	int static mercsMaxSlots;
+	int static mercsNumOfLine;
 
 	using t_onReinitNamedCharacterInfoScroll = void(__fastcall*)(int param_1);
 	static t_onReinitNamedCharacterInfoScroll o_onReinitNamedCharacterInfoScroll;
@@ -530,6 +586,27 @@ public:
 	static t_onResetTraitsListHeight o_onResetTraitsListHeight;
 	static void __thiscall onResetTraitsListHeight(int _this, int height);
 	static bool isReset;
+
+	using t_onMercenaryScrollInit = void(__thiscall*)(mercenaryScroll* _this, int param_2, int param_3, int param_4, int param_5, int param_6);
+	static t_onMercenaryScrollInit o_onMercenaryScrollInit;
+	static void __thiscall onMercenaryScrollInit(mercenaryScroll* _this, int param_2, int param_3, int param_4, int param_5, int param_6);
+
+	using t_onSetSliderState = void(__thiscall*)(sliderStruct* _this, int sliderState, char param_3);
+	static t_onSetSliderState o_onSetSliderState;
+	static void __thiscall onSetSliderState(sliderStruct* _this, int sliderState, char param_3);
+	static mercenaryScroll* lastMercScroll;
+	static sliderStruct* lastSliderStruct;
+	static bool isMercenaryScrollOpen;
+	static map<int, int> bufferPosY;
+
+	using t_onElementReset = void(__fastcall*)(void* param_1);
+	static t_onElementReset o_onElementReset;
+	static void __fastcall onElementReset(void* param_1);
+	static bool checkSetPosY(void* pointer);
+	static bool checkActive() { return isMercenaryScrollOpen && lastMercScroll && lastMercScroll->slider && 
+		lastMercScroll->cursorPosX > lastMercScroll->slider->xPos - 15 && lastMercScroll->cursorPosX < lastMercScroll->slider->xPos + 30 &&
+		lastMercScroll->cursorPosY > lastMercScroll->slider->yPos - 30 && lastMercScroll->cursorPosY < lastMercScroll->slider->yPos + lastMercScroll->slider->length + 50;
+	}
 };
 
 #define GET_VARIABLE_NAME(Variable) (#Variable)

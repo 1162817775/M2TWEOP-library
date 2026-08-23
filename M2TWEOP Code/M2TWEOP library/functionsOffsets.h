@@ -437,6 +437,9 @@ public:
 		DWORD a_onTraitsListConstructor2 = NULL;
 		DWORD a_onReinitNamedCharacterInfoScroll = NULL;
 		DWORD a_onResetTraitsListHeight = NULL;
+		DWORD a_onMercenaryScrollInit = NULL;
+		DWORD a_onSetSliderState = NULL;
+		DWORD a_onElementReset = NULL;
 	}offsets;
 
 	static void initCodes(int gameVer);
