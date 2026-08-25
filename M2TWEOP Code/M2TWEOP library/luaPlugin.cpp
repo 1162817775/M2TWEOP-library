@@ -986,20 +986,26 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	tables.M2TWEOP.set_function("getOptions2", &gameHelpers::getOptions2);
 	
 	/***
-	Get the campaign difficulty modifiers.
+	Get the campaign difficulty modifiers. Note: If making changes, make sure to re-apply in onPreFactionTurnStart
 	@function M2TWEOP.getCampaignDifficulty1
 	@treturn campaignDifficulty1 options
 	@usage
-		local modifiers = M2TWEOP.getCampaignDifficulty1();
+	function onPreFactionTurnStart(eventData)
+		local difficultyOptions1 = M2TWEOP.getCampaignDifficulty1();
+		difficultyOptions1.orderFromGrowth = 0
+	end
 	*/
 	tables.M2TWEOP.set_function("getCampaignDifficulty1", &campaignHelpers::getCampaignDifficulty1);
 	
 	/***
-	Get the campaign difficulty modifiers.
+	Get the campaign difficulty modifiers. Note: If making changes, make sure to re-apply in onPreFactionTurnStart
 	@function M2TWEOP.getCampaignDifficulty2
 	@treturn campaignDifficulty2 options
 	@usage
-		local modifiers = M2TWEOP.getCampaignDifficulty2();
+	function onPreFactionTurnStart(eventData)
+		local difficultyOptions2 = M2TWEOP.getCampaignDifficulty2();
+		difficultyOptions2.popGrowthBonusAi = 0
+	end
 	*/
 	tables.M2TWEOP.set_function("getCampaignDifficulty2", &campaignHelpers::getCampaignDifficulty2);
 	
