@@ -368,7 +368,7 @@ public:
 	}
 	cardinal* getElectionResult(int index)
 	{
-		if (index < 0 || index >= cardinalNum)
+		if (index < 0 || index >= electionResultsCount)
 			return nullptr;
 		return electionResults[index].cardinal;
 	}
