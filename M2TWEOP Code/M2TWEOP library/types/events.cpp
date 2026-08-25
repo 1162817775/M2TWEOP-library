@@ -4752,10 +4752,11 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	Called when a calculation ratio for birth or adoption.
+	Note: The default value is how many regions the faction owns
 	
 	@function onCalculationRatioForBirth
 	@tparam factionStruct faction
-	@tparam int value(default - number of regions)
+	@tparam int default
 	@treturn int newValue
 
 	@usage
