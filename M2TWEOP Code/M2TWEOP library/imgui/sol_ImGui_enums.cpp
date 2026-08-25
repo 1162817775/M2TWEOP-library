@@ -255,7 +255,7 @@ namespace sol_ImGui
 			"SpanAllColumns", ImGuiSelectableFlags_SpanAllColumns,
 			"AllowDoubleClick", ImGuiSelectableFlags_AllowDoubleClick,
 			"Disabled", ImGuiSelectableFlags_Disabled,
-			"AllowOverlap ", ImGuiSelectableFlags_AllowOverlap
+			"AllowOverlap", ImGuiSelectableFlags_AllowOverlap
 		);
 #pragma endregion Selectable Flags
 
