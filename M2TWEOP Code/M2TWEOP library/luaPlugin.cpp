@@ -729,10 +729,10 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	/***
 	Set parameters for the mercenary scroll. By default: 18, 6, 9, 3, 92.   
 	@function M2TWEOP.setMercsScrollParameters
-	@tparam int maxSlots on the left
-	@tparam int maxSlotsInLine on the left
-	@tparam int maxSlots on the right
-	@tparam int maxSlotsInLine on the right
+	@tparam int maxSlotsLeft on the left
+	@tparam int maxSlotsInLineLeft on the left
+	@tparam int maxSlotsRight on the right
+	@tparam int maxSlotsInLineRight on the right
 	@tparam int traitsListHeight
 	@usage
 	function onPluginLoad()

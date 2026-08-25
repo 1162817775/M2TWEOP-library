@@ -4773,7 +4773,7 @@ void luaPlugin::onPluginLoadF()
 		return value;
 	end
 
-	function onCalculationRatioForBirth(faction, value --[[default - number of regions--]])
+	function onCalculationRatioForBirth(faction, value)
 		if faction.name~="slave" then
 			local newValue = faction.settlementsNum + getAdultDaughtersAndOldFamilyMembersNum(faction);
 			M2TWEOP.logGame("onCalculationRatioForBirth(faction: "..faction.name..", value: "..value..", new value: "..newValue..")");
