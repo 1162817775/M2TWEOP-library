@@ -381,13 +381,13 @@ namespace gameEvents
 		addEvent<EventType::standardEvent>(newCode[gv], "onBattleDominatingPlaza");
 
 		newCode[0] = 0x013681F4; newCode[1] = 0x013231CC;
-		addEvent<EventType::standardEvent>(newCode[gv], "onBattngineUnmanned");
+		addEvent<EventType::standardEvent>(newCode[gv], "onBattleEngineUnmanned");
 
 		newCode[0] = 0x013682E4; newCode[1] = 0x013232BC;
 		addEvent<EventType::standardEvent>(newCode[gv], "onBattlePlayerArmyHalfDestroyed");
 
 		newCode[0] = 0x013683BC; newCode[1] = 0x01323394;
-		addEvent<EventType::standardEvent>(newCode[gv], "onBattnemyArmyHalfDestroyed");
+		addEvent<EventType::standardEvent>(newCode[gv], "onBattleEnemyArmyHalfDestroyed");
 
 		newCode[0] = 0x01368584; newCode[1] = 0x0132355C;
 		addEvent<EventType::standardEvent>(newCode[gv], "onBattleTideofBattle");
@@ -658,10 +658,10 @@ namespace gameEvents
 		addEvent<EventType::standardEvent>(newCode[gv], "onBattleEnemyUnitGoesBerserk");
 
 		newCode[0] = 0x0136785C; newCode[1] = 0x01322834;
-		addEvent<EventType::standardEvent>(newCode[gv], "onBattnemyUnitRouts");
+		addEvent<EventType::standardEvent>(newCode[gv], "onBattleEnemyUnitRouts");
 
 		newCode[0] = 0x01367A14; newCode[1] = 0x013229EC;
-		addEvent<EventType::standardEvent>(newCode[gv], "onBattnemySiegeEngineDestroyed");
+		addEvent<EventType::standardEvent>(newCode[gv], "onBattleEnemySiegeEngineDestroyed");
 
 		newCode[0] = 0x01367D44; newCode[1] = 0x01322D1C;
 		addEvent<EventType::standardEvent>(newCode[gv], "onBattleGatesAttackedByEnemyEngine");
@@ -1403,9 +1403,9 @@ void luaPlugin::onPluginLoadF()
 	@tfield onBattleWinningPlaza onBattleWinningPlaza
 	@tfield onBattleStopsWinningPlaza onBattleStopsWinningPlaza
 	@tfield onBattleDominatingPlaza onBattleDominatingPlaza
-	@tfield onBattngineUnmanned onBattngineUnmanned
+	@tfield onBattleEngineUnmanned onBattleEngineUnmanned
 	@tfield onBattlePlayerArmyHalfDestroyed onBattlePlayerArmyHalfDestroyed
-	@tfield onBattnemyArmyHalfDestroyed onBattnemyArmyHalfDestroyed
+	@tfield onBattleEnemyArmyHalfDestroyed onBattleEnemyArmyHalfDestroyed
 	@tfield onBattleFinished onBattleFinished
 	@tfield onBattleArmyHalfDestroyed onBattleArmyHalfDestroyed
 	@tfield onEscPressed onEscPressed
@@ -1494,8 +1494,8 @@ void luaPlugin::onPluginLoadF()
 	@tfield onBattlePlayerSiegeEngineDestroyed onBattlePlayerSiegeEngineDestroyed
 	@tfield onBattleGatesAttackedByPlayerEngine onBattleGatesAttackedByPlayerEngine
 	@tfield onBattleEnemyUnitGoesBerserk onBattleEnemyUnitGoesBerserk
-	@tfield onBattnemyUnitRouts onBattnemyUnitRouts
-	@tfield onBattnemySiegeEngineDestroyed onBattnemySiegeEngineDestroyed
+	@tfield onBattleEnemyUnitRouts onBattleEnemyUnitRouts
+	@tfield onBattleEnemySiegeEngineDestroyed onBattleEnemySiegeEngineDestroyed
 	@tfield onBattleGatesAttackedByEnemyEngine onBattleGatesAttackedByEnemyEngine
 	@tfield onDisaster onDisaster
 	@tfield onEventCounter onEventCounter
@@ -2906,11 +2906,11 @@ void luaPlugin::onPluginLoadF()
 	/***
 	A siege engine is now unmanned.
 
-	@function onBattngineUnmanned
+	@function onBattleEngineUnmanned
 	@tparam eventTrigger eventData
 
 	@usage
-	function onBattngineUnmanned(eventData)
+	function onBattleEngineUnmanned(eventData)
 	--something here
 	end
 	*/
@@ -2930,11 +2930,11 @@ void luaPlugin::onPluginLoadF()
 	/***
 	Half of the enemy's army has been destroyed.
 
-	@function onBattnemyArmyHalfDestroyed
+	@function onBattleEnemyArmyHalfDestroyed
 	@tparam eventTrigger eventData
 
 	@usage
-	function onBattnemyArmyHalfDestroyed(eventData)
+	function onBattleEnemyArmyHalfDestroyed(eventData)
 	--something here
 	end
 	*/
@@ -4074,11 +4074,11 @@ void luaPlugin::onPluginLoadF()
 	One of the enemy's units has routed.
 	Exports: enemyUnit
 
-	@function onBattnemyUnitRouts
+	@function onBattleEnemyUnitRouts
 	@tparam eventTrigger eventData
 
 	@usage
-	function onBattnemyUnitRouts(eventData)
+	function onBattleEnemyUnitRouts(eventData)
 	--something here
 	end
 	*/
@@ -4087,11 +4087,11 @@ void luaPlugin::onPluginLoadF()
 	A siege engine belonging to the enemy has been destroyed.
 	Exports: enemyUnit
 
-	@function onBattnemySiegeEngineDestroyed
+	@function onBattleEnemySiegeEngineDestroyed
 	@tparam eventTrigger eventData
 
 	@usage
-	function onBattnemySiegeEngineDestroyed(eventData)
+	function onBattleEnemySiegeEngineDestroyed(eventData)
 	--something here
 	end
 	*/
@@ -4752,10 +4752,11 @@ void luaPlugin::onPluginLoadF()
 
 	/***
 	Called when a calculation ratio for birth or adoption.
+	Note: The default value is how many regions the faction owns
 	
 	@function onCalculationRatioForBirth
 	@tparam factionStruct faction
-	@tparam int value(default - number of regions)
+	@tparam int default
 	@treturn int newValue
 
 	@usage
@@ -4773,7 +4774,7 @@ void luaPlugin::onPluginLoadF()
 		return value;
 	end
 
-	function onCalculationRatioForBirth(faction, value --[[default - number of regions--]])
+	function onCalculationRatioForBirth(faction, value)
 		if faction.name~="slave" then
 			local newValue = faction.settlementsNum + getAdultDaughtersAndOldFamilyMembersNum(faction);
 			M2TWEOP.logGame("onCalculationRatioForBirth(faction: "..faction.name..", value: "..value..", new value: "..newValue..")");

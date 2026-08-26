@@ -1568,7 +1568,7 @@ namespace settlementHelpers
 		@usage
 		local spyCapLimit = settlementStruct:getAgentLimitCapability(0)
 		*/
-		types.settlementStruct.set_function("getAgentLimitCapability", &settlementStruct::getAgentCapability);
+		types.settlementStruct.set_function("getAgentLimitCapability", &settlementStruct::getAgentLimitCapability);
 		/***
 		Get a recruitment capability by index (max 64!).
 		@function settlementStruct:getRecruitmentCapability

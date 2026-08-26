@@ -374,7 +374,7 @@ namespace sol_ImGui
 			"AlwaysClamp", ImGuiSliderFlags_AlwaysClamp,
 			"Logarithmic", ImGuiSliderFlags_Logarithmic,
 			"NoRoundToFormat", ImGuiSliderFlags_NoRoundToFormat,
-			"NoInput ", ImGuiSliderFlags_NoInput,
+			"NoInput", ImGuiSliderFlags_NoInput,
 			"InvalidMask", ImGuiSliderFlags_InvalidMask_
 		);
 #pragma endregion ImGuiSliderFlags

@@ -905,9 +905,9 @@ namespace battleHelpers
 		typeAll.battleAI.set("defendRadius", &battleAI::defendRadius);
 		typeAll.battleAI.set("defendHill", &battleAI::defendHill);
 		typeAll.battleAI.set("visibleEnemyUnitCount", &battleAI::enemyUnitsNum);
-		typeAll.battleAI.set("alliedInitialStrength", &battleAI::playerObjectivesCount);
-		typeAll.battleAI.set("alliedStrength", &battleAI::alliedInitialTotal);
-		typeAll.battleAI.set("enemyInitialStrength", &battleAI::alliedTotal);
+		typeAll.battleAI.set("alliedInitialStrength", &battleAI::alliedInitialTotal);
+		typeAll.battleAI.set("alliedStrength", &battleAI::alliedTotal);
+		typeAll.battleAI.set("enemyInitialStrength", &battleAI::enemyInitialTotal);
 		typeAll.battleAI.set("enemyStrength", &battleAI::enemyTotal);
 		typeAll.battleAI.set("enemyVisibleInitialStrength", &battleAI::enemyInitialVisible);
 		typeAll.battleAI.set("enemyVisibleStrength", &battleAI::enemyVisible);
@@ -1114,7 +1114,7 @@ namespace battleHelpers
 		typeAll.battleUnit.set("expStart", &battleUnit::expStart);
 		typeAll.battleUnit.set("expGained", &battleUnit::expGained);
 		typeAll.battleUnit.set("isGeneral", &battleUnit::isGeneral);
-		typeAll.battleUnit.set("hasWithdrawn", &battleUnit::isGeneral);
+		typeAll.battleUnit.set("hasWithdrawn", &battleUnit::hasWithdrawn);
 		typeAll.battleUnit.set("shipsSunk", &battleUnit::shipsSunk);
 		typeAll.battleUnit.set("shipDamage", &battleUnit::shipDamage);
 

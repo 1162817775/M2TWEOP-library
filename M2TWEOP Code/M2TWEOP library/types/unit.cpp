@@ -2762,7 +2762,7 @@ void luaPlugin::initUnits()
 	types.projectileStruct.set("damage", &projectile::damage);
 	types.projectileStruct.set("damageToTroops", &projectile::damageToTroops);
 	types.projectileStruct.set("affectedByRain", &projectile::affectedByRain);
-	types.projectileStruct.set("isBodyPiercing", &projectile::accuracyVsUnits);
+	types.projectileStruct.set("isBodyPiercing", &projectile::isBodyPiercing);
 	types.projectileStruct.set("fiery", &projectile::fiery);
 		
 	///Mount
@@ -2801,7 +2801,7 @@ void luaPlugin::initUnits()
 	types.mountStruct.set("yRadius", &descrMountEntry::yRadius);
 	types.mountStruct.set("yOffset", &descrMountEntry::yOffset);
 	types.mountStruct.set("height", &descrMountEntry::height);
-	types.mountStruct.set("mass", &descrMountEntry::radius);
+	types.mountStruct.set("mass", &descrMountEntry::mass);
 	types.mountStruct.set("elephantDeadRadius", &descrMountEntry::elephantDeadRadius);
 	types.mountStruct.set("elephantTuskRadius", &descrMountEntry::elephantTuskRadius);
 	types.mountStruct.set("elephantTuskZ", &descrMountEntry::elephantTuskZ);
