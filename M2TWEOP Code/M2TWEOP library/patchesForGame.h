@@ -518,6 +518,10 @@ public:
 	static t_onQuickLoading o_onQuickLoading;
 	static void __cdecl onQuickLoading(UNICODE_STRING**& savePath);
 
+	using t_onUnitDestroy = void(__thiscall*)(armyStruct* _this, unit* unit);
+	static t_onUnitDestroy o_onUnitDestroy;
+	static void __thiscall onUnitDestroy(armyStruct* _this, unit* unit);
+
 	using t_onCreateTooltip = void(__thiscall*)(DWORD _this, void* p, UNICODE_STRING*** u);
 	static t_onCreateTooltip o_onCreateTooltip;
 	static void __thiscall onCreateTooltip(DWORD _this, void* p, UNICODE_STRING*** u);

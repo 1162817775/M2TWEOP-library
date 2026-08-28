@@ -436,6 +436,7 @@ void codes::initCodes(int gameVer)
 		offsets.a_onMercenaryScrollInit = 0x00c1e9d0;
 		offsets.a_onSetSliderState = 0x00b48310;
 		offsets.a_onElementReset = 0x00b1aed0;
+		offsets.a_onUnitDestroy = 0x00714090;
 	}
 
 
@@ -875,5 +876,6 @@ void codes::initCodes(int gameVer)
 		offsets.a_onMercenaryScrollInit = 0x00c18d90;
 		offsets.a_onSetSliderState = 0x00b42650;
 		offsets.a_onElementReset = 0x00b151e0;
+		offsets.a_onUnitDestroy = 0x00714790;
 	}
 }

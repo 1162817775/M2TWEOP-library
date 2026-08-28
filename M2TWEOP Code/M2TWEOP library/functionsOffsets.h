@@ -440,6 +440,7 @@ public:
 		DWORD a_onMercenaryScrollInit = NULL;
 		DWORD a_onSetSliderState = NULL;
 		DWORD a_onElementReset = NULL;
+		DWORD a_onUnitDestroy = NULL;
 	}offsets;
 
 	static void initCodes(int gameVer);

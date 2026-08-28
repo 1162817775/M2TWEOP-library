@@ -670,6 +670,7 @@ namespace gameHelpers
 	void playGameSound(int value);
 	void resetTooltipText(const char* text);
 	bool getTooltipActive();
+	int getLastCursorState();
 	void setAdvancedSettlementInfoScrollFrameSize(int width, int height);
 	void setMercsScrollNumOfLines(int line);
 	void setMercsScrollParameters(int maxSlots, int maxSlotsInLine, int maxSlots2, int maxSlotsInLine2, int traitsHeight);

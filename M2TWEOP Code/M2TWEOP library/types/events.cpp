@@ -1047,11 +1047,6 @@ std::string* onCreateTooltip(const char* str)
 			}
 		}
 	}
-	else
-	{
-		std::string retS(str);
-		return &retS;
-	}
 	std::string* retS = new std::string(tmpS);
 	return retS;
 }
@@ -1085,6 +1080,14 @@ void onBlockadePort(character* admiral, portBuildingStruct* port)
 	if (plugData::data.luaAll.onBlockadePort != nullptr)
 	{
 		tryLua((*plugData::data.luaAll.onBlockadePort)(admiral, port))
+	}
+}
+
+void onUnitDestroy(armyStruct* army, unit* unit)
+{
+	if (plugData::data.luaAll.onUnitDestroy != nullptr)
+	{
+		tryLua((*plugData::data.luaAll.onUnitDestroy)(army, unit))
 	}
 }
 
@@ -4794,12 +4797,15 @@ void luaPlugin::onPluginLoadF()
 	@treturn string newText
 	
 	@usage
+	DISABLE_TOOLTIP = true;
 	function onCreateTooltip(text)
+		local lastCursorState = M2TWEOP.getLastCursorState();
 		local xCoord, yCoord = M2TWEOP.getGameTileCoordsWithCursor();
-		if(xCoord==400 and yCoord==52) or(xCoord==398 and yCoord==53) then
-			text = "newText";
+		if lastCursorState==cursorState.onStratMap and((xCoord==400 and yCoord==52) or(xCoord==398 and yCoord==53)) then
+			return "onCreateTooltip: newText";
+		elseif lastCursorState==cursorState.onMinMap and DISABLE_TOOLTIP then
+			return "disable"; -- disable tooltip on min map
 		end
-		return text;
 	end
 	*/
 	onCreateTooltip = new sol::function(luaState["onCreateTooltip"]);
@@ -4837,6 +4843,21 @@ void luaPlugin::onPluginLoadF()
 	*/
 	onBlockadePort = new sol::function(luaState["onBlockadePort"]);
 	checkLuaFunc(&onBlockadePort);
+
+	/***
+	Called when the unit has been destroyed.   
+	
+	@function onUnitDestroy
+	@tparam armyStruct army
+	@tparam unit unit
+	
+	@usage
+	function onUnitDestroy(army,unit)
+	--something here
+	end
+	*/
+	onUnitDestroy = new sol::function(luaState["onUnitDestroy"]);
+	checkLuaFunc(&onUnitDestroy);
 
 
 	if (onPluginLoad != nullptr)
