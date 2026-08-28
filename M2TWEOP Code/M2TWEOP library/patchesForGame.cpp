@@ -3163,6 +3163,7 @@ minHookFunctions::t_onResetTraitsListHeight                minHookFunctions::o_o
 minHookFunctions::t_onMercenaryScrollInit                  minHookFunctions::o_onMercenaryScrollInit = nullptr;
 minHookFunctions::t_onSetSliderState                       minHookFunctions::o_onSetSliderState = nullptr;
 minHookFunctions::t_onElementReset                         minHookFunctions::o_onElementReset = nullptr;
+minHookFunctions::t_onUnitDestroy                          minHookFunctions::o_onUnitDestroy = nullptr;
 
 DWORD minHookFunctions::lastSoundClass = NULL;
 bool minHookFunctions::isUnlockWeaponLimit = false;
@@ -3244,6 +3245,7 @@ void minHookFunctions::init()
 	MIN_HOOK(a_onMercenaryScrollInit,                  onMercenaryScrollInit,                  o_onMercenaryScrollInit);
 	MIN_HOOK(a_onSetSliderState,                       onSetSliderState,                       o_onSetSliderState);
 	MIN_HOOK(a_onElementReset,                         onElementReset,                         o_onElementReset);
+	MIN_HOOK(a_onUnitDestroy,                          onUnitDestroy,                          o_onUnitDestroy);
 }
 
 int __thiscall minHookFunctions::debugLineAdd(void* _this, vector3* start, vector3* end, color8888 color, float time, bool zbuffered)
@@ -3549,6 +3551,12 @@ void __cdecl minHookFunctions::onQuickLoading(UNICODE_STRING**& savePath)
 	o_onQuickLoading(savePath);
 }
 
+void __thiscall minHookFunctions::onUnitDestroy(armyStruct* _this, unit* unit)
+{
+	gameEvents::onUnitDestroy(_this, unit);
+	o_onUnitDestroy(_this, unit);
+}
+
 /////////////////////////
 ///=== UI ELEMENTS ===///
 /////////////////////////
@@ -3567,7 +3575,12 @@ void __thiscall minHookFunctions::onCreateTooltip(DWORD _this, void* p, UNICODE_
 		{
 			string* newStrP = gameEvents::onCreateTooltip(str.c_str());
 			string newStr = *newStrP;
-			if (newStr != str)
+			delete newStrP;
+			if (newStr == "disable")
+			{
+				u = nullptr;
+			}
+			else if (newStr.size() > 0 && newStr != str)
 			{
 				gameStringHelpers::createUniString(uni, newStr.c_str());
 				u = &uni;
@@ -3583,6 +3596,7 @@ void __thiscall minHookFunctions::onCreateTooltipByCoords(void* _this, coordPair
 	{
 		string* newStrP = gameEvents::onCreateTooltipByCoords(coords->xCoord, coords->yCoord);
 		string newStr = *newStrP;
+		delete newStrP;
 		if (newStr.size() > 0)
 		{
 			gameStringHelpers::createUniString(u1, newStr.c_str());
@@ -4101,6 +4115,17 @@ void minHookFunctions::draw()
 	if (ImGui::Button("setMercsScrollParameters"))
 	{
 		gameHelpers::setMercsScrollParameters(14, 7, 4, 2, 142);
+	}
+
+	ImGui::InputInt("unit in stack", &buffer_line);
+	if (ImGui::Button("onUnitDestroy"))
+	{
+		if (auto ch = gameHelpers::getGameDataAll()->selectInfo->getSelectedCharacter(); ch && ch->army)
+		{
+			unit* un = ch->army->getUnit(buffer_line);
+			onUnitDestroy(ch->army, un);
+		//	onUnitDestroy(ch->army, un, un->general);
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////

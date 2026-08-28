@@ -3601,6 +3601,11 @@ namespace gameHelpers
 		return *reinterpret_cast<bool*>(minHookFunctions::lastTooltipClass1 + 0x68);
 	}
 
+	int getLastCursorState()
+	{
+		return *reinterpret_cast<int*>(dataOffsets::offsets.stratCursorCoords + 0x0014);
+	}
+
 	void setAdvancedSettlementInfoScrollFrameSize(int width, int height)
 	{
 		minHookFunctions::setAdvancedSettlementInfoScrollFrameSize(width, height);

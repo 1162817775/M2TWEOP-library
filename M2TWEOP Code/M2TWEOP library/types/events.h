@@ -263,6 +263,7 @@ namespace gameEvents
 	std::string* onCreateTooltip(const char* str);
 	std::string* onCreateTooltipByCoords(int xCoord, int yCoord);
 	void onBlockadePort(character* admiral, portBuildingStruct* port);
+	void onUnitDestroy(armyStruct* army, unit* unit);
 	
 	template<EventType EvType> class Event :public EventBase
 	{

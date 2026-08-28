@@ -2486,6 +2486,7 @@ public:
 	{
 		return eduEntry->hasAttribute(attributeName);
 	}
+	void destroy();
 };
 
 struct indexLookUp
