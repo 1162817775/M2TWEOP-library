@@ -1487,5 +1487,23 @@ void luaPlugin::initLuaEnums()
 		"ladder", 19,
 		"holy_cart", 20
 	);
+
+	/***
+	Enum of cursor state
+
+	@tfield int onStratMap
+	@tfield int onScroll
+	@tfield int onElement - button(except zoom in missions),slider,checkbox,etc
+	@tfield int onMinMap
+
+	@table cursorState
+	*/
+	luaState.new_enum(
+		"cursorState",
+		"onStratMap", 0,
+		"onScroll", 1,
+		"onElement", 2,
+		"onMinMap", 3
+	);
 }
 

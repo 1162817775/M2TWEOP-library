@@ -704,6 +704,24 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	tables.M2TWEOP.set_function("getTooltipActive", &gameHelpers::getTooltipActive);
 
 	/***
+	Get game last cursor state.   
+	@function M2TWEOP.getLastCursorState
+	@treturn int cursorState use enum: cursorState
+	@usage
+	DISABLE_TOOLTIP = true;
+	function onCreateTooltip(text)
+		local lastCursorState = M2TWEOP.getLastCursorState();
+		local xCoord, yCoord = M2TWEOP.getGameTileCoordsWithCursor();
+		if lastCursorState==cursorState.onStratMap and((xCoord==400 and yCoord==52) or(xCoord==398 and yCoord==53)) then
+			return "onCreateTooltip: newText";
+		elseif lastCursorState==cursorState.onMinMap and DISABLE_TOOLTIP then
+			return "disable"; -- disable tooltip on min map
+		end
+	end
+	*/
+	tables.M2TWEOP.set_function("getLastCursorState", &gameHelpers::getLastCursorState);
+
+	/***
 	Change the frame size in the "advanced_settlement_info_scroll" scroll. By default: 442 x 358.   
 	@function M2TWEOP.setAdvancedSettlementInfoScrollFrameSize
 	@tparam int height

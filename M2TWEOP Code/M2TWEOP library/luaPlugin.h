@@ -366,6 +366,7 @@ public:
 	sol::function* onCreateTooltip = nullptr;
 	sol::function* onCreateTooltipByCoords = nullptr;
 	sol::function* onBlockadePort = nullptr;
+	sol::function* onUnitDestroy = nullptr;
 	static void checkLuaFunc(sol::function** lRef);
 private:
 

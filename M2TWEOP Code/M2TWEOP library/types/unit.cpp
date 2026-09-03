@@ -445,6 +445,11 @@ void unit::setWeapon(uint8_t wpn)
 	GAME_FUNC(void(__thiscall*)(unit*, uint8_t), setUnitWeaponFunc)(this, weapon);
 }
 
+void unit::destroy()
+{
+	GAME_FUNC(void(__thiscall*)(armyStruct*, unit*), a_onUnitDestroy)(army, this);
+}
+
 bool unitDb::parse(descrParser* parser)
 {
 	while (parser->walker < parser->end)
@@ -2060,6 +2065,13 @@ void luaPlugin::initUnits()
 	unit:kill();
 	*/
 	types.unit.set_function("kill", &unitHelpers::killUnit);
+	/***
+	It destroys the unit without returning it to the recruitment pool. It destroys a fleet on the high seas, even if it has troops on board.
+	@function unit:destroy
+	@usage
+	unit:destroy();
+	*/
+	types.unit.set_function("destroy", &unit::destroy);
 	/***
 	Set unit basic parameters
 	@function unit:setParams
