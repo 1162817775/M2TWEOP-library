@@ -437,6 +437,8 @@ void codes::initCodes(int gameVer)
 		offsets.a_onSetSliderState = 0x00b48310;
 		offsets.a_onElementReset = 0x00b1aed0;
 		offsets.a_onUnitDestroy = 0x00714090;
+		offsets.a_onSetColor = 0x00f1c750;
+		offsets.a_onCreateDebugInfoText = 0x00f01070;
 	}
 
 
@@ -877,5 +879,7 @@ void codes::initCodes(int gameVer)
 		offsets.a_onSetSliderState = 0x00b42650;
 		offsets.a_onElementReset = 0x00b151e0;
 		offsets.a_onUnitDestroy = 0x00714790;
+		offsets.a_onSetColor = 0x00f1cdc0;
+		offsets.a_onCreateDebugInfoText = 0x00f01640;
 	}
 }

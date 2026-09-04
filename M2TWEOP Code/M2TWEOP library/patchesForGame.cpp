@@ -1570,8 +1570,10 @@ int patchesForGame::onOffMapModelThing(const int culture)
 
 DWORD* patchesForGame::onSetKhakiText(DWORD* text)
 {
-	if (text && (*text == 0xFF807761 || *text == 0xFF4B3C0A || *text == 0xFF4C4836))
+	if (m2tweopOptions::isSetKhaki && text && (*text == 0xFF807761 || *text == 0xFF4B3C0A || *text == 0xFF4C4836))
 		*text = m2tweopOptions::getColor();
+	else if (text)
+		*text = minHookFunctions::checkSet(*text);
 	return text;
 }
 
@@ -3147,6 +3149,7 @@ minHookFunctions::t_fleeConstructor                        minHookFunctions::o_f
 minHookFunctions::t_fleeConstructor                        minHookFunctions::o_fleeConstructor2 = nullptr;
 minHookFunctions::t_onBlockadePort                         minHookFunctions::o_onBlockadePort = nullptr;
 minHookFunctions::t_onQuickLoading                         minHookFunctions::o_onQuickLoading = nullptr;
+minHookFunctions::t_onUnitDestroy                          minHookFunctions::o_onUnitDestroy = nullptr;
 minHookFunctions::t_onCreateTooltip                        minHookFunctions::o_onCreateTooltip = nullptr;
 minHookFunctions::t_onCreateTooltipByCoords                minHookFunctions::o_onCreateTooltipByCoords = nullptr;
 minHookFunctions::t_onCreateCapabilityUnicodeString        minHookFunctions::o_onCreateCapabilityUnicodeString = nullptr;
@@ -3163,7 +3166,8 @@ minHookFunctions::t_onResetTraitsListHeight                minHookFunctions::o_o
 minHookFunctions::t_onMercenaryScrollInit                  minHookFunctions::o_onMercenaryScrollInit = nullptr;
 minHookFunctions::t_onSetSliderState                       minHookFunctions::o_onSetSliderState = nullptr;
 minHookFunctions::t_onElementReset                         minHookFunctions::o_onElementReset = nullptr;
-minHookFunctions::t_onUnitDestroy                          minHookFunctions::o_onUnitDestroy = nullptr;
+minHookFunctions::t_onSetColor                             minHookFunctions::o_onSetColor = nullptr;
+minHookFunctions::t_onCreateDebugInfoText                  minHookFunctions::o_onCreateDebugInfoText = nullptr;
 
 DWORD minHookFunctions::lastSoundClass = NULL;
 bool minHookFunctions::isUnlockWeaponLimit = false;
@@ -3188,14 +3192,10 @@ mercenaryScroll* minHookFunctions::lastMercScroll = NULL;
 sliderStruct* minHookFunctions::lastSliderStruct = NULL;
 bool minHookFunctions::isMercenaryScrollOpen = false;
 map<int, int> minHookFunctions::bufferPosY;
+unordered_map<uint32_t, rgba> minHookFunctions::rgbaColors;
+bool minHookFunctions::isDebugInfoOpen = false;
+const char* minHookFunctions::debugInfoText = "debug";
 
-
-static string pointerToString(LPVOID ppPointer)
-{
-	stringstream ss;
-	ss << ppPointer;
-	return ss.str();
-}
 
 MH_STATUS minHookFunctions::hook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal, string function)
 {
@@ -3229,6 +3229,7 @@ void minHookFunctions::init()
 	MIN_HOOK(a_onCalculationRatioForBirth,             onCalculationRatioForBirth,             o_onCalculationRatioForBirth);
 	MIN_HOOK(a_onBlockadePort,                         onBlockadePort,                         o_onBlockadePort);
 	MIN_HOOK(a_onQuickLoading,                         onQuickLoading,                         o_onQuickLoading);
+	MIN_HOOK(a_onUnitDestroy,                          onUnitDestroy,                          o_onUnitDestroy);
 	MIN_HOOK(a_onCreateTooltip,                        onCreateTooltip,                        o_onCreateTooltip);
 	MIN_HOOK(a_onCreateTooltipByCoords,                onCreateTooltipByCoords,                o_onCreateTooltipByCoords);
 	MIN_HOOK(a_onCreateCapabilityUnicodeString,        onCreateCapabilityUnicodeString,        o_onCreateCapabilityUnicodeString);
@@ -3245,7 +3246,8 @@ void minHookFunctions::init()
 	MIN_HOOK(a_onMercenaryScrollInit,                  onMercenaryScrollInit,                  o_onMercenaryScrollInit);
 	MIN_HOOK(a_onSetSliderState,                       onSetSliderState,                       o_onSetSliderState);
 	MIN_HOOK(a_onElementReset,                         onElementReset,                         o_onElementReset);
-	MIN_HOOK(a_onUnitDestroy,                          onUnitDestroy,                          o_onUnitDestroy);
+	MIN_HOOK(a_onSetColor,                             onSetColor,                             o_onSetColor);
+	MIN_HOOK(a_onCreateDebugInfoText,                  onCreateDebugInfoText,                  o_onCreateDebugInfoText);
 }
 
 int __thiscall minHookFunctions::debugLineAdd(void* _this, vector3* start, vector3* end, color8888 color, float time, bool zbuffered)
@@ -3859,6 +3861,20 @@ void __fastcall minHookFunctions::onElementReset(void* param_1)
 	o_onElementReset(param_1);
 }
 
+bool __cdecl minHookFunctions::onSetColor(rgba* color)
+{
+	checkSet(color);
+	return o_onSetColor(color);
+}
+
+UNICODE_STRING**& __thiscall minHookFunctions::onCreateDebugInfoText(UNICODE_STRING**& _this, const char* str)
+{
+	UNICODE_STRING**& result = o_onCreateDebugInfoText(_this, str);
+	if (isDebugInfoOpen)
+		debugInfoText = gameStringHelpers::uniStringToStr(result).c_str();
+	return result;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// CALL GAME FUNCTIONS /////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4098,15 +4114,15 @@ void minHookFunctions::draw()
 			onPlayCharacterVoice(buffer_sound, character, false);
 		}
 	}
-	if (advancedSettlementInfoScrollClass && advancedSettlementInfoScrollClass->elements && advancedSettlementInfoScrollClass->elements->frame)
-	{
-		ImGui::Text("setAdvancedSettlementInfoScrollFrameSize");
-		ImGui::PushItemWidth(100);
-		ImGui::InputInt("width",  &advancedSettlementInfoScrollClass->elements->frame->width);
-		ImGui::SameLine();
-		ImGui::InputInt("height", &advancedSettlementInfoScrollClass->elements->frame->height);
-		ImGui::PopItemWidth();
-	}
+//	if (advancedSettlementInfoScrollClass && advancedSettlementInfoScrollClass->elements && advancedSettlementInfoScrollClass->elements->frame)
+//	{
+//		ImGui::Text("setAdvancedSettlementInfoScrollFrameSize");
+//		ImGui::PushItemWidth(100);
+//		ImGui::InputInt("width",  &advancedSettlementInfoScrollClass->elements->frame->width);
+//		ImGui::SameLine();
+//		ImGui::InputInt("height", &advancedSettlementInfoScrollClass->elements->frame->height);
+//		ImGui::PopItemWidth();
+//	}
 	ImGui::InputInt("line", &buffer_line);
 	if (ImGui::Button("setMercenariesNumberOfLines"))
 	{

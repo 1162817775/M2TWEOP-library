@@ -26,6 +26,7 @@ int m2tweopOptions::armourBonusModifier = 2;
 uint8_t m2tweopOptions::khakiTextRed = 0x0;//0x80;
 uint8_t m2tweopOptions::khakiTextGreen = 0x0; //0x77;
 uint8_t m2tweopOptions::khakiTextBlue = 0x0; //0x61;
+bool m2tweopOptions::isSetKhaki = false;
 int m2tweopOptions::maxBodyguardSize = 31;
 int m2tweopOptions::minBodyguardSize = 4;
 int m2tweopOptions::extraLeaderSoldiers = 6;
@@ -3679,6 +3680,39 @@ namespace gameHelpers
 		MemWork::WriteData(&iconWidth,      dataOffsets::offsets.unitScroll_10, 1);
 		MemWork::WriteData(&maxSlotsInLine, dataOffsets::offsets.unitScroll_11, 1);
 		MemWork::WriteData(&maxSlotsInLine, dataOffsets::offsets.unitScroll_12, 1);
+	}
+
+	void setRgbaTextColor(sol::table targetColor, sol::table newColor)
+	{
+		rgba tarCol{
+			static_cast<uint8_t>(targetColor.get_or(3, 0)), // blue;
+			static_cast<uint8_t>(targetColor.get_or(2, 0)), // green;
+			static_cast<uint8_t>(targetColor.get_or(1, 0)), // red;
+			static_cast<uint8_t>(targetColor.get_or(4, 0))  // alpha;
+		};
+		rgba newCol{
+			static_cast<uint8_t>(newColor.get_or(3, 0)),
+			static_cast<uint8_t>(newColor.get_or(2, 0)),
+			static_cast<uint8_t>(newColor.get_or(1, 0)),
+			static_cast<uint8_t>(newColor.get_or(4, 0))
+		};
+		minHookFunctions::createRgbaMap(&tarCol, &newCol);
+	}
+
+	void enableDebugInfo(bool set)
+	{
+		minHookFunctions::isDebugInfoOpen = set;
+	}
+
+	void drawDebugInfo()
+	{
+		if (!minHookFunctions::isDebugInfoOpen || !minHookFunctions::debugInfoText)
+			return;
+		static ImGuiWindowFlags transparentF = ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove;
+		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+		ImGui::Begin("debugText", nullptr, transparentF);
+		ImGui::Text(minHookFunctions::debugInfoText);
+		ImGui::End();
 	}
 
 	void fixReligionTrigger()
