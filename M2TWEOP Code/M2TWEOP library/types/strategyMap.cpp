@@ -1969,7 +1969,7 @@ namespace stratMapHelpers
 		typeAll.regionStruct.set_function("getHiddenResource", &regionStruct::hasHiddenResource);
 
 		/***
-		Set a region's hidden resource (reset on game restart).
+		Set a region's hidden resource
 		@function regionStruct:setHiddenResource
 		@tparam string name
 		@tparam bool enable
