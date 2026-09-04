@@ -445,7 +445,7 @@ public:
 	static MH_STATUS hook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal, std::string function);
 	static void draw();
 	static void log(std::string text)               { gameHelpers::logStringGame(text); };
-	static string pointerToString(LPVOID ppPointer) { stringstream ss; ss << ppPointer; return ss.str(); }
+	static std::string pointerToString(LPVOID ppPointer) { std::stringstream ss; ss << ppPointer; return ss.str(); }
 
 
 	static bool openConsole;
@@ -662,7 +662,7 @@ public:
 	static t_onCreateDebugInfoText o_onCreateDebugInfoText;
 	static UNICODE_STRING**& __thiscall onCreateDebugInfoText(UNICODE_STRING**& _this, const char* str);
 	static bool isDebugInfoOpen;
-	static const char* debugInfoText;
+	static std::string debugInfoText;
 };
 
 #define GET_VARIABLE_NAME(Variable) (#Variable)

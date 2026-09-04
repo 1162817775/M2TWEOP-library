@@ -677,7 +677,7 @@ namespace gameHelpers
 	void setMercsScrollParameters(int maxSlots, int maxSlotsInLine, int maxSlots2, int maxSlotsInLine2, int traitsHeight);
 	void setEnemyArmyUnitsScrollParameters(int maxSlots, int maxSlotsInLine, int iconWidth, int iconHeight);
 	void setRgbaTextColor(sol::table targetColor, sol::table newColor);
-	void enableDebugInfo(bool set);
+	void enableDebugInfo(bool main, bool battle, int8_t terrain);
 	void drawDebugInfo();
 
 	religionDatabase* getReligionDatabase();

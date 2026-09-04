@@ -3699,19 +3699,25 @@ namespace gameHelpers
 		minHookFunctions::createRgbaMap(&tarCol, &newCol);
 	}
 
-	void enableDebugInfo(bool set)
+	static struct debugInfo
 	{
-		minHookFunctions::isDebugInfoOpen = set;
+		int8_t param;
+	};
+	void enableDebugInfo(bool main, bool battle, int8_t terrain)
+	{
+		minHookFunctions::isDebugInfoOpen = main;
+		reinterpret_cast<debugInfo*>(gameHelpers::getGameVersion() == 1 ? 0x02cbcd34 : 0x02c73cbc)->param = terrain;
+		reinterpret_cast<debugInfo*>(gameHelpers::getGameVersion() == 1 ? 0x016ebab1 : 0x016a2881)->param = battle;
 	}
 
 	void drawDebugInfo()
 	{
-		if (!minHookFunctions::isDebugInfoOpen || !minHookFunctions::debugInfoText)
+		if (!minHookFunctions::isDebugInfoOpen || minHookFunctions::debugInfoText.empty())
 			return;
 		static ImGuiWindowFlags transparentF = ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove;
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 		ImGui::Begin("debugText", nullptr, transparentF);
-		ImGui::Text(minHookFunctions::debugInfoText);
+		ImGui::Text(minHookFunctions::debugInfoText.c_str());
 		ImGui::End();
 	}
 

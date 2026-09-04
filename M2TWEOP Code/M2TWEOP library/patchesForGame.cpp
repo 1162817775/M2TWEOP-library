@@ -3194,7 +3194,7 @@ bool minHookFunctions::isMercenaryScrollOpen = false;
 map<int, int> minHookFunctions::bufferPosY;
 unordered_map<uint32_t, rgba> minHookFunctions::rgbaColors;
 bool minHookFunctions::isDebugInfoOpen = false;
-const char* minHookFunctions::debugInfoText = "debug";
+string minHookFunctions::debugInfoText = "debug";
 
 
 MH_STATUS minHookFunctions::hook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal, string function)
@@ -3870,8 +3870,8 @@ bool __cdecl minHookFunctions::onSetColor(rgba* color)
 UNICODE_STRING**& __thiscall minHookFunctions::onCreateDebugInfoText(UNICODE_STRING**& _this, const char* str)
 {
 	UNICODE_STRING**& result = o_onCreateDebugInfoText(_this, str);
-	if (isDebugInfoOpen)
-		debugInfoText = gameStringHelpers::uniStringToStr(result).c_str();
+	if (isDebugInfoOpen && result)
+		debugInfoText = gameStringHelpers::uniStringToStr(result);
 	return result;
 }
 
