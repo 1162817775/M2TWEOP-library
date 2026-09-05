@@ -78,6 +78,7 @@ namespace console
 #ifdef MIN_HOOK_TESTS
 		minHookFunctions::draw();
 #endif // MIN_HOOK_TESTS
+		gameHelpers::drawDebugInfo();
 
 		if (consoleData.isDraw == false)
 		{

@@ -441,6 +441,8 @@ public:
 		DWORD a_onSetSliderState = NULL;
 		DWORD a_onElementReset = NULL;
 		DWORD a_onUnitDestroy = NULL;
+		DWORD a_onSetColor = NULL;
+		DWORD a_onCreateDebugInfoText = NULL;
 	}offsets;
 
 	static void initCodes(int gameVer);

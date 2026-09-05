@@ -418,6 +418,22 @@ struct mercenaryScroll
 	sliderStruct* slider; //0x0104
 };
 
+struct rgba
+{
+	uint8_t blue;
+	uint8_t green;
+	uint8_t red;
+	uint8_t alpha;
+	explicit rgba(uint8_t b, uint8_t g, uint8_t r, uint8_t a) : red(r), green(g), blue(b), alpha(a) {}
+	rgba() : blue(0), green(0), red(0), alpha(0)              {}
+	void set(uint8_t r, uint8_t g, uint8_t b)                 { red = r; green = g; blue = b; }
+	void set(uint8_t r, uint8_t g, uint8_t b, uint8_t a)      { red = r; green = g; blue = b; alpha = a; }
+	void set(rgba* c)                                         { red = c->red; green = c->green; blue = c->blue; alpha = c->alpha; }
+	bool cmp(uint8_t r, uint8_t g, uint8_t b) const           { return red == r && green == g && blue == b; }
+	bool cmp(uint8_t r, uint8_t g, uint8_t b, uint8_t a) const{ return red == r && green == g && blue == b && alpha == a; }
+	uint32_t getHex() const                                   { return (static_cast<uint32_t>(alpha) << 24) | (static_cast<uint32_t>(red) << 16) | (static_cast<uint32_t>(green) << 8) | blue; }
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// MIN HOOK FUNCTIONS //////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -428,7 +444,8 @@ public:
 	static void init();
 	static MH_STATUS hook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal, std::string function);
 	static void draw();
-	static void log(std::string text) { gameHelpers::logStringGame(text); };
+	static void log(std::string text)               { gameHelpers::logStringGame(text); };
+	static std::string pointerToString(LPVOID ppPointer) { std::stringstream ss; ss << ppPointer; return ss.str(); }
 
 
 	static bool openConsole;
@@ -611,6 +628,41 @@ public:
 		lastMercScroll->cursorPosX > lastMercScroll->slider->xPos - 15 && lastMercScroll->cursorPosX < lastMercScroll->slider->xPos + 30 &&
 		lastMercScroll->cursorPosY > lastMercScroll->slider->yPos - 30 && lastMercScroll->cursorPosY < lastMercScroll->slider->yPos + lastMercScroll->slider->length + 50;
 	}
+
+	using t_onSetColor = bool(__cdecl*)(rgba* color);
+	static t_onSetColor o_onSetColor;
+	static bool __cdecl onSetColor(rgba* color);
+	static unordered_map<uint32_t, rgba> rgbaColors;
+	static void createRgbaMap(rgba* targetColor, rgba* newColor) 
+	{ 
+		log("setRgbaTextColor: targetColor: " + to_string(targetColor->red) + ", " + to_string(targetColor->green) + ", " + to_string(targetColor->blue) + ", " + to_string(targetColor->alpha) + " --> newColor: " + to_string(newColor->red) + ", " + to_string(newColor->green) + ", " + to_string(newColor->blue) + ", " + to_string(newColor->alpha));
+		rgbaColors[targetColor->getHex()] = *newColor;
+	}
+	static void checkSet(rgba* targetColor) {
+		if (!targetColor || rgbaColors.size() == 0 || targetColor->cmp(255, 255, 255, 255))
+			return;
+		if (auto it = rgbaColors.find(targetColor->getHex()); it != rgbaColors.end())
+		{
+			rgba* newColor = &it->second;
+		//	log("checkSet: targetColor: " + to_string(targetColor->red) + ", " + to_string(targetColor->green) + ", " + to_string(targetColor->blue) + ", " + to_string(targetColor->alpha) + ", newColor: " + to_string(newColor->red) + ", " + to_string(newColor->green) + ", " + to_string(newColor->blue) + ", " + to_string(newColor->alpha));
+			targetColor->set(newColor);
+		}
+	}
+	static DWORD checkSet(DWORD targetHex) {
+		if (auto it = rgbaColors.find(static_cast<uint32_t>(targetHex)); it != rgbaColors.end())
+		{
+			rgba* newColor = &it->second;
+		//	log("checkSet: targetHex: #" + pointerToString((LPVOID*)targetHex) + ", newColor: " + to_string(newColor->red) + ", " + to_string(newColor->green) + ", " + to_string(newColor->blue) + ", " + to_string(newColor->alpha));
+			return static_cast<DWORD>(newColor->getHex());
+		}
+		return targetHex;
+	}
+
+	using t_onCreateDebugInfoText = UNICODE_STRING**&(__thiscall*)(UNICODE_STRING**& _this, const char* str);
+	static t_onCreateDebugInfoText o_onCreateDebugInfoText;
+	static UNICODE_STRING**& __thiscall onCreateDebugInfoText(UNICODE_STRING**& _this, const char* str);
+	static bool isDebugInfoOpen;
+	static std::string debugInfoText;
 };
 
 #define GET_VARIABLE_NAME(Variable) (#Variable)

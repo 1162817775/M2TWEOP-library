@@ -1391,6 +1391,54 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	tables.M2TWEOP.set_function("setKhakiTextColor", &m2tweopOptions::setKhakiTextColor);
 	
 	/***
+	Change one RGBA color to another.
+	@function M2TWEOP.setRgbaTextColor
+	@tparam table target rgba
+	@tparam table new rgba
+	@usage
+	function onPluginLoad()
+		--[[
+			RGBA:
+			black				0, 0, 0, 255
+			white				255, 255, 255, 255
+			khaki				128, 119, 97, 255
+			grey                76, 72, 54, 255
+			dark brown			75, 60, 10, 255
+			gold				255, 245, 139, 255
+			red			        200, 0, 0, 255
+			yellow		     	255, 247, 119, 255
+			blue				9, 76, 165, 255
+			strat map shadows   0, 0, 0, 128
+			tooltips background 0, 0, 0, 128
+		--]]
+		M2TWEOP.setRgbaTextColor({0, 0, 0, 255},       {0, 0, 255, 255});     -- black
+		M2TWEOP.setRgbaTextColor({255, 255, 255, 255}, {0, 255, 0, 255});     -- white
+		M2TWEOP.setRgbaTextColor({128, 119, 97, 255},  {202, 49, 216, 255});  -- khaki == setKhakiTextColor 1
+		M2TWEOP.setRgbaTextColor({76, 72, 54, 255},    {202, 49, 216, 255});  -- grey == setKhakiTextColor 2
+		M2TWEOP.setRgbaTextColor({75, 60, 10, 255},    {202, 49, 216, 255});  -- dark brown == setKhakiTextColor 3
+		M2TWEOP.setRgbaTextColor({255, 245, 139, 255}, {255, 159, 34, 255});  -- gold
+		M2TWEOP.setRgbaTextColor({200, 0, 0, 255},     {50, 103, 112, 255});  -- red
+		M2TWEOP.setRgbaTextColor({255, 247, 119, 255}, {183, 90, 149, 255});  -- yellow
+		M2TWEOP.setRgbaTextColor({9, 76, 165, 255},    {234, 150, 204, 255}); -- blue
+		M2TWEOP.setRgbaTextColor({0, 0, 0, 128},       {91, 91, 91, 128});    -- strat map shadows and tooltips background
+	end
+	*/
+	tables.M2TWEOP.set_function("setRgbaTextColor", &gameHelpers::setRgbaTextColor);
+	
+	/***
+	Enable display of debug information.
+	@function M2TWEOP.enableDebugInfo
+	@tparam bool enable main info
+	@tparam bool enable battle cursor info
+	@tparam int enable terrain info, 1 - 5
+	@usage
+	function onPluginLoad()
+		M2TWEOP.enableDebugInfo(true,false,3);
+	end
+	*/
+	tables.M2TWEOP.set_function("enableDebugInfo", &gameHelpers::enableDebugInfo);
+	
+	/***
 	Get modifiers for minor settlements for income and growth.
 	@function M2TWEOP.getMinorSettlementBalance
 	@treturn minorSettlementBalance modifiers

@@ -474,7 +474,7 @@ public:
 	static bool getDisplayEnemyStats() { return displayEnemyStats; }
 	static void setDisplayEnemyStats(const bool value) { displayEnemyStats = value; }
 	static DWORD getColor() { return (static_cast<uint32_t>(0xFF) << 24) | (khakiTextRed << 16) | (khakiTextGreen << 8) | khakiTextBlue; }
-	static void setKhakiTextColor(const uint8_t red, const uint8_t green, const uint8_t blue) { khakiTextRed = red; khakiTextGreen = green; khakiTextBlue = blue; }
+	static void setKhakiTextColor(const uint8_t red, const uint8_t green, const uint8_t blue) { khakiTextRed = red; khakiTextGreen = green; khakiTextBlue = blue; isSetKhaki = true; }
 	static int watchTowerRange;
 	static int weaponBonusModifier;
 	static int armourBonusModifier;
@@ -504,6 +504,7 @@ public:
 	static uint8_t khakiTextRed;
 	static uint8_t khakiTextGreen;
 	static uint8_t khakiTextBlue;
+	static bool isSetKhaki;
 	static bool isOpenGateOnStratMap;
 	static int isOpenGateOnStratMapActive;
 };
@@ -675,6 +676,9 @@ namespace gameHelpers
 	void setMercsScrollNumOfLines(int line);
 	void setMercsScrollParameters(int maxSlots, int maxSlotsInLine, int maxSlots2, int maxSlotsInLine2, int traitsHeight);
 	void setEnemyArmyUnitsScrollParameters(int maxSlots, int maxSlotsInLine, int iconWidth, int iconHeight);
+	void setRgbaTextColor(sol::table targetColor, sol::table newColor);
+	void enableDebugInfo(bool main, bool battle, int8_t terrain);
+	void drawDebugInfo();
 
 	religionDatabase* getReligionDatabase();
 	gameDataAllStruct* getGameDataAll();
