@@ -619,23 +619,12 @@ public:
 	static sliderStruct* lastSliderStruct;
 	static bool isMercenaryScrollOpen;
 	static map<int, int> bufferPosY;
-	//The cached scroll lives only as long as the scroll that created it, so drop it whenever that scroll
-	//goes away - otherwise the next read lands on freed (and by then reused) memory.
-	static void resetMercScrollCache()
-	{
-		lastMercScroll = nullptr;
-		lastSliderStruct = nullptr;
-		isMercenaryScrollOpen = false;
-		bufferPosY.clear();
-	}
-	//maxSlots is written as a single byte, so anything outside this range is a garbage read.
-	static bool isMercsNumValid() { return lastMercScroll && lastMercScroll->mercs && lastMercScroll->mercsNum > 0 && lastMercScroll->mercsNum <= 255; }
 
 	using t_onElementReset = void(__fastcall*)(void* param_1);
 	static t_onElementReset o_onElementReset;
 	static void __fastcall onElementReset(void* param_1);
 	static bool checkSetPosY(void* pointer);
-	static bool checkActive() { return isMercenaryScrollOpen && lastMercScroll && lastMercScroll->slider && isMercsNumValid() &&
+	static bool checkActive() { return isMercenaryScrollOpen && lastMercScroll && lastMercScroll->slider && 
 		lastMercScroll->cursorPosX > lastMercScroll->slider->xPos - 15 && lastMercScroll->cursorPosX < lastMercScroll->slider->xPos + 30 &&
 		lastMercScroll->cursorPosY > lastMercScroll->slider->yPos - 30 && lastMercScroll->cursorPosY < lastMercScroll->slider->yPos + lastMercScroll->slider->length + 50;
 	}
