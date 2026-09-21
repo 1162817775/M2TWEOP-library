@@ -2660,8 +2660,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 		char* str = reinterpret_cast<char*>(vTab[1]);
 		if (strcmp(str, "own_named_character_info_scroll") == 0 || strcmp(str, "fort_info_scroll") == 0)
 		{
-			minHookFunctions::bufferPosY.clear();
-			minHookFunctions::isMercenaryScrollOpen = false;
+			minHookFunctions::resetMercScrollCache();
 		}
 	}
 	else if (eventCode == factionTurnStartCode)
@@ -2700,6 +2699,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 	}
 	else if (eventCode == gameReloaded)
 	{
+		minHookFunctions::resetMercScrollCache();
 		if (!eopHiddenResources::isInitialized())
 			eopHiddenResources::initialize();
 		minorSettlementDb::load();
@@ -2710,6 +2710,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 	}
 	else if (eventCode == deploymentPhaseCommenced)
 	{
+		minHookFunctions::resetMercScrollCache();
 	}
 	else if (eventCode == conflictPhaseCommenced)
 	{
@@ -2814,6 +2815,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 	}
 	else if (eventCode == postBattle)
 	{
+		minHookFunctions::resetMercScrollCache();
 		const auto campData = campaignHelpers::getCampaignData();
 		campData->ignoreSpeedUp = false;
 		if (campData->type == 3)
@@ -3797,12 +3799,13 @@ void __thiscall minHookFunctions::onMercenaryScrollInit(mercenaryScroll* _this, 
 {
 	o_onMercenaryScrollInit(_this, param_2, param_3, param_4, param_5, param_6);
 	lastMercScroll = _this;
+	log("minHookFunctions::onMercenaryScrollInit(" + pointerToString(_this) + ")");
 }
 
 void __thiscall minHookFunctions::onSetSliderState(sliderStruct* _this, int sliderState, char param_3)
 {
 	lastSliderStruct = _this;
-	if (sliderState == 0 || !lastMercScroll || lastMercScroll->slider != _this)
+	if (sliderState == 0 || !isMercenaryScrollOpen || !lastMercScroll || lastMercScroll->slider != _this)
 	{
 		return o_onSetSliderState(_this, sliderState, param_3);
 	}
@@ -3838,7 +3841,8 @@ void __thiscall minHookFunctions::onSetSliderState(sliderStruct* _this, int slid
 
 bool minHookFunctions::checkSetPosY(void* pointer)
 {
-	if (!checkActive() || lastMercScroll->mercsNum <= mercsMaxSlots || lastMercScroll->slider->currentState == 0 || bufferPosY.size() < lastMercScroll->mercsNum)
+	if (!checkActive() || lastMercScroll->mercsNum <= mercsMaxSlots || lastMercScroll->slider->currentState == 0
+		|| bufferPosY.size() < static_cast<size_t>(lastMercScroll->mercsNum))
 		return false;
 
 //	log("checkSetPosY");
