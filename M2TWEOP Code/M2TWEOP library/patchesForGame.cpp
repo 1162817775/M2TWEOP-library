@@ -2665,6 +2665,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 	}
 	else if (eventCode == factionTurnStartCode)
 	{
+		minHookFunctions::resetMercScrollCache();
 		factionStruct* fac = reinterpret_cast<factionStruct*>(vTab[1]);
 		gameHelpers::logStringGame("Faction turn start: " + string(fac->factionRecord->facName));
 		globalEopAiConfig::getInstance()->turnStartMove(fac, false);
@@ -3799,7 +3800,7 @@ void __thiscall minHookFunctions::onMercenaryScrollInit(mercenaryScroll* _this, 
 {
 	o_onMercenaryScrollInit(_this, param_2, param_3, param_4, param_5, param_6);
 	lastMercScroll = _this;
-	log("minHookFunctions::onMercenaryScrollInit(" + pointerToString(_this) + ")");
+//	log("minHookFunctions::onMercenaryScrollInit(" + pointerToString(_this) + ")");
 }
 
 void __thiscall minHookFunctions::onSetSliderState(sliderStruct* _this, int sliderState, char param_3)
