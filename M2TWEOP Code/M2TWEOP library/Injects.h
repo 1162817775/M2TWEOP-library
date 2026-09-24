@@ -2466,6 +2466,20 @@ private:
 	LPVOID funcAddress;
 };
 
+
+class onExchangeWithCharacter
+	:public AATemplate
+{
+public:
+	onExchangeWithCharacter(MemWork* mem, LPVOID addr, int ver);
+	~onExchangeWithCharacter() = default;
+
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 class onUiBitmapTexture
 	:public AATemplate
 {

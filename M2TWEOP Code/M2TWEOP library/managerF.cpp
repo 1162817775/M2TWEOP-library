@@ -1168,6 +1168,12 @@ void managerF::execPatches()
 	toGetSpecPos->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onExchangeWithCharacter patch" << '\n';
+	onExchangeWithCharacter* toExchangeWithCharacter = new onExchangeWithCharacter(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
+	toExchangeWithCharacter->SetNewCode();
+	toExchangeWithCharacter->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying onHiddenResourceConditionParse patch" << '\n';
 	onHiddenResourceConditionParse* toHiddenResourceConditionParse = new onHiddenResourceConditionParse(mem, (LPVOID)patchesForGame::onGetHiddenResource, globals::dataS.gameVersion);
 	toHiddenResourceConditionParse->SetNewCode();
