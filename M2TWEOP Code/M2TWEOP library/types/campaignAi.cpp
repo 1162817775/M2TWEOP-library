@@ -777,6 +777,10 @@ bool attackSettlementOrder::evaluateAttack()
 	if (PLAYER_ASSAULTED)
 		return false;
 	const auto settlement = targetSettlement->settlement;
+	if (!assignedArmies.front()->resource->validate())
+	{
+		return false;
+	}
 	if (assignedArmies.front()->moveCost >= assignedArmies.front()->resource->army->gen->movePointsArmy || assignedArmies.front()->turns > 1)
 	{
 #ifdef PRIORITY_DEBUG
@@ -1108,6 +1112,10 @@ bool attackArmyOrder::evaluateAttack()
 #ifdef PRIORITY_DEBUG
 		gameHelpers::logStringGame("PLAYER_ASSAULTED");
 #endif
+		return false;
+	}
+	if (!assignedArmies.front()->resource->validate())
+	{
 		return false;
 	}
 	const auto attModifier = campaignHelpers::getCampaignDb()->campaignDbAi.attStrModifier;

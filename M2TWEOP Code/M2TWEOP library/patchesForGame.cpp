@@ -2752,6 +2752,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 	}
 	else if (eventCode == characterTurnEnd)
 	{
+		/*
 		if (const auto record = reinterpret_cast<characterRecord*>(vTab[1]);
 			record->gen
 			&& record->faction->isPlayerControlled == 0
@@ -2761,6 +2762,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 		{
 			globalEopAiConfig::getInstance()->characterTurnStart(record->gen, false);
 		}
+		*/
 	}
 	else if (eventCode == characterTurnStart)
 	{
@@ -2783,6 +2785,15 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 				const auto randomModel = rebelFac->characterModels.front();
 				stratModelsChange::setCharacterModel(record->gen, randomModel);
 			}
+		}
+		
+		if (record->gen
+			&& record->faction->isPlayerControlled == 0
+			&& record->gen->isGeneral()
+			&& record->gen->army
+			)
+		{
+			globalEopAiConfig::getInstance()->characterTurnStart(record->gen, true);
 		}
 		//globalEopAiConfig::getInstance()->characterTurnStart(record->gen, true);
 	}

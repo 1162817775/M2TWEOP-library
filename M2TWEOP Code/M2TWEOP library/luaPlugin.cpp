@@ -1429,8 +1429,8 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	Enable display of debug information.
 	@function M2TWEOP.enableDebugInfo
 	@tparam bool enable main info
-	@tparam bool enable battle cursor info
-	@tparam int enable terrain info, 1 - 5
+	@tparam bool enableBattle battle cursor info
+	@tparam int infoType terrain info, 1 - 5
 	@usage
 	function onPluginLoad()
 		M2TWEOP.enableDebugInfo(true,false,3);
