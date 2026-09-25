@@ -6830,6 +6830,40 @@ void onGetSpecPos::SetNewCode()
 	delete a;
 }
 
+
+onExchangeWithCharacter::onExchangeWithCharacter(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x5BAF48;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x5BAA68;
+}
+
+void onExchangeWithCharacter::SetNewCode()
+{
+	const auto a = new Assembler();
+	const auto label = a->newLabel();
+	a->mov(ecx, dword_ptr(esi, 0x20));
+	a->test(ecx, ecx);
+	a->jnz(label);
+	if (m_adress == 0x5BAF48)
+	{
+		a->mov(eax, 0x5BADA9);
+	}
+	else
+	{
+		a->mov(eax, 0x5BA8C9);
+	}
+	a->jmp(eax);
+	a->bind(label);
+	a->mov(ebp, eax);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
 onSetBuildPolicies::onSetBuildPolicies(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {
