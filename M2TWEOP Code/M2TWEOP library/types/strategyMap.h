@@ -1068,8 +1068,8 @@ namespace stratMapHelpers
 	UINT32 getTileRegionID(int x, int y);
 	factionStruct* getRegionOwner(int regionID);
 	float getTileMoveCost(int x, int y, int destX, int destY);
-	std::pair<int, int> findValidTileNearTile(int x, int y, int charType);
-	bool isTileValidForCharacterType(int charType, int x, int y);
+	std::pair<int, int> findValidTileNearTile(int x, int y, int charType, bool forSpawn = false);
+	bool isTileValidForCharacterType(int charType, int x, int y, const bool forSpawn = false);
 	void viewTacticalMap(int x, int y);
 	float getGroundTypeMoveCost(int groundType);
 	void setGroundTypeMoveCost(int groundType, float newCost);
