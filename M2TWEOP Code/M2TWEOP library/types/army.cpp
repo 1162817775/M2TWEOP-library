@@ -805,7 +805,7 @@ namespace armyHelpers
 		}
     	else
     	{
-    		const auto [spawnX, spawnY] = stratMapHelpers::findValidTileNearTile(x, y, characterType);
+    		const auto [spawnX, spawnY] = stratMapHelpers::findValidTileNearTile(x, y, characterType, true);
     		spawnCoords.xCoord = spawnX;
     		spawnCoords.yCoord = spawnY;
     		tile = stratMapHelpers::getTile(spawnCoords.xCoord, spawnCoords.yCoord);

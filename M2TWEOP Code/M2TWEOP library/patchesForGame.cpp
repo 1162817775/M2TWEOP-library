@@ -2697,6 +2697,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 			campaign->playerFacBitMap |= (1 << fac->factionID);
 		else
 			campaign->playerFacBitMap &= ~(1 << fac->factionID);
+		
 	}
 	else if (eventCode == gameReloaded)
 	{
@@ -2787,6 +2788,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 			}
 		}
 		
+		/*
 		if (record->gen
 			&& record->faction->isPlayerControlled == 0
 			&& record->gen->isGeneral()
@@ -2795,6 +2797,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 		{
 			globalEopAiConfig::getInstance()->characterTurnStart(record->gen, true);
 		}
+		*/
 		//globalEopAiConfig::getInstance()->characterTurnStart(record->gen, true);
 	}
 	else if (eventCode == factionTurnEnd)
@@ -2808,6 +2811,18 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 		//if (globalEopAiConfig::getInstance()->enableLogging && !fac->isPlayerControlled)
 		//	fac->aiFaction->aiGlobalStrategyDirector->militaryDirector.logData();
 		//globalEopAiConfig::getInstance()->turnStartMove(fac, true);
+		
+		if (fac->isPlayerControlled == 0)
+		{
+			for (int i = fac->numOfCharacters - 1; i >= 0; i--)
+			{
+				if (const auto character = fac->characters[i]; 
+					character && character->isGeneral() && character->army && !character->getSettlement())
+				{
+					globalEopAiConfig::getInstance()->characterTurnStart(character, true);
+				}
+			}
+		}
 		
 		FIRST_END = true;
 	}

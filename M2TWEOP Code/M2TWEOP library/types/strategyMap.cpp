@@ -1009,17 +1009,29 @@ namespace stratMapHelpers
 		clearAllMapArrows();
 	}
 	
-	bool isTileValidForCharacterType(const int charType, int x, int y)
+	bool isFreeForSpawn(const int charType, int x, int y)
+	{
+		const auto tile = getTile(x, y);
+		if (!tile)
+			return false;
+		return !tile->settlement && !tile->fort && !tile->army;
+	}
+	
+	bool isTileValidForCharacterType(const int charType, int x, int y, const bool forSpawn)
 	{
 		const auto coords = std::make_shared<coordPair>(x, y);
 		if (!GAME_FUNC(bool(__stdcall*)(coordPair*, int, int), isTileValidForCharacter)(coords.get(), charType, 1))
 			return false;
-		return isTileFree(&coords->xCoord);
+		if (!isTileFree(&coords->xCoord))
+			return false;
+		if (forSpawn && !isFreeForSpawn(charType, x, y))
+			return false;
+		return true;
 	}
 
-	std::pair<int, int> findValidTileNearTile(int x, int y, const int charType)
+	std::pair<int, int> findValidTileNearTile(int x, int y, const int charType, const bool forSpawn)
 	{
-		if (isTileValidForCharacterType(charType, x, y))
+		if (isTileValidForCharacterType(charType, x, y, forSpawn))
 			return {x, y};
 		std::queue<std::pair<int, int>> neighbours = getNeighbourTiles(x, y);
 		const std::pair<int, int> start = { x, y };
@@ -1031,7 +1043,7 @@ namespace stratMapHelpers
 			std::pair<int, int> checkCoord = neighbours.front();
 			neighbours.pop();
 			visited.push_back(checkCoord);
-			if (isTileValidForCharacterType(charType, checkCoord.first, checkCoord.second))
+			if (isTileValidForCharacterType(charType, checkCoord.first, checkCoord.second, forSpawn))
 				return {checkCoord.first, checkCoord.second};
 			std::queue<std::pair<int, int>>  newNeighbours = getNeighbourTiles(checkCoord.first, checkCoord.second);
 			while (!newNeighbours.empty())
