@@ -2228,7 +2228,8 @@ void eopProductionHelper::unitProducer(const factionStruct* faction)
 
 globalEopAiConfig::globalEopAiConfig()
 {
-	m_FactionData.fill(std::make_shared<aiFactionData>());
+	for (auto& facData : m_FactionData)
+		facData = std::make_shared<aiFactionData>();
 }
 
 aiFactionData* globalEopAiConfig::getFactionDataLua(const factionStruct* fac)
