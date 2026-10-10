@@ -28,6 +28,7 @@ struct edbEntry;
 struct settlementStruct;
 struct stringWithHash;
 struct unitDb;
+class m_IDirect3DTexture9;
 
 struct trackedArmy
 {
@@ -344,6 +345,7 @@ struct color8888
 	}
 };
 
+//### Can try to collect all the structures of the UI into a single structure.   
 struct frameStruct
 {
 	int field_2[2];
@@ -380,7 +382,7 @@ struct sliderStruct
 	int cursorPosY;
 	int xPos;
 	int yPos;
-	tableStruct* table;
+	tableStruct* table; //0x0048
 	int field_118[118];
 	int minState;
 	int maxState;
@@ -408,14 +410,84 @@ struct mercenaryScroll
 	int field_8[8];
 	int cursorPosX; //0x0038
 	int cursorPosY;
-	int sizeX;
-	int sizeY;
-	int field_0048;
+	int posX;
+	int posY;
+	tableStruct* table; //0x0048
 	mercenaryIcon** mercs;
 	int field_0050;
 	int mercsNum;
 	int field_43[43];
 	sliderStruct* slider; //0x0104
+};
+struct imageStruct
+{
+	BYTE fields[0x00B4];
+	const char* texturePath;
+	int field_2[2];
+	int	width; //0x00C0
+	int	height;
+};
+struct detailsStruct
+{
+	tableStruct* table1; //0x0000
+	tableStruct* table2; //0x0004
+	imageStruct* img;  //0x0008
+	void* plagueIcon;
+};
+struct direct3DTextureStruct
+{
+	void* pointer;
+	int field_6[6];
+	char* something;
+	char field_3[3];
+	int field_9[9];
+	m_IDirect3DTexture9* texture1; //0x0048
+	int field;
+	m_IDirect3DTexture9* duplicate1; //0x0050
+/*	///...
+	m_IDirect3DTexture9* texture2; //0x04C8
+	int field2;
+	m_IDirect3DTexture9* duplicate2;
+	///...
+	m_IDirect3DTexture9* texture3; //0x0AC8
+	int field3;
+	m_IDirect3DTexture9* duplicate3;
+	///...
+	m_IDirect3DTexture9* texture4; //0x0BC8
+	m_IDirect3DTexture9* texture5; //0x0BCC*/
+public:
+	m_IDirect3DTexture9* getGameTexture(int index) const
+	{
+		if (index == 1)
+			return texture1;
+	/*	else if (index == 2)
+			return reinterpret_cast<m_IDirect3DTexture9*>(static_cast<char*>(pointer) + 0x04C8);
+		else if (index == 3)
+			return reinterpret_cast<m_IDirect3DTexture9*>(static_cast<char*>(pointer) + 0x0AC8);
+		else if (index == 4)
+			return reinterpret_cast<m_IDirect3DTexture9*>(static_cast<char*>(pointer) + 0x0BC8);
+		else if (index == 5)
+			return reinterpret_cast<m_IDirect3DTexture9*>(static_cast<char*>(pointer) + 0x0BCC);
+		return NULL;*/
+	}
+};
+struct characterInfoFrame
+{
+	int field_4[4];
+	int	width; //0x0010
+	int	height;
+	int field_8[8];
+	int cursorPosX; //0x0038
+	int cursorPosY;
+	int posX;
+	int posY;
+	tableStruct* table; //0x0048
+	detailsStruct* details; //0x004C
+	BYTE fields[0x02B0];
+	int portraitFrameX; // 0x0300
+	int portraitFrameY; // 0x0304
+	int field; // 0x0308
+	direct3DTextureStruct* textures; // 0x030C
 };
 
 struct rgba
@@ -434,6 +506,407 @@ struct rgba
 	uint32_t getHex() const                                   { return (static_cast<uint32_t>(alpha) << 24) | (static_cast<uint32_t>(red) << 16) | (static_cast<uint32_t>(green) << 8) | blue; }
 };
 
+enum cameraState
+{
+	rotateLeft,
+	rotateRight,
+	rotateUp,
+	rotateDown,
+	stepLeft,
+	stepRight,
+	stepFwd,
+	stepBack,
+	unknown_1,
+	unknown_2,
+	unknown_3,
+	unknown_4,
+	unknown_5,
+	unknown_6,
+	unknown_7,
+	unknown_8
+};
+
+//Perhaps in the future, if and when the number of functions increases, I will implement everything related to the camera in a separate file.
+struct eopCamera
+{
+	bool isInit        = false;
+	bool isRotated     = false;
+	bool isMove        = false;
+	bool isBattle      = false;
+	bool isScrollOpen  = false;
+	bool isReset       = false;
+	bool toBattle      = false;
+	bool camLog        = false;
+	vector3 camPos     = {0.0f, 0.0f, 0.0f};
+	vector3 camTarget  = {0.0f, 0.0f, 0.0f};
+	float speedRotate  = 0.25f;
+	float speedMove    = 0.25f;
+	float speedZoom    = 0.25f;
+	float offsetX1     = 0.0f;
+	float offsetY1     = 0.0f;
+	float offsetX2     = 0.0f;
+	float offsetY2     = 0.0f;
+	float offsetZ      = 0.0f;
+	float offAerMapX   = 0.0f;
+	float offAerMapY   = 0.0f;
+	float minZ1        = 4.839232f;
+	float maxZ1        = 33.348934f;
+	float minZ2        = -10.363630f;
+	float maxZ2        = 0.0f;
+	float targetZ      = -1.0f;
+	float targetX      = -1.0f;
+	float targetY      = -1.0f;
+	int screenX        = 1700;
+	int screenY        = 1550;
+
+	vector3* getPosition()     { return reinterpret_cast<vector3*>(codes::offsets.cameraPosition); }
+	vector3* getTarget()       { return reinterpret_cast<vector3*>(codes::offsets.cameraTarget);   }
+	void log(std::string text) { gameHelpers::logStringGame(text); };
+
+	void move(float xOffset, float yOffset)
+	{
+		vector3* cameraPosition = getPosition();
+		vector3* cameraTarget   = getTarget();
+
+		float diffX = cameraTarget->x - cameraPosition->x;
+		float diffY = cameraTarget->y - cameraPosition->y;
+		float diffZ = cameraTarget->z - cameraPosition->z;
+
+		float len = sqrt(diffX * diffX + diffY * diffY + diffZ * diffZ);
+
+		if (len > 1e-6f) 
+		{
+			diffX /= len;
+			diffY /= len;
+			diffZ /= len;
+		}
+		else 
+		{
+			diffX = 0.0f;
+			diffY = 1.0f;
+			diffZ = 0.0f;
+		}
+
+		float rightX = diffY;
+		float rightY = -diffX;
+		float rightZ = 0.0f;
+
+		float moveX = (diffX * yOffset + rightX * xOffset) * speedMove;
+		float moveY = (diffY * yOffset + rightY * xOffset) * speedMove;
+		float moveZ = (diffZ * yOffset + rightZ * xOffset) * speedMove;
+
+		offsetX1  = moveX;
+		offsetY1  = moveY;
+		isMove    = true; 
+		isRotated = false;
+	}
+
+	void moveX(float x) { move(x, 0.0f); }
+	void moveY(float y) { move(0.0f, y); }
+	void zoom(float z)  { offsetZ = speedZoom * z; isMove = true; isRotated = false; }
+
+	void resetPos()
+	{
+		vector3* cameraPosition = getPosition();
+		vector3* cameraTarget   = getTarget();
+		cameraPosition->x = camPos.x;
+		cameraPosition->y = camPos.y;
+		cameraPosition->z = camPos.z;
+		cameraTarget->x   = camTarget.x;
+		cameraTarget->y   = camTarget.y;
+		cameraTarget->z   = camTarget.z;
+		isMove = true;
+
+		if (camLog)
+			log(
+				"resetPos: \n | camPos: " + to_string(camPos.x) +          ", " + to_string(camPos.y) +          ", " + to_string(camPos.z) +
+				"\n | camTarget: "        + to_string(camTarget.x) +       ", " + to_string(camTarget.y) +       ", " + to_string(camTarget.z) +
+				"\n | cameraPosition: "   + to_string(cameraPosition->x) + ", " + to_string(cameraPosition->y) + ", " + to_string(cameraPosition->z) +
+				"\n | cameraTarget: "     + to_string(cameraTarget->x) +   ", " + to_string(cameraTarget->y) +   ", " + to_string(cameraTarget->z)
+			);
+	}
+
+	void reset(bool isKeypad8)
+	{ 
+		offsetX1  = 0.0f;
+		offsetY1  = 0.0f;
+		offsetX2  = 0.0f;
+		offsetY2  = 0.0f;
+		offsetZ   = 0.0f;
+		targetZ   = -1.0f;
+		targetX   = -1.0f;
+		targetY   = -1.0f;
+		isRotated = false;
+		isMove    = isKeypad8;
+		isReset   = isKeypad8;
+	}
+
+	void zoomCommand(vector3* camPos, vector3* camTarget)
+	{
+		if (targetZ < 0.0f)
+			return;
+
+		float gameMin = 0.2f; 
+		float gameMax = 1.0f;
+
+		float t = (targetZ - gameMin) / (gameMax - gameMin);
+		t = max(0.0f, min(1.0f, t));
+
+		float desiredZ = minZ1 + t * (maxZ1 - minZ1);
+		float diff = desiredZ - camPos->z;
+		if (abs(diff) < 0.5f) 
+		{
+			offsetZ = 0.0f;
+			targetZ = -1.0f;
+			return;
+		}
+
+		float moveZ = diff * 0.12f;
+		if (abs(moveZ) > abs(diff))
+			moveZ = diff;
+		offsetZ = moveZ;
+
+		if (camLog)
+			log("zoomCommand:"
+				"\n | targetZ: "   + to_string(targetZ) +
+				"\n | t: "         + to_string(t) +
+				"\n | desiredZ: "  + to_string(desiredZ) +
+				"\n | camPos->z: " + to_string(camPos->z) +
+				"\n | diff: "      + to_string(diff) +
+				"\n | moveZ: "     + to_string(moveZ)
+			);
+	}
+
+	void moveCommand(vector3* camPos, vector3* camTarget)
+	{
+		if (targetX < 0.0f || targetY < 0.0f)
+			return;
+
+		float diffX = camTarget->x - camPos->x;
+		float diffY = camTarget->y - camPos->y;
+		float diffZ = camTarget->z - camPos->z;
+		float groundX, groundY;
+		if (abs(diffZ) > 1e-6f)
+		{
+			float t = -camPos->z / diffZ;
+			groundX = camPos->x + t * diffX;
+			groundY = camPos->y + t * diffY;
+		}
+		else 
+		{
+			groundX = camTarget->x;
+			groundY = camTarget->y;
+		}
+
+		float toX  = targetX - groundX;
+		float toY  = targetY - groundY;
+		float dist = sqrt(toX * toX + toY * toY);
+
+		if (dist < 2.0f) 
+		{
+			targetX = -1.0f;
+			targetY = -1.0f;
+			return;
+		}
+
+		float gTime = GAME_FUNC(float(__cdecl*)(), updateTime)() / 2.0f;
+		float moveX = toX * gTime;
+		float moveY = toY * gTime;
+		offsetX1    = moveX;
+		offsetY1    = moveY;
+	}
+
+	void set(vector3& pos, vector3& tar)
+	{
+		if (!isMove)
+			return;
+
+		//If it is a full reset, we skip one frame, thereby resetting all camera parameters to their default values.   
+		if (isReset)
+		{
+			isReset = false;
+			return;
+		}
+
+		vector3* cameraPosition = getPosition();
+		vector3* cameraTarget   = getTarget();
+
+		moveCommand(cameraPosition, cameraTarget);
+		zoomCommand(cameraPosition, cameraTarget);
+
+		cameraPosition->x += offsetX1;
+		cameraPosition->y += offsetY1;
+		cameraTarget->x   += offsetX1;
+		cameraTarget->y   += offsetY1;
+
+		//If it's a transition to a battle.
+		if (isBattle)
+		{
+			if (cameraPosition->z - 3.0f > minZ1)
+			{
+				cameraPosition->z -= 0.175f;
+				cameraTarget->z   -= 0.175f;
+			}
+		}
+		else 
+		{
+			if (cameraPosition->z + offsetZ < minZ1 /*|| cameraTarget->z + offsetZ < minZ2*/)
+			{
+				cameraPosition->z = minZ1;
+			//	cameraTarget->z   = minZ2;
+				targetZ = -1.0f;
+			}
+			else if (cameraPosition->z + offsetZ > maxZ1 /*|| cameraTarget->z + offsetZ > maxZ2*/)
+			{
+				cameraPosition->z = maxZ1;
+			//	cameraTarget->z   = maxZ2;
+				targetZ = -1.0f;
+			}
+			else 
+			{
+				cameraPosition->z += offsetZ;
+				cameraTarget->z   += offsetZ / 2.75f;
+			}
+		}
+
+		offsetX1 = 0.0f;
+		offsetY1 = 0.0f;
+		offsetZ  = 0.0f;
+
+		battleDataS* battle = battleHelpers::getBattleData();
+		if (!isBattle && battle && !battle->inBattle)
+		{
+			camPos    = *cameraPosition;
+			camTarget = *cameraTarget;
+		}
+
+		if (camLog)
+			log("set:"
+				"\n | pos:            " + to_string(pos.x)                               + ", " + to_string(pos.y)                               + ", " + to_string(pos.z)                            +
+				"\n | tar:            " + to_string(tar.x)                               + ", " + to_string(tar.y)                               + ", " + to_string(tar.z)                            +
+				"\n | camPos:         " + to_string(camPos.x)                            + ", " + to_string(camPos.y)                            + ", " + to_string(camPos.z)                         +
+				"\n | camTarget:      " + to_string(camTarget.x)                         + ", " + to_string(camTarget.y)                         + ", " + to_string(camTarget.z)                      +
+				"\n | cameraPosition: " + to_string(cameraPosition->x)                   + ", " + to_string(cameraPosition->y)                   + ", " + to_string(cameraPosition->z)                +
+				"\n | cameraTarget:   " + to_string(cameraTarget->x)                     + ", " + to_string(cameraTarget->y)                     + ", " + to_string(cameraTarget->z)                  +
+				"\n | difference:     " + to_string(cameraTarget->x - cameraPosition->x) + ", " + to_string(cameraTarget->y - cameraPosition->y) + ", " + to_string(cameraTarget->z - cameraPosition->z)
+			);
+
+		pos = *cameraPosition;
+		tar = *cameraTarget;
+	}
+
+	void rotate(void* gameCamera, float offset)
+	{
+		if (!gameCamera)
+			return;
+
+		isRotated = true;
+		isMove    = false;
+		offset *= speedRotate;
+
+		float gTime = GAME_FUNC(float(__cdecl*)(), updateTime)();
+		GAME_FUNC(void(__thiscall*)(void*, float, float, float), rotateStratCamera)(gameCamera, 0.0f, gTime * offset, 0.0f);
+
+		vector3* cameraPosition = getPosition();
+		vector3* cameraTarget   = getTarget();
+		offsetX2   = cameraTarget->x - cameraPosition->x;
+		offsetY2   = cameraTarget->y - cameraPosition->y;
+		offAerMapX = offsetX2;
+		offAerMapY = offsetY2;
+		camPos     = *cameraPosition;
+		camTarget  = *cameraTarget;
+
+		if (camLog)
+			log("rotate: position:    " + to_string(cameraPosition->x) + ", " + to_string(cameraPosition->y) + ", " + to_string(cameraPosition->z) +
+				" | cameraTarget: "     + to_string(cameraTarget->x)   + ", " + to_string(cameraTarget->y)   + ", " + to_string(cameraTarget->z) +
+				"\n | offsetX2: "       + to_string(offsetX2)          + " | offsetY2: " + to_string(offsetY2) 
+			);
+	}
+
+	//This probably needs a bit of reworking.
+	coordPair getAerialMapXY()
+	{
+	//	vector3* cameraPosition = getPosition();
+		vector3* cameraTarget   = getTarget();
+
+		float offX = 0.0f;
+		float offY = 0.0f;
+
+		if (!isBattle)
+		{
+			offX = offAerMapX / 2.0f;
+			if (offAerMapY < 4.75f /*&& cameraPosition->z > minZ1 * 3.0f*/)
+				offY = -(abs(offAerMapY) + 7.0f);
+		}
+
+		int x = static_cast<int>(ceil(cameraTarget->x + offX));
+		int y = static_cast<int>(ceil(cameraTarget->y + offY));
+
+		if (camLog)
+			log("getAerialMapXY: offX: " + to_string(offX) + ", offY: " + to_string(offY) + ", x: " + to_string(x) + ", y: " + to_string(y));
+
+		return coordPair(x, y);
+	}
+
+	void transitionToBattle()
+	{
+		isInit    = !toBattle;
+		isBattle  = true;
+		isMove    = true;
+		isRotated = false;
+		if (!isInit)
+			return;
+		getPosition()->z = maxZ1;
+		getTarget()->z   = -maxZ1;
+	}
+
+	bool setPosition(int x, int y)
+	{
+		if (!isInit)
+			return false;
+
+		vector3* cameraPosition = getPosition();
+		vector3* cameraTarget   = getTarget();
+
+		float diffX = cameraTarget->x - cameraPosition->x;
+		float diffZ = cameraTarget->z - cameraPosition->z;
+		float diffY = cameraTarget->y - cameraPosition->y;
+
+		float groundX, groundY;
+		if (abs(diffZ) > 1e-6f)
+		{
+			float t = -cameraPosition->z / diffZ;
+			groundX = cameraPosition->x + t * diffX;
+			groundY = cameraPosition->y + t * diffY;
+		}
+		else 
+		{
+			groundX = cameraTarget->x;
+			groundY = cameraTarget->y;
+		}
+
+		if (isBattle)
+		{
+			float horizLen = sqrt(diffX * diffX + diffY * diffY);
+			if (horizLen > 1e-6f) 
+			{
+				float backX = -diffX / horizLen;
+				float backY = -diffY / horizLen;
+				float backOffset = 8.0f;
+				groundX += backX * backOffset;
+				groundY += backY * backOffset;
+			}
+		}
+
+		offsetX1  = static_cast<float>(x) - groundX;
+		offsetY1  = static_cast<float>(y) - groundY;
+		isMove    = true;
+		isRotated = false;
+
+		return true;
+	}
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// MIN HOOK FUNCTIONS //////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -444,9 +917,8 @@ public:
 	static void init();
 	static MH_STATUS hook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal, std::string function);
 	static void draw();
-	static void log(std::string text)               { gameHelpers::logStringGame(text); };
+	static void log(std::string text)                    { gameHelpers::logStringGame(text); };
 	static std::string pointerToString(LPVOID ppPointer) { std::stringstream ss; ss << ppPointer; return ss.str(); }
-
 
 	static bool openConsole;
 	static oneTile* selectTile;
@@ -647,7 +1119,7 @@ public:
 		rgbaColors[targetColor->getHex()] = *newColor;
 	}
 	static void checkSet(rgba* targetColor) {
-		if (!targetColor || rgbaColors.size() == 0 || targetColor->cmp(255, 255, 255, 255))
+		if (!targetColor || rgbaColors.size() == 0 || targetColor->cmp(255, 255, 255, 255) || targetColor->cmp(0, 0, 0, 255))
 			return;
 		if (auto it = rgbaColors.find(targetColor->getHex()); it != rgbaColors.end())
 		{
@@ -671,6 +1143,44 @@ public:
 	static UNICODE_STRING**& __thiscall onCreateDebugInfoText(UNICODE_STRING**& _this, const char* str);
 	static bool isDebugInfoOpen;
 	static std::string debugInfoText;
+
+	using t_onCharacterInfoFrameInit = void(__thiscall*)(characterInfoFrame* _this, characterRecord& nc, int param_3, int param_4, int param_5);
+	static t_onCharacterInfoFrameInit o_onCharacterInfoFrameInit;
+	static void __thiscall onCharacterInfoFrameInit(characterInfoFrame* _this, characterRecord& nc, int param_3, int param_4, int param_5);
+	static direct3DTextureStruct* rememberTextures;
+
+	using t_onCameraMove = void(__thiscall*)(void* _this, vector3* camPos, vector3* camTarget, bool some);
+	static t_onCameraMove o_onCameraMove;
+	static void __thiscall onCameraMove(void* _this, vector3* camPos, vector3* camTarget, bool some);
+
+	using t_onCameraAction = void(__thiscall*)(void* _this, cameraState action, float speed);
+	static t_onCameraAction o_onCameraAction;
+	static void __thiscall onCameraAction(void* _this, cameraState action, float speed);
+	
+	using t_onAerialMapInit = int*(__thiscall*)(int* _this, vector3* maxHeightVec, float maxHeight);
+	static t_onAerialMapInit o_onAerialMapInit;
+	static int* __thiscall onAerialMapInit(int* _this, vector3* maxHeightVec, float maxHeight);
+
+	using t_onAerialMapUpdate = bool(__thiscall*)(int _this, bool full);
+	static t_onAerialMapUpdate o_onAerialMapUpdate;
+	static bool __thiscall onAerialMapUpdate(int _this, bool full);
+
+	using t_onAerialMapSetPosition = void(__thiscall*)(int _this, int x, int y);
+	static t_onAerialMapSetPosition o_onAerialMapSetPosition;
+	static void __thiscall onAerialMapSetPosition(int _this, int x, int y);
+
+	using t_onMoveStratCameraSlow = void(__cdecl*)(int x, int y);
+	static t_onMoveStratCameraSlow o_onMoveStratCameraSlow;
+	static void __cdecl onMoveStratCameraSlow(int x, int y);
+
+	using t_onZoomStratCamera = void(__cdecl*)(float target);
+	static t_onZoomStratCamera o_onZoomStratCamera;
+	static void __cdecl onZoomStratCamera(float target);
+
+	static void stratCameraMouseWheel();
+	static void enableEopCamera(bool set, float speedRotate, float speedMove, float speedZoom, bool toBattle);
+	static void transitionToBattle(const int x, const int y);
+	static bool isEopCameraEnable;
 };
 
 #define GET_VARIABLE_NAME(Variable) (#Variable)

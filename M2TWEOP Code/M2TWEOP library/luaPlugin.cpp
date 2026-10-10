@@ -1439,6 +1439,42 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	tables.M2TWEOP.set_function("enableDebugInfo", &gameHelpers::enableDebugInfo);
 	
 	/***
+	Enable EOP stratmap camera. Control: Keypad7 - left rotate, Keypad9 - right rotate, Keypad8 - reset rotate. 
+	@function M2TWEOP.enableEopCamera
+	@tparam bool enableCamera enable EOP stratmap camera
+	@tparam float speedRotate camera rotation speed
+	@tparam float speedMove camera move speed
+	@tparam float speedZoom camera zoom speed
+	@tparam bool resetRotate camera rotation when transition to battle(on pressing the "prebattle_fight_button")
+	@usage
+	EOP_CAMERA_ENABLE = true;
+	EOP_CAMERA_ACTIVE = EOP_CAMERA_ENABLE;
+	function onPluginLoad()
+		--initialization (necessarily)
+		M2TWEOP.enableEopCamera(EOP_CAMERA_ENABLE, 0.25, 0.5, 0.25, false);
+	end
+	function draw(device)
+		--further use (not necessarily)
+		if EOP_CAMERA_ACTIVE and ImGui.IsKeyPressed(ImGuiKey.C) and ImGui.IsKeyDown(ImGuiKey.LeftCtrl) and ImGui.IsKeyDown(ImGuiKey.LeftShift) and M2TW.stratMap.isLoaded then
+			EOP_CAMERA_ENABLE = not EOP_CAMERA_ENABLE;
+			print("enableEopCamera: "..tostring(EOP_CAMERA_ENABLE));
+			M2TWEOP.enableEopCamera(EOP_CAMERA_ENABLE, 0.25, 0.5, 0.25, false);
+		end
+	end
+	*/
+	tables.M2TWEOP.set_function("enableEopCamera", &gameHelpers::enableEopCamera);
+	
+	/***
+	View tactical map at the specified coordinates.
+	@function M2TWEOP.viewTacticalMap
+	@tparam int xCoord x coord of the tile
+	@tparam int yCoord y coord of the tile
+	@usage
+	viewTacticalMap
+	*/
+	tables.M2TWEOP.set_function("viewTacticalMap", &stratMapHelpers::viewTacticalMap);
+	
+	/***
 	Get modifiers for minor settlements for income and growth.
 	@function M2TWEOP.getMinorSettlementBalance
 	@treturn minorSettlementBalance modifiers

@@ -3712,13 +3712,23 @@ namespace gameHelpers
 
 	void drawDebugInfo()
 	{
+		minHookFunctions::stratCameraMouseWheel();
 		if (!minHookFunctions::isDebugInfoOpen || minHookFunctions::debugInfoText.empty())
 			return;
+		ImGuiIO& io = ImGui::GetIO();
 		static ImGuiWindowFlags transparentF = ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove;
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 		ImGui::Begin("debugText", nullptr, transparentF);
+		ImGui::SetWindowFontScale(1.5f);
 		ImGui::Text(minHookFunctions::debugInfoText.c_str());
+		ImGui::Text("\nApplication average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+		ImGui::SetWindowFontScale(1.0f);
 		ImGui::End();
+	}
+
+	void enableEopCamera(bool set, float speedRotate, float speedMove, float speedZoom, bool toBattle)
+	{
+		minHookFunctions::enableEopCamera(set, speedRotate, speedMove, speedZoom, toBattle);
 	}
 
 	void fixReligionTrigger()

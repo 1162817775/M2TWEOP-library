@@ -99,6 +99,15 @@ public:
 		DWORD moveStratCameraSlowFunc = NULL;
 		DWORD moveStratCameraFastFunc = NULL;
 		DWORD zoomStratCameraFunc = NULL;
+		DWORD a_onCameraMove = NULL;
+		DWORD a_onCameraAction = NULL;
+		DWORD a_onAerialMapInit = NULL;
+		DWORD a_onAerialMapUpdate = NULL;
+		DWORD a_onAerialMapSetPosition = NULL;
+		DWORD rotateStratCamera = NULL;
+		DWORD updateTime = NULL;
+		DWORD cameraPosition = NULL;
+		DWORD cameraTarget = NULL;
 
 		//ecx - general*
 		//stack 8 - y
@@ -443,6 +452,7 @@ public:
 		DWORD a_onUnitDestroy = NULL;
 		DWORD a_onSetColor = NULL;
 		DWORD a_onCreateDebugInfoText = NULL;
+		DWORD a_onCharacterInfoFrameInit = NULL;
 	}offsets;
 
 	static void initCodes(int gameVer);
