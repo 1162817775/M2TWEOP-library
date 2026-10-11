@@ -473,6 +473,10 @@ public:
 	static void setNoAiMissileLooseFormation(const bool value) { noAiMissileLooseFormation = value; }
 	static bool getDisplayEnemyStats() { return displayEnemyStats; }
 	static void setDisplayEnemyStats(const bool value) { displayEnemyStats = value; }
+	static bool getEnableAiBattles() { return enableAiBattles; }
+	static void setEnableAiBattles(const bool value) { enableAiBattles = value; }
+	static int getAiBattleFrequency() { return aiBattleFrequency; }
+	static void setAiBattleFrequency(const int value) { aiBattleFrequency = value; }
 	static DWORD getColor() { return (static_cast<uint32_t>(0xFF) << 24) | (khakiTextRed << 16) | (khakiTextGreen << 8) | khakiTextBlue; }
 	static void setKhakiTextColor(const uint8_t red, const uint8_t green, const uint8_t blue) { khakiTextRed = red; khakiTextGreen = green; khakiTextBlue = blue; isSetKhaki = true; }
 	static int watchTowerRange;
@@ -487,6 +491,8 @@ public:
 	static int shieldWallMissileDefense;
 	static int elephantJavBonus;
 	static int elephantHitpointDamage;
+	static int isOpenGateOnStratMapActive;
+	static int aiBattleFrequency;
 	static bool hideUnknownUnitTooltips;
 	static bool eopHandleUnitCards;
 	static bool enableFamilyEventsForTeutonic;
@@ -506,7 +512,7 @@ public:
 	static uint8_t khakiTextBlue;
 	static bool isSetKhaki;
 	static bool isOpenGateOnStratMap;
-	static int isOpenGateOnStratMapActive;
+	static bool enableAiBattles;
 };
 
 struct boostLightMutex

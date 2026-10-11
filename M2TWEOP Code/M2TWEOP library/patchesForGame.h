@@ -108,6 +108,8 @@ public:
 	static int __fastcall onGetHiddenResource(const stringWithHash* name);
 	static int __fastcall onCheckHiddenResource(int id, int region);
 	static int __cdecl onGetWatchTowerRange();
+	static void __fastcall threatDebugWalls(void *settAnalyzer);
+	static int __fastcall onCallAuto(void *resolveData);
 	static void __fastcall posSpecAttackGet(formationGame* form, formationData* data, uint32_t index, vector2* outPos);
 	static uint32_t __fastcall onGetNormalPos(const formationData* data, uint32_t index);
 	static int __fastcall onGeneralSiegeBug(const generalAssault* assault);

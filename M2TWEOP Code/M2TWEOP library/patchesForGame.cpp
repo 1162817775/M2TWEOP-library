@@ -1343,7 +1343,7 @@ int patchesForGame::onCalcArrowKillChance(unitStats* stats, soldierInBattle* def
 	auto shield = defender->stats.armourStats.shield;
 	if (stats->priStats.isAP && m2tweopOptions::getApIsShieldPiercing())
 		shield >>= 1;
-	if (stats->priStats.weaponTecType == weaponTechType::missile_gunpowder)
+	if (stats->priStats.weaponTecType == weaponTechType::missile_gunpowder || stats->priStats.isShieldPiercing())
 		shield >>= 1;
 
 	if (attackDir)
@@ -3015,6 +3015,156 @@ void __stdcall patchesForGame::checkAndChangeModels()
 	f1.close();
 #endif
 	stratModelsChange::checkAndChangeStratModels();
+}
+
+struct surfaceEntry
+{
+	gameStdVector<int> walls;
+	gameStdVector<int> defenses;
+	int id;
+	float health;
+};
+
+struct weakPointEntry
+{
+	buildingBattle* building;
+	int surface;
+	gameStdVector<int> defenses;
+	float health;
+};
+
+struct defenseEntry
+{
+	buildingBattle* building;
+	gameStdVector<int> surfaces;
+	gameStdVector<int> gates;
+};
+
+struct positionEntry
+{
+	float posX;
+	float posy;
+	float dirX;
+	float dirY;
+	gameStdVector<int> dependants;
+	int priority;
+	int flags;
+};
+
+struct streetEntry
+{
+	float posX;
+	float posy;
+	float dirX;
+	float dirY;
+	positionEntry* position;
+};
+
+struct perimeterEntry
+{
+	gameStdVector<surfaceEntry> surfaces;
+	gameStdVector<weakPointEntry> weakPoints;
+	gameStdVector<defenseEntry> defenses;
+	gameStdVector<streetEntry> streets;
+	int breaches;
+	int defAvailable;
+	int manned;
+	int neutralized;
+};
+
+struct analyzerWeakPoint
+{
+	float threat;
+	weakPointEntry* entry;
+};
+
+struct analyzerSurface
+{
+	float threat;
+	surfaceEntry* entry;
+};
+
+struct analyzerStreet
+{
+	streetEntry* entry;
+	float threat;
+};
+
+struct analyzerArty
+{
+	float posX;
+	float posY;
+	uint8_t flags;
+	uint8_t pad[3];
+};
+
+struct defenseThreat
+{
+	unit* unit;
+	siegeEngine* engine;
+};
+
+struct defenseAnalyzerPerimeter
+{
+	gameStdVector<defenseThreat> threats;
+	float enemyMeleeStr;
+	float enemyMissileStr;
+	float enemyMeleeProportion;
+	float enemyStr;
+	float allyMeleeStr;
+	float allyMissileStr;
+	float allyMeleeProportion;
+	float allyStr;
+	float friendlyMeleeStr;
+	float friendlyMissileStr;
+	float friendlyMeleeProportion;
+	float friendlyStr;
+	gameStdVector<analyzerWeakPoint> breaches;
+	gameStdVector<analyzerWeakPoint> assaults;
+	gameStdVector<analyzerSurface> surfaces;
+	gameStdVector<analyzerStreet> streets;
+	gameStdVector<analyzerArty> artillery;
+};
+
+struct settlementAnalyzer
+{
+	gameStdVector<defenseAnalyzerPerimeter> perimeters;
+	float allyStr;
+	float allyMeleeStr;
+	float enemyStr;
+	float enemyMeleeStr;
+	float friendlyStr;
+	float friendlyMeleeStr;
+	float plazaThreat;
+	bool  inSettlement;
+	int  ticks;
+	battleResidence* residence;
+	battleAI* battleAi;
+};
+
+
+void patchesForGame::threatDebugWalls(void *perimeter)
+{
+	const auto analyzer = static_cast<defenseAnalyzerPerimeter*>(perimeter);
+	
+	for (int i = 0; i < analyzer->breaches.size(); ++i)
+	{
+		const auto breach = analyzer->breaches[i];
+		
+		if(breach.threat < 1e-3f || !breach.entry)
+			break;
+	}
+}
+
+int __fastcall patchesForGame::onCallAuto(void* resolveData)
+{
+	if (const auto campaign = campaignHelpers::getCampaignData(); campaign->turnNumber == 0 || !campaign->setupAiBattle())
+	{
+		
+		GAME_FUNC(void(__thiscall*)(void*, bool), autoResolveHandler)(resolveData, true);
+		return 0;
+	}
+	return 1;
 }
 
 void __stdcall patchesForGame::battleLoaded()

@@ -256,6 +256,37 @@ characterRecord* campaign::worldwideAncillaryExists(const std::string& ancName)
 	return nullptr;
 }
 
+namespace 
+{
+	int AI_BATTLE_COUNTER = 0;
+}
+static int aiBattleFrequency = 1;
+static bool enableAiBattles = true;
+
+bool campaign::setupAiBattle()
+{
+	const auto battleData = battleHelpers::getBattleData();
+	if (const auto army1 = &battleData->sides[0].armies[0]; !army1 || !army1->stack || army1->stack->isAdmiral)
+		return false;
+	if (enableAiBattles)
+	{
+		AI_BATTLE_COUNTER++;
+		if (AI_BATTLE_COUNTER >= aiBattleFrequency)
+		{
+			gameHelpers::logStringGame("setup ai battle");
+			isPaused = true;
+			battleData->playerArmyNum = 0;
+			GAME_FUNC(void(__thiscall*)(float*, bool), setupBattleTime)(&currentDate, battleData->isNightBattle);
+			const auto gameData = gameHelpers::getGameDataAll();
+			GAME_FUNC(void(__thiscall*)(void*, int), transitionToBattle)(gameData->stratMapGameHandler, 0);
+			AI_BATTLE_COUNTER = 0;
+			return true;
+		}
+		gameHelpers::logStringGame("skip ai battle");
+	}
+	return false;
+}
+
 void campaign::setDipStance(const campaignEnums::DipRelEnum dipType, const factionStruct* fac1, const factionStruct* fac2)
 {
 	using namespace campaignEnums;

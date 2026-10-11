@@ -694,6 +694,7 @@ public:
 			return nullptr;
 		return fortsArray[index];
 	}
+	bool setupAiBattle();
 	portBuildingStruct* getPort(int index)
 	{
 		if (index < 0 || index >= portsBuildingsNum)

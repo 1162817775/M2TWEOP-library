@@ -1047,6 +1047,7 @@ namespace factionHelpers
 		@tfield setFactionBanner setFactionBanner
 		@tfield setLeader setLeader
 		@tfield setCapital setCapital
+		@tfield deleteWatchtower deleteWatchtower
 
 		@table factionStruct
 		*/

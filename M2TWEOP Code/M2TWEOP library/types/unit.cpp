@@ -869,24 +869,25 @@ namespace unitActions
         unitUseSpecialAbility(const unit* un) : thisUnit(un) {}
     };
     
-    void useSpecialAbility(const unit* un, bool heroOnly)
+    bool useSpecialAbility(const unit* un, const bool heroOnly)
     {
         if (un == nullptr)
-            return;
+            return false;
     	const heroAbility* ability = nullptr;
     	if (un->generalInfo)
     		ability = un->generalInfo->ability;
     	if (!ability && heroOnly)
-			return;
+			return false;
     	if (ability)
     	{
 		    if (ability->usesLeft > 0 && ability->abilityTimer > 0)
-				return;
+				return false;
     		if (heroOnly && ability->usesLeft == 0)
-				return;
+				return false;
     	}
         const auto order = std::make_shared<unitUseSpecialAbility>(un);
         gameHelpers::fireGameScriptFunc(order.get(), codes::offsets.useSpecialAbility);
+    	return true;
     }
 
     /*----------------------------------------------------------------------------------------------------------------*\
@@ -1950,6 +1951,11 @@ void luaPlugin::initUnits()
 	@tfield unitAiGroupData aiGroupData
 	@tfield int nearbyFriendlyUnitsNum
 	@tfield int nearbyEnemyUnitsNum
+	@tfield generalBattleStruct officer1
+	@tfield generalBattleStruct officer2
+	@tfield generalBattleStruct officer3
+	@tfield generalBattleStruct generalInfo
+	@tfield generalBattleStruct generalArmy
 	@tfield settlementStruct retrainingSettlement
 	@tfield unitGroup unitGroup
 	@tfield int fatigue (battle)
@@ -2003,6 +2009,7 @@ void luaPlugin::initUnits()
 	@tfield isFiring isFiring
 	@tfield isIdle isIdle
 	@tfield unitStats unitStats
+	@tfield destroy destroy
 
 	@table unit
 	*/
@@ -2046,6 +2053,11 @@ void luaPlugin::initUnits()
 	types.unit.set("battlePosX", &unit::positionX);
 	types.unit.set("battlePosZ", &unit::positionZ);
 	types.unit.set("battlePosY", &unit::positionY);
+	types.unit.set("officer1", &unit::officer1);
+	types.unit.set("officer2", &unit::officer2);
+	types.unit.set("officer3", &unit::officer3);
+	types.unit.set("generalInfo", &unit::generalInfo);
+	types.unit.set("generalArmy", &unit::generalArmy);
 	types.unit.set("angle", sol::property(&unit::getUnitAngle, &unit::setUnitAngle));
 	types.unit.set("unitGroup", &unit::unitGroup);
 	types.unit.set("fatigue", &unit::fatigue);
@@ -2293,8 +2305,9 @@ void luaPlugin::initUnits()
 	Makes the unit perform their special ability.
 	@function unit:useSpecialAbility
 	@tparam bool heroOnly
+	@treturn bool success
 	@usage
-		unit:useSpecialAbility();
+		local fired = unit:useSpecialAbility(true);
 	*/
 	types.unit.set_function("useSpecialAbility", &unitActions::useSpecialAbility);
 	/***
@@ -3189,6 +3202,7 @@ void luaPlugin::initUnits()
 	@tfield bool isSpearBonus8
 	@tfield bool isSpearBonus6
 	@tfield bool isSpearBonus4
+	@tfield bool isShieldPiercing
 	@tfield int attack
 	@tfield int charge
 	@tfield int ammo
@@ -3235,6 +3249,7 @@ void luaPlugin::initUnits()
 	types.attackStats.set("soundType", &statPri::soundType);
 	types.attackStats.set("minAttackDelayPri", &statPri::minAttackDelayPri);
 	types.attackStats.set("weaponFX", &statPri::weaponFX);
+	types.attackStats.set("isShieldPiercing", sol::property(&statPri::isShieldPiercing, &statPri::setIsShieldPiercing));
 		
 	/***
 	@tfield bool isValid

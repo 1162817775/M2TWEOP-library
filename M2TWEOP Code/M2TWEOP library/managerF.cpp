@@ -1174,6 +1174,18 @@ void managerF::execPatches()
 	toExchangeWithCharacter->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onCallAuto patch" << '\n';
+	onCallAuto* toCallAuto = new onCallAuto(mem, (LPVOID)patchesForGame::onCallAuto, globals::dataS.gameVersion);
+	toCallAuto->SetNewCode();
+	toCallAuto->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onCallAutoSett patch" << '\n';
+	onCallAutoSett* toCallAutoSett = new onCallAutoSett(mem, (LPVOID)patchesForGame::onCallAuto, globals::dataS.gameVersion);
+	toCallAutoSett->SetNewCode();
+	toCallAutoSett->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying onHiddenResourceConditionParse patch" << '\n';
 	onHiddenResourceConditionParse* toHiddenResourceConditionParse = new onHiddenResourceConditionParse(mem, (LPVOID)patchesForGame::onGetHiddenResource, globals::dataS.gameVersion);
 	toHiddenResourceConditionParse->SetNewCode();

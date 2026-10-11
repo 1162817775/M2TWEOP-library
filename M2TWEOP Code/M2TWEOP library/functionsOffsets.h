@@ -167,6 +167,7 @@ public:
 
 
 		DWORD autoResolveFunc = NULL;
+		DWORD autoResolveHandler = NULL;
 
 
 		DWORD useButtonFunc = NULL;
@@ -321,6 +322,8 @@ public:
 		DWORD mergeArmies = NULL;
 		DWORD stopBlockade = NULL;
 		DWORD stopSiege = NULL;
+		DWORD setupBattleTime = NULL;
+		DWORD transitionToBattle = NULL;
 		DWORD addToSettlement = NULL;
 		DWORD addToFort = NULL;
 		DWORD ungarrisonResidence = NULL;

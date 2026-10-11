@@ -6864,6 +6864,76 @@ void onExchangeWithCharacter::SetNewCode()
 	delete a;
 }
 
+
+onCallAuto::onCallAuto(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x61D440;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x61D090;
+}
+
+void onCallAuto::SetNewCode()
+{
+	const auto a = new Assembler();
+	const auto label = a->newLabel();
+	a->pop(eax);
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->test(eax, eax);
+	a->jz(label);
+	if (m_adress == 0x61D440)
+	{
+		a->mov(eax, 0x61D649);
+	}
+	else
+	{
+		a->mov(eax, 0x61D299);
+	}
+	a->jmp(eax);
+	a->bind(label);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+
+onCallAutoSett::onCallAutoSett(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x61F124;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x61ED74;
+}
+
+void onCallAutoSett::SetNewCode()
+{
+	const auto a = new Assembler();
+	const auto label = a->newLabel();
+	a->pop(eax);
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->test(eax, eax);
+	a->jz(label);
+	if (m_adress == 0x61F124)
+	{
+		a->mov(eax, 0x61F2FA);
+	}
+	else
+	{
+		a->mov(eax, 0x61EF4A);
+	}
+	a->jmp(eax);
+	a->bind(label);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
 onSetBuildPolicies::onSetBuildPolicies(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {

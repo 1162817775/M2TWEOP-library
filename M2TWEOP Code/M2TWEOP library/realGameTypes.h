@@ -10,6 +10,7 @@ typedef unsigned short ushort;
 #pragma pack(push,1)
 
 #define FLOAT_EQUAL(_a, _b) (fabs(_a - _b) < 0.0001f)
+#define SP_MAGIC_NUMBER 13371337
 
 /*----------------------------------------------------------------------------------------------------------------*\
 									Firing game function helpers
@@ -769,6 +770,14 @@ public:
 	void setAmmo(int newAmmo)
 	{
 		ammo = newAmmo & 0x7F;
+	}
+	bool isShieldPiercing()
+	{
+		return minAttackDelayPri == SP_MAGIC_NUMBER;
+	}
+	void setIsShieldPiercing()
+	{
+		minAttackDelayPri = SP_MAGIC_NUMBER;
 	}
 };
 

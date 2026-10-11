@@ -2467,6 +2467,32 @@ private:
 };
 
 
+class onCallAuto
+	:public AATemplate
+{
+public:
+	onCallAuto(MemWork* mem, LPVOID addr, int ver);
+	~onCallAuto() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+
+class onCallAutoSett
+	:public AATemplate
+{
+public:
+	onCallAutoSett(MemWork* mem, LPVOID addr, int ver);
+	~onCallAutoSett() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
+
 class onExchangeWithCharacter
 	:public AATemplate
 {

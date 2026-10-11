@@ -47,6 +47,8 @@ bool m2tweopOptions::alwaysAbortLua = false;
 bool m2tweopOptions::noMovementResetOnFlee = true;
 bool m2tweopOptions::noAiMissileLooseFormation = true;
 bool m2tweopOptions::displayEnemyStats = true;
+int m2tweopOptions::aiBattleFrequency = 2;
+bool m2tweopOptions::enableAiBattles = false;
 
 scriptCommand::scriptCommand(const char* name) : className(name)
 {
