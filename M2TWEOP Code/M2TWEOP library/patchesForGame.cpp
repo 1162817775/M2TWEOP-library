@@ -2422,12 +2422,14 @@ void __stdcall patchesForGame::onGameInit()
 	gameHelpers::setDisplayEnemyStats(m2tweopOptions::getDisplayEnemyStats());
 }
 
+eopCamera stratCamera;
 void __stdcall patchesForGame::onUnloadCampaign()
 {
 	eopRebelFactionDb::clear();
 	globalEopAiConfig::clearFactionData();
 	discordManager::menuLoaded();
 	gameEvents::onUnloadCampaign();
+	stratCamera.isInit = false;
 }
 void __stdcall patchesForGame::onNewGameLoaded()
 {
@@ -2608,6 +2610,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 	const DWORD preBattleWithdrawal = gameVersion == 1 ? 0x01366D54 : 0x01321D2C; 
 	const DWORD generalAssaultsResidence = gameVersion == 1 ? 0x0136A3E4 : 0x013253BC; 
 	const DWORD deploymentPhaseCommenced = gameVersion == 1 ? 0x01366FD4 : 0x01321FAC; 
+	const DWORD buttonPressedCode = gameVersion == 1 ? 0x013717D4 : 0x0132C7AC;
 	if (eventCode == scrollOpenedCode)
 	{
 		char* str = reinterpret_cast<char*>(vTab[1]);
@@ -2615,6 +2618,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 		{
 			battleCreator::onBattleStratScreen();
 			campaignAi::setPlayerAssaulted();
+			stratCamera.isScrollOpen = true;
 		}
 		else if (strcmp(str, "post_battle_scroll") == 0)
 		{
@@ -2870,6 +2874,16 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 	//		MessageBoxA(nullptr, "isMinorSettlement failed to verify", "Attention", NULL);
 	//	}
 	//}
+	else if (eventCode == buttonPressedCode)
+	{
+		char* str = reinterpret_cast<char*>(vTab[1]);
+		if (strcmp(str, "prebattle_fight_button") == 0)
+		{
+		//	battleDataS* battle = battleHelpers::getBattleData();
+			stratCamera.transitionToBattle();
+		//	stratCamera.setPosition(battle->xCoord, battle->yCoord);
+		}
+	}
 	
 	gameEvents::onEventWrapper(eventCode, vTab);
 }
@@ -3197,6 +3211,14 @@ minHookFunctions::t_onSetSliderState                       minHookFunctions::o_o
 minHookFunctions::t_onElementReset                         minHookFunctions::o_onElementReset = nullptr;
 minHookFunctions::t_onSetColor                             minHookFunctions::o_onSetColor = nullptr;
 minHookFunctions::t_onCreateDebugInfoText                  minHookFunctions::o_onCreateDebugInfoText = nullptr;
+minHookFunctions::t_onCharacterInfoFrameInit               minHookFunctions::o_onCharacterInfoFrameInit = nullptr;
+minHookFunctions::t_onCameraMove                           minHookFunctions::o_onCameraMove = nullptr;
+minHookFunctions::t_onCameraAction                         minHookFunctions::o_onCameraAction = nullptr;
+minHookFunctions::t_onAerialMapInit                        minHookFunctions::o_onAerialMapInit = nullptr;
+minHookFunctions::t_onAerialMapUpdate                      minHookFunctions::o_onAerialMapUpdate = nullptr;
+minHookFunctions::t_onAerialMapSetPosition                 minHookFunctions::o_onAerialMapSetPosition = nullptr;
+minHookFunctions::t_onMoveStratCameraSlow                  minHookFunctions::o_onMoveStratCameraSlow = nullptr;
+minHookFunctions::t_onZoomStratCamera                      minHookFunctions::o_onZoomStratCamera = nullptr;
 
 DWORD minHookFunctions::lastSoundClass = NULL;
 bool minHookFunctions::isUnlockWeaponLimit = false;
@@ -3224,6 +3246,8 @@ map<int, int> minHookFunctions::bufferPosY;
 unordered_map<uint32_t, rgba> minHookFunctions::rgbaColors;
 bool minHookFunctions::isDebugInfoOpen = false;
 string minHookFunctions::debugInfoText = "debug";
+direct3DTextureStruct* minHookFunctions::rememberTextures = NULL;
+bool minHookFunctions::isEopCameraEnable = false;
 
 
 MH_STATUS minHookFunctions::hook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal, string function)
@@ -3277,6 +3301,14 @@ void minHookFunctions::init()
 	MIN_HOOK(a_onElementReset,                         onElementReset,                         o_onElementReset);
 	MIN_HOOK(a_onSetColor,                             onSetColor,                             o_onSetColor);
 	MIN_HOOK(a_onCreateDebugInfoText,                  onCreateDebugInfoText,                  o_onCreateDebugInfoText);
+//	MIN_HOOK(a_onCharacterInfoFrameInit,               onCharacterInfoFrameInit,               o_onCharacterInfoFrameInit);
+	MIN_HOOK(a_onCameraMove,                           onCameraMove,                           o_onCameraMove);
+	MIN_HOOK(a_onCameraAction,                         onCameraAction,                         o_onCameraAction);
+	MIN_HOOK(a_onAerialMapInit,                        onAerialMapInit,                        o_onAerialMapInit);
+	MIN_HOOK(a_onAerialMapUpdate,                      onAerialMapUpdate,                      o_onAerialMapUpdate);
+	MIN_HOOK(a_onAerialMapSetPosition,                 onAerialMapSetPosition,                 o_onAerialMapSetPosition);
+	MIN_HOOK(moveStratCameraSlowFunc,                  onMoveStratCameraSlow,                  o_onMoveStratCameraSlow);
+	MIN_HOOK(zoomStratCameraFunc,                      onZoomStratCamera,                      o_onZoomStratCamera);
 }
 
 int __thiscall minHookFunctions::debugLineAdd(void* _this, vector3* start, vector3* end, color8888 color, float time, bool zbuffered)
@@ -3906,6 +3938,210 @@ UNICODE_STRING**& __thiscall minHookFunctions::onCreateDebugInfoText(UNICODE_STR
 	return result;
 }
 
+void __thiscall minHookFunctions::onCharacterInfoFrameInit(characterInfoFrame* _this, characterRecord& nc, int param_3, int param_4, int param_5)
+{
+	o_onCharacterInfoFrameInit(_this, nc, param_3, param_4, param_5);
+	log("onCharacterInfoFrameInit: nc: " + string(nc.fullName) + ", portrait: " + string(_this->details->img->texturePath));
+	rememberTextures = _this->textures;
+}
+
+/////////////////////////
+///===== CAMERA ======///
+/////////////////////////
+
+void __thiscall minHookFunctions::onCameraMove(void* _this, vector3* camPos, vector3* camTarget, bool some)
+{
+	//Disable the EOP camera during camera initialization on the tactic map.
+	if (stratCamera.isBattle && camTarget->x == 0.0f && camTarget->y == 0.0f && camTarget->z == 0.0f)
+	{
+		stratCamera.isInit = false;
+		return o_onCameraMove(_this, camPos, camTarget, some);
+	}
+
+	if (!stratCamera.isInit)
+		return o_onCameraMove(_this, camPos, camTarget, some);
+
+	if (ImGui::IsKeyDown(ImGuiKey_Keypad7))
+		stratCamera.rotate(_this, -1.0f);
+	else if (ImGui::IsKeyDown(ImGuiKey_Keypad9))
+		stratCamera.rotate(_this, 1.0f);
+
+	if (ImGui::IsKeyDown(ImGuiKey_KeypadSubtract))
+		stratCamera.zoom(1.0f);
+	else if (ImGui::IsKeyDown(ImGuiKey_KeypadAdd))
+		stratCamera.zoom(-1.0f);
+
+	else if (ImGui::IsKeyDown(ImGuiKey_Keypad8))
+		return stratCamera.reset(true);
+
+	if (stratCamera.isRotated)
+		return;
+
+	stratCamera.set(*camPos, *camTarget);
+	o_onCameraMove(_this, camPos, camTarget, some);
+}
+
+void __thiscall minHookFunctions::onCameraAction(void* _this, cameraState action, float speed)
+{
+	if (!stratCamera.isInit || stratCamera.isBattle)
+		return o_onCameraAction(_this, action, speed);
+
+	switch (action)
+	{
+		case rotateLeft:
+		{
+			stratCamera.moveX(-1.0f);
+			break;
+		}
+		case rotateRight:
+		{
+			stratCamera.moveX(1.0f);
+			break;
+		}
+		case rotateUp:
+		{
+			stratCamera.moveY(1.0f);
+			break;
+		}
+		case rotateDown:
+		{
+			stratCamera.moveY(-1.0f);
+			break;
+		}
+		case stepLeft:
+		{
+			stratCamera.moveX(-1.0f);
+			break;
+		}
+		case stepRight:
+		{
+			stratCamera.moveX(1.0f);
+			break;
+		}
+		case stepFwd:
+		{
+			stratCamera.moveY(1.0f);
+			break;
+		}
+		case stepBack:
+		{
+			stratCamera.moveY(-1.0f);
+			break;
+		}
+	}
+	o_onCameraAction(_this, action, speed);
+}
+
+int* __thiscall minHookFunctions::onAerialMapInit(int* _this, vector3* maxHeightVec, float maxHeight)
+{
+	int* result = o_onAerialMapInit(_this, maxHeightVec, maxHeight);
+
+	stratCamera.isInit = isEopCameraEnable;
+	//When returning from the tactic to the strategy map, set the coordinates that were in effect prior to calling `transitionToBattle`.
+	//This will also work if load a save from the tactic (for example, during a naval battle script).
+	if (stratCamera.isInit && stratCamera.isBattle)
+	{
+		stratCamera.isBattle = false;
+		stratCamera.reset(false);
+		stratCamera.resetPos();
+	}
+	//When loading a save, the camera resets to the default position, without rotation.
+	//But in the future, it might be possible to save the coordinates in the save file and restore them when loading the save.
+	else if (stratCamera.isInit)
+		stratCamera.reset(false);
+	else if (!stratCamera.isInit)
+		return result;
+
+	if (stratCamera.camLog)
+		log("onAerialMapInit start: result[5]: " + to_string(result[5]) + ", result[4]: " + to_string(result[4]) + ", result[6]: " + to_string(result[6]) + ", result[7]: " + to_string(result[7]) + ", result[8]: " + to_string(result[8]) + ", result[9]: " + to_string(result[9]));
+
+	//Slightly increase the rendering area of aerialMap.
+	result[5] *= 1.5;
+	result[4] *= 1.5;
+	result[6] *= 1.5;
+	result[7] *= 1.5;
+	result[8] *= 1.5;
+	result[9] *= 1.5;
+
+	if (stratCamera.camLog)
+		log("onAerialMapInit end: result[5]: " + to_string(result[5]) + ", result[4]: " + to_string(result[4]) + ", result[6]: " + to_string(result[6]) + ", result[7]: " + to_string(result[7]) + ", result[8]: " + to_string(result[8]) + ", result[9]: " + to_string(result[9]));
+
+	return result;
+}
+
+bool __thiscall minHookFunctions::onAerialMapUpdate(int _this, bool full)
+{
+	if (stratCamera.isInit && (stratCamera.isMove || stratCamera.isRotated))
+	{
+		//The camera coordinates and the AerialMap need to match.
+		coordPair coords = stratCamera.getAerialMapXY();
+		*(int*)(_this + 0x11bc) = coords.xCoord; //aerialMapX
+		*(int*)(_this + 0x11c0) = coords.yCoord; //aerialMapY
+	}
+	return o_onAerialMapUpdate(_this, full);
+}
+
+//Lua, script commands: M2TW.stratMap.jumpCamera, "snap_strat_camera"
+void __thiscall minHookFunctions::onAerialMapSetPosition(int _this, int x, int y)
+{
+	o_onAerialMapSetPosition(_this, x, y);
+	//Update the camera coordinates when the AerialMap coordinates change (for example, upon clicking the minimap).
+	stratCamera.setPosition(x, y);
+}
+
+//Lua, script commands: M2TW.stratMap.moveCamera, "move_strat_camera"
+void __cdecl minHookFunctions::onMoveStratCameraSlow(int x, int y)
+{
+	if (!stratCamera.isInit)
+		return o_onMoveStratCameraSlow(x, y);
+	stratCamera.targetX   = static_cast<float>(x);
+	stratCamera.targetY   = static_cast<float>(y);
+	stratCamera.isMove    = true;
+	stratCamera.isRotated = false;
+}
+
+//Lua, script, console commands: M2TW.stratMap.zoomCamera, "zoom_strat_camera", "zoom"
+void __cdecl minHookFunctions::onZoomStratCamera(float target)
+{
+	if (!stratCamera.isInit)
+		return o_onZoomStratCamera(target);
+	stratCamera.targetZ   = min(max(target, 0.2f), 1.08f);
+	stratCamera.isMove    = true;
+	stratCamera.isRotated = false;
+}
+
+void minHookFunctions::stratCameraMouseWheel()
+{
+	if (!stratCamera.isInit || stratCamera.isBattle || !stratMapHelpers::isStratMap() || graphicsD3D::dataS.ifMouseOrKeyBoardAtImgui)
+		return;
+
+	if (ImGui::GetIO().MouseWheel > 0.0f)
+	{
+		stratCamera.zoom(-2.0f);
+	}
+	else if (ImGui::GetIO().MouseWheel < 0.0f)
+	{
+		stratCamera.zoom(2.0f);
+	}
+}
+
+void minHookFunctions::enableEopCamera(bool set, float speedRotate, float speedMove, float speedZoom, bool toBattle)
+{
+	isEopCameraEnable       = set;
+	stratCamera.speedRotate = speedRotate;
+	stratCamera.speedMove   = speedMove;
+	stratCamera.speedZoom   = speedZoom;
+	stratCamera.toBattle    = toBattle;
+	if (stratMapHelpers::isStratMap())
+		stratCamera.isInit = set;
+}
+
+void minHookFunctions::transitionToBattle(const int x, const int y)
+{
+	stratCamera.transitionToBattle();
+	stratCamera.setPosition(x, y);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// CALL GAME FUNCTIONS /////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3967,6 +4203,69 @@ void minHookFunctions::setAdvancedSettlementInfoScrollFrameSize(int width, int h
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////// TESTS ////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Fix broken army:   
+//In my mod, I encountered an issue where the Scottish army was listed in the slave' army array, causing a fatal crash. 
+//This fix solved the problem for me. I'll leave this here for now—it might come in handy—and delete it later.
+static bool checkFactionArmy(armyStruct* targetArmy, int x, int y)
+{
+	campaign* camp = gameHelpers::getGameDataAll()->campaignStruct;
+	for (int f = 0; f < camp->factionCount; f++)
+	{
+		factionStruct* faction = camp->factionsSortedByTurnOrder[f];
+		for (int a = 0; a < faction->stackNum; a++)
+		{
+			armyStruct* army = faction->armies[a];
+			if (targetArmy == army && targetArmy->faction == faction)
+			{
+				return true;
+			}
+			else if (targetArmy == army && targetArmy->faction != faction)
+			{
+				minHookFunctions::log(
+					"checkFactionArmy: army fix start(coords: " + to_string(x) + "," + to_string(y) + 
+					" | real army faction: " + string(targetArmy->faction->factionRecord->facName)  + ", stackNum: " + to_string(targetArmy->faction->stackNum) + 
+					" | bug army faction: "  + string(faction->factionRecord->facName)              + ", stackNum: " + to_string(faction->stackNum)             +
+				")");
+
+				GAME_FUNC_RAW(void(__thiscall*)(factionStruct*, armyStruct*, factionStruct*), 0x004f4520)(faction, targetArmy, targetArmy->faction);//armySwitchFaction //disk   
+
+				minHookFunctions::log(
+					"checkFactionArmy: army fix end(coords: " + to_string(x) + "," + to_string(y) + 
+					" | real army faction: " + string(targetArmy->faction->factionRecord->facName)  + ", stackNum: " + to_string(targetArmy->faction->stackNum) + 
+					" | bug army faction: "  + string(faction->factionRecord->facName)              + ", stackNum: " + to_string(faction->stackNum)             +
+				")");
+
+				return true;
+			}
+		}
+	}
+	return false;
+}
+static void checkRegionsArmies()
+{
+	stratMap* map = stratMapHelpers::getStratMap();
+	if (!map || !map->isOpen)
+		return;
+
+	for (int r = 0; r < map->regionsNum; r++)
+	{
+		auto region = &map->regions[r];
+
+		for (int a = 0; a < region->stacksNum; a++)
+		{
+			armyStruct* army = region->armies[a];
+
+			int x = army->getX(); 
+			int y = army->getY();
+			if (army && !checkFactionArmy(army, x, y))
+			{
+				minHookFunctions::log("checkRegionsArmies: army not found(coords: " + to_string(x) + "," + to_string(y) + " | army: " + minHookFunctions::pointerToString(army) + ", | faction->stackNum: " + to_string(army->faction->stackNum) + ")");
+			}
+		}
+
+	}
+}
 
 int buffer_sound = 0;
 int buffer_line = 3;
@@ -4145,15 +4444,6 @@ void minHookFunctions::draw()
 			onPlayCharacterVoice(buffer_sound, character, false);
 		}
 	}
-//	if (advancedSettlementInfoScrollClass && advancedSettlementInfoScrollClass->elements && advancedSettlementInfoScrollClass->elements->frame)
-//	{
-//		ImGui::Text("setAdvancedSettlementInfoScrollFrameSize");
-//		ImGui::PushItemWidth(100);
-//		ImGui::InputInt("width",  &advancedSettlementInfoScrollClass->elements->frame->width);
-//		ImGui::SameLine();
-//		ImGui::InputInt("height", &advancedSettlementInfoScrollClass->elements->frame->height);
-//		ImGui::PopItemWidth();
-//	}
 	ImGui::InputInt("line", &buffer_line);
 	if (ImGui::Button("setMercenariesNumberOfLines"))
 	{
@@ -4163,17 +4453,22 @@ void minHookFunctions::draw()
 	{
 		gameHelpers::setMercsScrollParameters(14, 7, 4, 2, 142);
 	}
-
-	ImGui::InputInt("unit in stack", &buffer_line);
-	if (ImGui::Button("onUnitDestroy"))
+	if (ImGui::Button("FIX/kill checkRegionsArmies()"))
 	{
-		if (auto ch = gameHelpers::getGameDataAll()->selectInfo->getSelectedCharacter(); ch && ch->army)
-		{
-			unit* un = ch->army->getUnit(buffer_line);
-			onUnitDestroy(ch->army, un);
-		//	onUnitDestroy(ch->army, un, un->general);
-		}
+		checkRegionsArmies();
 	}
+	if (rememberTextures)
+	{
+		ImGui::Image(rememberTextures->getGameTexture(1), ImVec2(500, 500));
+	//	ImGui::Image(rememberTextures->getGameTexture(2), ImVec2(500, 500));
+	//	ImGui::Image(rememberTextures->getGameTexture(3), ImVec2(500, 500));
+	//	ImGui::Image(rememberTextures->getGameTexture(4), ImVec2(500, 500));
+	//	ImGui::Image(rememberTextures->getGameTexture(5), ImVec2(500, 500));
+	}
+
+	ImGui::Checkbox("stratCamera.camLog", &stratCamera.camLog);
+	ImGui::Checkbox("stratCamera.isInit", &stratCamera.isInit);
+	ImGui::Checkbox("isEopCameraEnable" , &isEopCameraEnable);
 
 	/////////////////////////////////////////////////////////////////////////////////
 

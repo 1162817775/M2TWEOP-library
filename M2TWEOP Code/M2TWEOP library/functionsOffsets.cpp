@@ -65,7 +65,16 @@ void codes::initCodes(int gameVer)
 		offsets.moveStratCameraSlowFunc = 0x0098d940;
 		offsets.moveStratCameraFastFunc = 0x0098d4b0;
 		offsets.zoomStratCameraFunc = 0x0098d6a0;
-		
+		offsets.a_onCameraMove = 0x008f8380;
+		offsets.a_onCameraAction = 0x00958050;
+		offsets.a_onAerialMapInit = 0x0097dd10;
+		offsets.a_onAerialMapUpdate = 0x00987a20;
+		offsets.a_onAerialMapSetPosition = 0x00982280;
+		offsets.rotateStratCamera = 0x008f6500;
+		offsets.updateTime = 0x00420870;
+		offsets.cameraPosition = 0x01986698;
+		offsets.cameraTarget = 0x01986714;
+
 		offsets.createCadAttackFortFunc = 0x005B5950;
 		offsets.createCadAssaultFortFunc = 0x005B5B90;
 		offsets.createCadSiegeFortFunc = 0x005B5A70;
@@ -439,6 +448,7 @@ void codes::initCodes(int gameVer)
 		offsets.a_onUnitDestroy = 0x00714090;
 		offsets.a_onSetColor = 0x00f1c750;
 		offsets.a_onCreateDebugInfoText = 0x00f01070;
+		offsets.a_onCharacterInfoFrameInit = 0x00bf1380;
 	}
 
 
@@ -504,7 +514,16 @@ void codes::initCodes(int gameVer)
 		offsets.moveStratCameraSlowFunc = 0x0098e4c0;
 		offsets.moveStratCameraFastFunc = 0x0098e030;
 		offsets.zoomStratCameraFunc = 0x0098e220;
-		
+		offsets.a_onCameraMove = 0x008f8e00;
+		offsets.a_onCameraAction = 0x00958b20;
+		offsets.a_onAerialMapInit = 0x0097e890;
+		offsets.a_onAerialMapUpdate = 0x009885a0;
+		offsets.a_onAerialMapSetPosition = 0x00982e00;
+		offsets.rotateStratCamera = 0x008f6f80;
+		offsets.updateTime = 0x00420ba0;
+		offsets.cameraPosition = 0x0193d538;
+		offsets.cameraTarget = 0x0193d5c4;
+
 		offsets.createCadAttackFortFunc = 0x005B5E30;
 		offsets.createCadAssaultFortFunc = 0x005B6070;
 		offsets.createCadSiegeFortFunc = 0x005B5F50;
@@ -881,5 +900,6 @@ void codes::initCodes(int gameVer)
 		offsets.a_onUnitDestroy = 0x00714790;
 		offsets.a_onSetColor = 0x00f1cdc0;
 		offsets.a_onCreateDebugInfoText = 0x00f01640;
+		offsets.a_onCharacterInfoFrameInit = 0x00beb710;
 	}
 }

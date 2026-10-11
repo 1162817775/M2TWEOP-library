@@ -679,6 +679,7 @@ namespace gameHelpers
 	void setRgbaTextColor(sol::table targetColor, sol::table newColor);
 	void enableDebugInfo(bool main, bool battle, int8_t terrain);
 	void drawDebugInfo();
+	void enableEopCamera(bool set, float speedRotate, float speedMove, float speedZoom, bool toBattle);
 
 	religionDatabase* getReligionDatabase();
 	gameDataAllStruct* getGameDataAll();

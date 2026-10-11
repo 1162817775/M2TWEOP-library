@@ -19,6 +19,7 @@
 #include "fort.h"
 #include "globals.h"
 #include "tilesChange.h"
+#include <patchesForGame.h>
 
 extentColor extentColors::m_Own =         { 0   , 0xFF, 0x20, 0x28, 0xFF };
 extentColor extentColors::m_Enemy =       { 0xFF, 0xFF, 0   , 0x28, 0xFF };
@@ -1111,6 +1112,7 @@ namespace stratMapHelpers
 	void viewTacticalMap(const int x, const int y)
 	{
 		globals::dataS.Modules.tacticalMapViewer.view(x, y);
+		minHookFunctions::transitionToBattle(x, y);
 	}
 
 	float getGroundTypeMoveCost(const int groundType)
