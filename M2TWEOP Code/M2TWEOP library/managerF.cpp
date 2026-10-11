@@ -1168,6 +1168,12 @@ void managerF::execPatches()
 	toGetSpecPos->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onChooseCaptainUnit patch" << '\n';
+	onChooseCaptainUnit* toChooseCaptainUnit = new onChooseCaptainUnit(mem, (LPVOID)patchesForGame::chooseCaptainUnit, globals::dataS.gameVersion);
+	toChooseCaptainUnit->SetNewCode();
+	toChooseCaptainUnit->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying onExchangeWithCharacter patch" << '\n';
 	onExchangeWithCharacter* toExchangeWithCharacter = new onExchangeWithCharacter(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
 	toExchangeWithCharacter->SetNewCode();

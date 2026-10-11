@@ -325,6 +325,8 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield setEnemyArmyUnitsScrollParameters setEnemyArmyUnitsScrollParameters 
 	@tfield setRgbaTextColor setRgbaTextColor 
 	@tfield enableDebugInfo enableDebugInfo 
+	@tfield enableEopCamera enableEopCamera 
+	@tfield viewTacticalMap viewTacticalMap 
 	@table M2TWEOP
 	*/
 	

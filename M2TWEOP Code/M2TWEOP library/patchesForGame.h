@@ -144,6 +144,7 @@ public:
 	static int __fastcall onCanWithdrawPreBattle(const settlementStruct* settlement);
 	static int __cdecl onCalcArrowKillChance(unitStats* stats, soldierInBattle* defender, int16_t angle, int* dir, float heightDiff, int bonus);
 	static int __fastcall onCalculateCommand(const characterRecord* general);
+	static int __fastcall chooseCaptainUnit(armyStruct* army);
 	static void __fastcall onRemoveFromUnitQueue(const unitRQ* queue, int index);
 	static void __fastcall onLoadModelRigid(model_Rigid* model);
 	static void __fastcall onUnloadModels();

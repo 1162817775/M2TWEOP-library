@@ -1626,6 +1626,57 @@ void patchesForGame::onAttachRegionSettlement(settlementStruct* sett, int region
 	}
 }
 
+int patchesForGame::chooseCaptainUnit(armyStruct* army)
+{
+	if (const auto battle = battleHelpers::getBattleData(); !battle || battle->battleCampaignType == 2)
+		return 0;
+	
+	int bestUnit = -1;
+	int bestBackupUnit = -1;
+	int bestMercUnit = -1;
+	float bestUnitValue = 0.f;
+	float bestBackupUnitValue = 0.f;
+	float bestMercUnitValue = 0.f;
+	
+	for (int i = 0; i < army->numOfUnits; ++i)
+	{
+		const auto un = army->units[i];
+		if (un->eduEntry->generalUnit || un->eduEntry->generalUnitUpgrade)
+		{
+			return i;
+		}
+		const auto value = un->eduEntry->aiUnitValue;
+		const auto valuePerSoldier = un->eduEntry->aiUnitValuePerSoldier;
+		if (!un->eduEntry->mercenaryUnit && (!un->eduEntry->mount || un->eduEntry->mount->mountClass != mountClass::elephant))
+		{
+			if (valuePerSoldier > bestUnitValue 
+				&& ((static_cast<float>(un->SoldierCountStrat) / static_cast<float>(un->SoldierCountMaxStrat)) > 0.5f))
+			{
+				bestUnitValue = valuePerSoldier;
+				bestUnit = i;
+			}
+			if (value > bestBackupUnitValue)
+			{
+				bestBackupUnit = i;
+				bestBackupUnitValue = value;
+			}
+		}
+		else if (value > bestMercUnitValue)
+		{
+			bestMercUnitValue = value;
+			bestMercUnit = i;
+		}
+	}
+	
+	if (bestUnitValue > 0)
+		return bestUnit;
+	if (bestBackupUnit > 0)
+		return bestBackupUnit;
+	if (bestMercUnitValue > 0)
+		return bestMercUnit;
+	return 0;
+}
+
 int patchesForGame::onGetTrueBuildingCapabilities(const int counter, const stackCapabilities* cap)
 {
 	if (counter < 32)
@@ -4356,7 +4407,7 @@ void minHookFunctions::setAdvancedSettlementInfoScrollFrameSize(int width, int h
 
 //Fix broken army:   
 //In my mod, I encountered an issue where the Scottish army was listed in the slave' army array, causing a fatal crash. 
-//This fix solved the problem for me. I'll leave this here for now—it might come in handy—and delete it later.
+//This fix solved the problem for me. I'll leave this here for nowï¿½it might come in handyï¿½and delete it later.
 static bool checkFactionArmy(armyStruct* targetArmy, int x, int y)
 {
 	campaign* camp = gameHelpers::getGameDataAll()->campaignStruct;

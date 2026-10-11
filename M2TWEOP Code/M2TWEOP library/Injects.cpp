@@ -6934,6 +6934,29 @@ void onCallAutoSett::SetNewCode()
 	delete a;
 }
 
+onChooseCaptainUnit::onChooseCaptainUnit(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x70FBC0;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x70F4D0;
+}
+
+void onChooseCaptainUnit::SetNewCode()
+{
+	const auto a = new Assembler();
+	const auto jumpAddr = m_adress + 0x1D;
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->mov(ecx, jumpAddr);
+	a->jmp(ecx);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
 onSetBuildPolicies::onSetBuildPolicies(MemWork* mem, LPVOID addr, int ver)
 	:AATemplate(mem), funcAddress(addr)
 {

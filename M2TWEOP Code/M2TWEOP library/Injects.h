@@ -2492,6 +2492,18 @@ private:
 	LPVOID funcAddress;
 };
 
+class onChooseCaptainUnit
+	:public AATemplate
+{
+public:
+	onChooseCaptainUnit(MemWork* mem, LPVOID addr, int ver);
+	~onChooseCaptainUnit() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 
 class onExchangeWithCharacter
 	:public AATemplate
