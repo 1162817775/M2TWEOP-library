@@ -260,18 +260,16 @@ namespace
 {
 	int AI_BATTLE_COUNTER = 0;
 }
-static int aiBattleFrequency = 1;
-static bool enableAiBattles = true;
 
 bool campaign::setupAiBattle()
 {
 	const auto battleData = battleHelpers::getBattleData();
 	if (const auto army1 = &battleData->sides[0].armies[0]; !army1 || !army1->stack || army1->stack->isAdmiral)
 		return false;
-	if (enableAiBattles)
+	if (m2tweopOptions::getEnableAiBattles())
 	{
 		AI_BATTLE_COUNTER++;
-		if (AI_BATTLE_COUNTER >= aiBattleFrequency)
+		if (AI_BATTLE_COUNTER >= m2tweopOptions::getAiBattleFrequency())
 		{
 			gameHelpers::logStringGame("setup ai battle");
 			isPaused = true;
