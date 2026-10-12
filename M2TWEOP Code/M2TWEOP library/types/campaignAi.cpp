@@ -1574,6 +1574,7 @@ void globalEopAiConfig::characterTurnStart(character* currentChar, bool turnStar
 		return;
 	bool used = false;
 	const auto moveData = currentChar->createMoveData(static_cast<int>(searchType::avoidZoc), 1);
+	bool movedDamaged = false;
 	for (const auto& nearSett : moveData->settlements)
 	{
 		if (!nearSett.settlement->faction)
@@ -1588,6 +1589,32 @@ void globalEopAiConfig::characterTurnStart(character* currentChar, bool turnStar
 					gameHelpers::logStringGame("Character: " + string(currentChar->characterRecord->fullName) + " Garrisoned empty settlement!");
 				used = true;
 				break;
+			}
+			
+			if (!movedDamaged && nearSett.settlement->army && nearSett.settlement->siegeNum == 0 && nearSett.moveCost < 150.f)
+			{
+				std::vector<unit*> damagedUnits;
+				for (int i = 0; i < army->numOfUnits; ++i)
+				{
+					const auto unit = army->getUnit(i);
+					if (unit->general)
+						continue;
+					if (unit->soldierCount < max(1, unit->SoldierCountMaxStrat * 0.33))
+						damagedUnits.push_back(unit);
+				}
+				if (!damagedUnits.empty() && nearSett.settlement->army->numOfUnits + damagedUnits.size() <= 20)
+				{
+					movedDamaged = true;
+					sol::table damagedUnitsTable =  sol::state_view(plugData::data.luaAll.luaState).create_table();
+					for (const auto& unit : damagedUnits)
+					{
+						damagedUnitsTable.add(unit);
+					}
+					factionHelpers::splitArmy(currentChar->characterRecord->faction, damagedUnitsTable, 
+						nearSett.settlement->xCoord, nearSett.settlement->yCoord);
+					used = true;
+					break;
+				}
 			}
 		}
 	}
@@ -1620,6 +1647,7 @@ void globalEopAiConfig::characterTurnStart(character* currentChar, bool turnStar
 			|| nearArmy.army->isAdmiral
 			|| nearArmy.army->faction->factionID != m_Faction->factionID
 			|| nearArmy.army->gen->markedForDeath
+			|| nearArmy.army->numOfUnits == 20
 			|| alreadyUsed)
 		{
 			continue;
@@ -2131,6 +2159,7 @@ void eopProductionHelper::unitProducer(const factionStruct* faction)
 	{
 		int freeSlots;
 		std::vector<eduEntry*> recruitedEntries;
+		std::vector<eduEntry*> retrainedEntries;
 	};
 	const auto settNum = faction->settlementsNum;
 	bool recruited = true;
@@ -2219,6 +2248,55 @@ void eopProductionHelper::unitProducer(const factionStruct* faction)
 						settInfo->freeSlots--;
 						recruited = true;
 						settInfo->recruitedEntries.emplace_back(bestUnit->getUnitEntry());
+					}
+				}
+			}
+				
+			bestUnitValue = 0.f;
+			bestRecruitCost = 0;
+			
+			for (int r = 0; r < optionNum; ++r)
+			{
+				const auto option = &(*recruitOptions)[r];
+
+				if (!option || !option->getUnitEntry())
+					continue;
+
+				const auto eduEntry = option->getUnitEntry();
+				
+				bool alreadyRetrained = false;
+				for (const auto& recruitedEntry : settInfo->retrainedEntries)
+				{
+					if (recruitedEntry == eduEntry)
+					{
+						alreadyRetrained = true;
+						break;
+					}
+				}
+
+				if (alreadyRetrained)
+					continue;
+
+				if (option->recruitType == 3
+					&& static_cast<float>(option->cost) * costMultiplier < static_cast<float>(money)
+					&& eduEntry
+					&& eduEntry->aiUnitValue > bestUnitValue)
+				{
+					bestUnit = option;
+					bestUnitValue = eduEntry->aiUnitValue;
+					bestRecruitCost = option->cost;
+				}
+
+				if (bestUnit)
+				{
+					if (settlementHelpers::addUnitToQueue(bestUnit))
+					{
+						if (logProduction)
+							gameHelpers::logStringGame("unitProducer - " + string(bestUnit->getUnitEntry()->eduType) + " recruited in " + string(settlement->name));
+						money -= bestRecruitCost;
+						settInfo->freeSlots--;
+						recruited = true;
+						settInfo->retrainedEntries.emplace_back(bestUnit->getUnitEntry());
 					}
 				}
 			}

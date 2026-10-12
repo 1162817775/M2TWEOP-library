@@ -1168,10 +1168,28 @@ void managerF::execPatches()
 	toGetSpecPos->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onChooseCaptainUnit patch" << '\n';
+	onChooseCaptainUnit* toChooseCaptainUnit = new onChooseCaptainUnit(mem, (LPVOID)patchesForGame::chooseCaptainUnit, globals::dataS.gameVersion);
+	toChooseCaptainUnit->SetNewCode();
+	toChooseCaptainUnit->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying onExchangeWithCharacter patch" << '\n';
 	onExchangeWithCharacter* toExchangeWithCharacter = new onExchangeWithCharacter(mem, (LPVOID)noFunc, globals::dataS.gameVersion);
 	toExchangeWithCharacter->SetNewCode();
 	toExchangeWithCharacter->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onCallAuto patch" << '\n';
+	onCallAuto* toCallAuto = new onCallAuto(mem, (LPVOID)patchesForGame::onCallAuto, globals::dataS.gameVersion);
+	toCallAuto->SetNewCode();
+	toCallAuto->Enable();
+	f1 << "Done" << '\n';
+	
+	f1 << "Start applying onCallAutoSett patch" << '\n';
+	onCallAutoSett* toCallAutoSett = new onCallAutoSett(mem, (LPVOID)patchesForGame::onCallAuto, globals::dataS.gameVersion);
+	toCallAutoSett->SetNewCode();
+	toCallAutoSett->Enable();
 	f1 << "Done" << '\n';
 	
 	f1 << "Start applying onHiddenResourceConditionParse patch" << '\n';

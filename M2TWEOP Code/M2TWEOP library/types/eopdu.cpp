@@ -16,6 +16,7 @@
 std::vector<std::shared_ptr<eopEduEntry>> eopDu::eopUnitDb{};
 std::unordered_map<std::string, std::shared_ptr<eopEduEntry>> eopDu::eopUnitLookup{};
 std::unordered_map<int, std::shared_ptr<eopEduEntry>> eopDu::eopUnitIndexLookup{};
+std::unordered_map<int, eopExtendedEdu> eopDu::eopAttributes{};
 
 //struct eduThingsG
 //{
@@ -180,7 +181,14 @@ eduEntry* eopDu::addEopEduEntryFromFile(const char* fileName, int newIdx)
     {
         return nullptr;
     }
-    return getEopEduEntry(newIdx);
+	const auto newEntry = getEopEduEntry(newIdx);
+    if (newEntry->hasAttribute("shield_piercing"))
+    {
+	    const auto extended = getExtendedAttributes(newIdx);
+	    extended->shieldPiercing = true;
+		newEntry->priStats.minAttackDelayPri = SP_MAGIC_NUMBER;
+    }
+	return newEntry;
 }
     
 void eopDu::addEopEduEntryFromEdu(eduEntry* entry)
@@ -198,7 +206,13 @@ void eopDu::addEopEduEntryFromEdu(eduEntry* entry)
 	eopUnitDb.push_back(sharedP);
 	eopUnitLookup.insert_or_assign(eopUnitDb.back()->originalTypeName, sharedP);
 	eopUnitLookup.insert_or_assign(eopUnitDb.back()->eopTypeName, sharedP);
-	eopUnitIndexLookup.insert_or_assign(entry->index, sharedP);
+	eopUnitIndexLookup.insert_or_assign(static_cast<int>(entry->index), sharedP);
+	if (entry->hasAttribute("shield_piercing"))
+	{
+		const auto extended = getExtendedAttributes(static_cast<int>(entry->index));
+		extended->shieldPiercing = true;
+		entry->priStats.minAttackDelayPri = SP_MAGIC_NUMBER;
+	}
 }
 
 eduEntry* eopDu::addEopEduEntry(int baseIdx, int newIdx)
@@ -212,7 +226,7 @@ eduEntry* eopDu::addEopEduEntry(int baseIdx, int newIdx)
     const auto sharedP = std::make_shared<eopEduEntry>(baseIdx, newIdx);
 	eopUnitDb.push_back(sharedP);
     eopUnitLookup.insert_or_assign(eopUnitDb.back()->eopTypeName, sharedP);
-    eopUnitIndexLookup.insert_or_assign(newIdx, sharedP);
+    eopUnitIndexLookup.insert_or_assign(static_cast<int>(newIdx), sharedP);
 
     return getEopEduEntry(newIdx);
 }
@@ -321,6 +335,24 @@ eduEntry* eopDu::findGeneralUpgradeUnit(const int factionId)
 		}
 	}
 	return nullptr;
+}
+
+eopExtendedEdu* eopDu::getExtendedAttributes(int eduIndex)
+{
+	if (eopAttributes.find(eduIndex) == eopAttributes.end())
+	{
+		eopAttributes.insert(std::make_pair(eduIndex, eopExtendedEdu()));
+	}
+	
+	return &eopAttributes[eduIndex];
+}
+
+bool eopDu::isShieldPiercing(const eduEntry* entry)
+{
+	if (!entry)
+		return false;
+	const auto& ext = getExtendedAttributes(static_cast<int>(entry->index));
+	return ext->isShieldPiercing();
 }
 
 unit* eopDu::createGeneralUnit(character* general, const int exp, const int wpnlvl, const int armlvl, const eduEntry* entry)

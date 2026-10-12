@@ -1343,7 +1343,7 @@ int patchesForGame::onCalcArrowKillChance(unitStats* stats, soldierInBattle* def
 	auto shield = defender->stats.armourStats.shield;
 	if (stats->priStats.isAP && m2tweopOptions::getApIsShieldPiercing())
 		shield >>= 1;
-	if (stats->priStats.weaponTecType == weaponTechType::missile_gunpowder)
+	if (stats->priStats.weaponTecType == weaponTechType::missile_gunpowder || stats->priStats.isShieldPiercing())
 		shield >>= 1;
 
 	if (attackDir)
@@ -1624,6 +1624,57 @@ void patchesForGame::onAttachRegionSettlement(settlementStruct* sett, int region
 		GAME_FUNC(void(__thiscall*)(resourceStruct*, settlementStruct*),
 			attachResourceSett)(region->resources[i], sett);
 	}
+}
+
+int patchesForGame::chooseCaptainUnit(armyStruct* army)
+{
+	if (const auto battle = battleHelpers::getBattleData(); !battle || battle->battleCampaignType == 2)
+		return 0;
+	
+	int bestUnit = -1;
+	int bestBackupUnit = -1;
+	int bestMercUnit = -1;
+	float bestUnitValue = 0.f;
+	float bestBackupUnitValue = 0.f;
+	float bestMercUnitValue = 0.f;
+	
+	for (int i = 0; i < army->numOfUnits; ++i)
+	{
+		const auto un = army->units[i];
+		if (un->eduEntry->generalUnit || un->eduEntry->generalUnitUpgrade)
+		{
+			return i;
+		}
+		const auto value = un->eduEntry->aiUnitValue;
+		const auto valuePerSoldier = un->eduEntry->aiUnitValuePerSoldier;
+		if (!un->eduEntry->mercenaryUnit && (!un->eduEntry->mount || un->eduEntry->mount->mountClass != mountClass::elephant))
+		{
+			if (valuePerSoldier > bestUnitValue 
+				&& ((static_cast<float>(un->SoldierCountStrat) / static_cast<float>(un->SoldierCountMaxStrat)) > 0.5f))
+			{
+				bestUnitValue = valuePerSoldier;
+				bestUnit = i;
+			}
+			if (value > bestBackupUnitValue)
+			{
+				bestBackupUnit = i;
+				bestBackupUnitValue = value;
+			}
+		}
+		else if (value > bestMercUnitValue)
+		{
+			bestMercUnitValue = value;
+			bestMercUnit = i;
+		}
+	}
+	
+	if (bestUnitValue > 0)
+		return bestUnit;
+	if (bestBackupUnit > 0)
+		return bestBackupUnit;
+	if (bestMercUnitValue > 0)
+		return bestMercUnit;
+	return 0;
 }
 
 int patchesForGame::onGetTrueBuildingCapabilities(const int counter, const stackCapabilities* cap)
@@ -3017,6 +3068,156 @@ void __stdcall patchesForGame::checkAndChangeModels()
 	stratModelsChange::checkAndChangeStratModels();
 }
 
+struct surfaceEntry
+{
+	gameStdVector<int> walls;
+	gameStdVector<int> defenses;
+	int id;
+	float health;
+};
+
+struct weakPointEntry
+{
+	buildingBattle* building;
+	int surface;
+	gameStdVector<int> defenses;
+	float health;
+};
+
+struct defenseEntry
+{
+	buildingBattle* building;
+	gameStdVector<int> surfaces;
+	gameStdVector<int> gates;
+};
+
+struct positionEntry
+{
+	float posX;
+	float posy;
+	float dirX;
+	float dirY;
+	gameStdVector<int> dependants;
+	int priority;
+	int flags;
+};
+
+struct streetEntry
+{
+	float posX;
+	float posy;
+	float dirX;
+	float dirY;
+	positionEntry* position;
+};
+
+struct perimeterEntry
+{
+	gameStdVector<surfaceEntry> surfaces;
+	gameStdVector<weakPointEntry> weakPoints;
+	gameStdVector<defenseEntry> defenses;
+	gameStdVector<streetEntry> streets;
+	int breaches;
+	int defAvailable;
+	int manned;
+	int neutralized;
+};
+
+struct analyzerWeakPoint
+{
+	float threat;
+	weakPointEntry* entry;
+};
+
+struct analyzerSurface
+{
+	float threat;
+	surfaceEntry* entry;
+};
+
+struct analyzerStreet
+{
+	streetEntry* entry;
+	float threat;
+};
+
+struct analyzerArty
+{
+	float posX;
+	float posY;
+	uint8_t flags;
+	uint8_t pad[3];
+};
+
+struct defenseThreat
+{
+	unit* unit;
+	siegeEngine* engine;
+};
+
+struct defenseAnalyzerPerimeter
+{
+	gameStdVector<defenseThreat> threats;
+	float enemyMeleeStr;
+	float enemyMissileStr;
+	float enemyMeleeProportion;
+	float enemyStr;
+	float allyMeleeStr;
+	float allyMissileStr;
+	float allyMeleeProportion;
+	float allyStr;
+	float friendlyMeleeStr;
+	float friendlyMissileStr;
+	float friendlyMeleeProportion;
+	float friendlyStr;
+	gameStdVector<analyzerWeakPoint> breaches;
+	gameStdVector<analyzerWeakPoint> assaults;
+	gameStdVector<analyzerSurface> surfaces;
+	gameStdVector<analyzerStreet> streets;
+	gameStdVector<analyzerArty> artillery;
+};
+
+struct settlementAnalyzer
+{
+	gameStdVector<defenseAnalyzerPerimeter> perimeters;
+	float allyStr;
+	float allyMeleeStr;
+	float enemyStr;
+	float enemyMeleeStr;
+	float friendlyStr;
+	float friendlyMeleeStr;
+	float plazaThreat;
+	bool  inSettlement;
+	int  ticks;
+	battleResidence* residence;
+	battleAI* battleAi;
+};
+
+
+void patchesForGame::threatDebugWalls(void *perimeter)
+{
+	const auto analyzer = static_cast<defenseAnalyzerPerimeter*>(perimeter);
+	
+	for (int i = 0; i < analyzer->breaches.size(); ++i)
+	{
+		const auto breach = analyzer->breaches[i];
+		
+		if(breach.threat < 1e-3f || !breach.entry)
+			break;
+	}
+}
+
+int __fastcall patchesForGame::onCallAuto(void* resolveData)
+{
+	if (const auto campaign = campaignHelpers::getCampaignData(); campaign->turnNumber == 0 || !campaign->setupAiBattle())
+	{
+		
+		GAME_FUNC(void(__thiscall*)(void*, bool), autoResolveHandler)(resolveData, true);
+		return 0;
+	}
+	return 1;
+}
+
 void __stdcall patchesForGame::battleLoaded()
 {
 	discordManager::battleLoaded();
@@ -4206,7 +4407,7 @@ void minHookFunctions::setAdvancedSettlementInfoScrollFrameSize(int width, int h
 
 //Fix broken army:   
 //In my mod, I encountered an issue where the Scottish army was listed in the slave' army array, causing a fatal crash. 
-//This fix solved the problem for me. I'll leave this here for now—it might come in handy—and delete it later.
+//This fix solved the problem for me. I'll leave this here for nowï¿½it might come in handyï¿½and delete it later.
 static bool checkFactionArmy(armyStruct* targetArmy, int x, int y)
 {
 	campaign* camp = gameHelpers::getGameDataAll()->campaignStruct;

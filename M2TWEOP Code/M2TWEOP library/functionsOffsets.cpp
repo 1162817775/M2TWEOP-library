@@ -449,6 +449,9 @@ void codes::initCodes(int gameVer)
 		offsets.a_onSetColor = 0x00f1c750;
 		offsets.a_onCreateDebugInfoText = 0x00f01070;
 		offsets.a_onCharacterInfoFrameInit = 0x00bf1380;
+		offsets.setupBattleTime = 0x45C460;
+		offsets.transitionToBattle = 0x44EA70;
+		offsets.autoResolveHandler = 0x628D60;
 	}
 
 
@@ -901,5 +904,8 @@ void codes::initCodes(int gameVer)
 		offsets.a_onSetColor = 0x00f1cdc0;
 		offsets.a_onCreateDebugInfoText = 0x00f01640;
 		offsets.a_onCharacterInfoFrameInit = 0x00beb710;
+		offsets.setupBattleTime = 0x45C7E0;
+		offsets.transitionToBattle = 0x44EDB0;
+		offsets.autoResolveHandler = 0x629110;
 	}
 }

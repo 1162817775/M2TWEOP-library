@@ -302,6 +302,8 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield enableFamilyEventsWithoutTree enableFamilyEventsWithoutTree
 	@tfield useEopFrontiers useEopFrontiers
 	@tfield modelExists modelExists
+	@tfield enableAiBattles enableAiBattles
+	@tfield aiBattleFrequency aiBattleFrequency
 	@tfield ignoreOwnershipRecruitment ignoreOwnershipRecruitment
 	@tfield noAiMissileLooseFormation noAiMissileLooseFormation
 	@tfield setKhakiTextColor setKhakiTextColor
@@ -316,6 +318,15 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield playGameSound playGameSound
 	@tfield resetTooltipText resetTooltipText
 	@tfield getTooltipActive getTooltipActive
+	@tfield getLastCursorState getLastCursorState
+	@tfield setAdvancedSettlementInfoScrollFrameSize setAdvancedSettlementInfoScrollFrameSize
+	@tfield setMercsScrollNumOfLines setMercsScrollNumOfLines
+	@tfield setMercsScrollParameters setMercsScrollParameters 
+	@tfield setEnemyArmyUnitsScrollParameters setEnemyArmyUnitsScrollParameters 
+	@tfield setRgbaTextColor setRgbaTextColor 
+	@tfield enableDebugInfo enableDebugInfo 
+	@tfield enableEopCamera enableEopCamera 
+	@tfield viewTacticalMap viewTacticalMap 
 	@table M2TWEOP
 	*/
 	
@@ -1360,6 +1371,24 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 		M2TWEOP.displayEnemyStats(true)
 	*/
 	tables.M2TWEOP.set_function("displayEnemyStats", &gameHelpers::setDisplayEnemyStats);
+	
+	/***
+	Enable watching AI battles for AI campaigns instead of autoresolve. Disabled by default.
+	@function M2TWEOP.enableAiBattles 
+	@tparam bool set
+	@usage
+		M2TWEOP.enableAiBattles(true)
+	*/
+	tables.M2TWEOP.set_function("enableAiBattles", &m2tweopOptions::setEnableAiBattles);
+	
+	/***
+	If AI battles are enabled, how often should they occur (for example 2 means every other battle). 1 by default.
+	@function M2TWEOP.aiBattleFrequency 
+	@tparam int frequency
+	@usage
+		M2TWEOP.aiBattleFrequency(2)
+	*/
+	tables.M2TWEOP.set_function("aiBattleFrequency", &m2tweopOptions::setAiBattleFrequency);
 
 	/***
 	Set watchtower range. Default: 10.

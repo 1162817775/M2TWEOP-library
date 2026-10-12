@@ -21,12 +21,19 @@ public:
     void setEntrySoldierModel(const char* newModel) const;
 };
 
+struct eopExtendedEdu
+{
+    bool shieldPiercing = false;
+    [[nodiscard]] bool isShieldPiercing() const { return shieldPiercing; }
+};
+
 class eopDu
 {
 public:
     static std::vector<std::shared_ptr<eopEduEntry>> eopUnitDb;
     static std::unordered_map<std::string, std::shared_ptr<eopEduEntry>> eopUnitLookup;
     static std::unordered_map<int, std::shared_ptr<eopEduEntry>> eopUnitIndexLookup;
+    static std::unordered_map<int, eopExtendedEdu> eopAttributes;
     static eduEntry* addEopEduEntryFromFile(const char* fileName, int newIdx);
     static void addEopEduEntryFromEdu(eduEntry* entry);
     static eduEntry* getEopEduEntry(int idx);
@@ -44,6 +51,8 @@ public:
     static unit* createGeneralUnit(character* general, int exp, int wpnlvl, int armlvl, const eduEntry* entry);
     static eduEntry* findGeneralUnit(int factionId);
     static eduEntry* findGeneralUpgradeUnit(int factionId);
+    static eopExtendedEdu* getExtendedAttributes(int eduIndex);
+    static bool isShieldPiercing(const eduEntry* entry);
 };
 
 namespace eopDuHelpers

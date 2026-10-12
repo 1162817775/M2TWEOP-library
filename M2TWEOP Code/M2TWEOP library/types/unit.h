@@ -2638,7 +2638,7 @@ namespace unitActions
     void moveToMissileRange(unit* un, const unit* targetUnit, bool run);
     void unitTurn(unit* un, int16_t angle, bool isRelative);
     void taunt(const unit* un);
-    void useSpecialAbility(const unit* un, bool heroOnly);
+    bool useSpecialAbility(const unit* un, bool heroOnly);
     int getSiegeEngineType(const unit* un);
     void attackBuilding(unit* un, buildingBattle* building);
     void collectEngine(unit* un, siegeEngine* engine);

@@ -1540,6 +1540,11 @@ void luaPlugin::onPluginLoadF()
 	@tfield onCharacterDied onCharacterDied
 	@tfield onFactionDied onFactionDied
 	@tfield onCharacterSwitchFaction onCharacterSwitchFaction
+	@tfield onCalculationRatioForBirth onCalculationRatioForBirth
+	@tfield onCreateTooltip onCreateTooltip
+	@tfield onCreateTooltipByCoords onCreateTooltipByCoords
+	@tfield onBlockadePort onBlockadePort
+	@tfield onUnitDestroy onUnitDestroy
 
 	@table EventsFunctionsList
 	*/
