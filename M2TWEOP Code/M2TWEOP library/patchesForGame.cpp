@@ -2925,7 +2925,7 @@ void __fastcall patchesForGame::onEvent(DWORD** vTab, DWORD arg2)
 	//		MessageBoxA(nullptr, "isMinorSettlement failed to verify", "Attention", NULL);
 	//	}
 	//}
-	else if (eventCode == buttonPressedCode)
+	else if (eventCode == buttonPressedCode && minHookFunctions::isEopCameraEnable)
 	{
 		char* str = reinterpret_cast<char*>(vTab[1]);
 		if (strcmp(str, "prebattle_fight_button") == 0)
@@ -4339,6 +4339,8 @@ void minHookFunctions::enableEopCamera(bool set, float speedRotate, float speedM
 
 void minHookFunctions::transitionToBattle(const int x, const int y)
 {
+	if (!isEopCameraEnable)
+		return;
 	stratCamera.transitionToBattle();
 	stratCamera.setPosition(x, y);
 }
