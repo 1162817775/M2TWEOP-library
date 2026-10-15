@@ -1180,6 +1180,12 @@ void managerF::execPatches()
 	toExchangeWithCharacter->Enable();
 	f1 << "Done" << '\n';
 	
+	f1 << "Start applying onHealCasualties patch" << '\n';
+	onHealCasualties* toHealCasualties = new onHealCasualties(mem, (LPVOID)patchesForGame::onHealCasualties, globals::dataS.gameVersion);
+	toHealCasualties->SetNewCode();
+	toHealCasualties->Enable();
+	f1 << "Done" << '\n';
+	
 	f1 << "Start applying onCallAuto patch" << '\n';
 	onCallAuto* toCallAuto = new onCallAuto(mem, (LPVOID)patchesForGame::onCallAuto, globals::dataS.gameVersion);
 	toCallAuto->SetNewCode();

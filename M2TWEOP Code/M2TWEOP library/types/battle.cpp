@@ -83,6 +83,27 @@ float battleTile::getWaterHeight()
 	return waterHeight * 0.1f + terrainData->heightOffset;
 }
 
+battleUnit* battleArmy::findBattleUnit(const unit* un)
+{
+	for (int b = 0; b < unitCount; ++b)
+	{
+		if (const auto bUnit = getBattleUnit(b); bUnit && bUnit->unit == un)
+			return bUnit;
+	}
+	return nullptr;
+}
+
+int battleArmy::takenPrisonerSum()
+{
+	int sum = 0;
+	for (int i = 0; i < unitCount; ++i)
+	{
+		if (const auto bUnit = getBattleUnit(i); bUnit)
+			sum += bUnit->takenPrisoner;
+	}
+	return sum;
+}
+
 battleSide* battleDataS::getAiSide()
 {
 	if (!inBattle)
@@ -289,7 +310,17 @@ namespace battleHelpers
 			call eax
 		}
 	}
-	
+
+	battleArmy* findBattleArmyWithSide(battleSide* side, const armyStruct* army)
+	{
+		for (int b = 0; b < side->armiesNum; ++b)
+		{
+			if (const auto bArmy = side->getBattleArmy(b); bArmy && bArmy->army == army)
+				return bArmy;
+		}
+		return nullptr;
+	}
+
 	bool autoWin(const char* winnerSide)
 	{
 		DWORD adrFunc = codes::offsets.autoWinFunc;

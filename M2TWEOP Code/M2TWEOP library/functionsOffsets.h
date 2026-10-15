@@ -13,7 +13,9 @@ public:
 		DWORD parseCas = NULL;
 		DWORD createModelRigid = NULL;
 		DWORD appendTexturesFolder = NULL;
+		DWORD onCalcPathFindWidth = NULL;
 		DWORD loadModelRigid = NULL;
+		DWORD recoverSoldier = NULL;
 		DWORD getCasModel = NULL;
 		DWORD closeCas = NULL;
 		DWORD simpleCasDestructor = NULL;

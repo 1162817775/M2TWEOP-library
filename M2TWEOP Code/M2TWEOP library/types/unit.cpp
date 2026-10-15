@@ -450,6 +450,11 @@ void unit::destroy()
 	GAME_FUNC(void(__thiscall*)(armyStruct*, unit*), a_onUnitDestroy)(army, this);
 }
 
+void unit::recoverSoldier(soldierInBattle* soldier)
+{
+	GAME_FUNC(void (__thiscall*)(unit*, soldierInBattle*), recoverSoldier)(this, soldier);
+}
+
 bool unitDb::parse(descrParser* parser)
 {
 	while (parser->walker < parser->end)
@@ -481,6 +486,12 @@ bool unitDb::parse(descrParser* parser)
 				return false;
 			}
 			GAME_FUNC(void(__thiscall*)(int*, char**, unsigned long*), dbHashTableSet)(&this->maxEntryNum, name, &newEntry->index);
+			if (newEntry->hasAttribute("shield_piercing"))
+			{
+				const auto extended = eopDu::getExtendedAttributes(static_cast<int>(newEntry->index));
+				extended->shieldPiercing = true;
+				newEntry->priStats.minAttackDelayPri = SP_MAGIC_NUMBER;
+			}
 		}
 		else
 		{

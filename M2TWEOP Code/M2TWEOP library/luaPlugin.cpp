@@ -327,6 +327,7 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 	@tfield enableDebugInfo enableDebugInfo 
 	@tfield enableEopCamera enableEopCamera 
 	@tfield viewTacticalMap viewTacticalMap 
+	@tfield randomizeHealing randomizeHealing 
 	@table M2TWEOP
 	*/
 	
@@ -1380,6 +1381,15 @@ sol::state* luaPlugin::init(std::string& luaFilePath, std::string& modPath)
 		M2TWEOP.enableAiBattles(true)
 	*/
 	tables.M2TWEOP.set_function("enableAiBattles", &m2tweopOptions::setEnableAiBattles);
+	
+	/***
+	Instead of first soldiers that died, random soldiers will be healed. Enabled by default.
+	@function M2TWEOP.randomizeHealing 
+	@tparam bool set
+	@usage
+		M2TWEOP.randomizeHealing(true)
+	*/
+	tables.M2TWEOP.set_function("randomizeHealing", &m2tweopOptions::setRandomizeHealing);
 	
 	/***
 	If AI battles are enabled, how often should they occur (for example 2 means every other battle). 1 by default.

@@ -2487,6 +2487,7 @@ public:
 		return eduEntry->hasAttribute(attributeName);
 	}
 	void destroy();
+	void recoverSoldier(soldierInBattle* soldier);
 };
 
 struct indexLookUp

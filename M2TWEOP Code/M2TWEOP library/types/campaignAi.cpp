@@ -41,6 +41,21 @@ namespace {
 	}
 }
 
+namespace
+{
+	struct extentsGuard
+	{
+		~extentsGuard()
+		{
+			if (const auto pathfinding = campaignHelpers::getStratPathFinding(); pathfinding)
+			{
+				GAME_FUNC(void(__thiscall*)(DWORD), deleteMoveExtents)(reinterpret_cast<DWORD>(pathfinding) + 0x88);
+			}
+		}
+	};
+}
+
+
 namespace campaignAi
 {
 	namespace {
@@ -1195,7 +1210,7 @@ bool attackArmyOrder::execute()
 				assignedArmy->resource->used = true;
 				for (const auto& assignedArmy2 : assignedArmies)
 				{
-					if (!assignedArmy->resource->validate())
+					if (!assignedArmy2->resource->validate())
 						continue;
 					if (campaignAi::distance(assignedArmy2->resource->army->gen, targetArmy->army->gen) < 2)
 					{
@@ -1330,7 +1345,13 @@ bool defendSettlementOrder::execute()
 		else
 		{
 			if (!targetSettlement->settlement->army || targetSettlement->settlement->army->canReceiveMerge(assignedArmy->resource->army))
+			{
+				if (!targetSettlement->settlement->army)
+				{
+					armyHelpers::createArmyInSettlement(targetSettlement->settlement);
+				}
 				assignedArmy->resource->army->moveTactical(targetSettlement->settlement->xCoord, targetSettlement->settlement->yCoord, true);
+			}
 			else
 			{
 				const auto [newX, newY] = stratMapHelpers::findValidTileNearTile(static_cast<int>(targetSettlement->settlement->xCoord), static_cast<int>(targetSettlement->settlement->yCoord), 7);
@@ -1479,6 +1500,7 @@ void globalEopAiConfig::checkRegion(int regionId)
 			continue;
 		auto regionArmyRes = findArmyResource(regionArmy);
 		const auto moveData = regionArmy->gen->createMoveData(static_cast<int>(searchType::avoidZoc), 1);
+		extentsGuard guard;
 		for (auto& nearSettlement : moveData->settlements)
 		{
 			if (nearSettlement.settlement->faction->factionID != m_Faction->factionID
@@ -1543,11 +1565,6 @@ void globalEopAiConfig::checkRegion(int regionId)
 
 void globalEopAiConfig::characterTurnStart(character* currentChar, bool turnStart)
 {
-	if (m_Faction != currentChar->characterRecord->faction)
-	{
-		m_usedCharacters.clear();
-		m_usedArmies.clear();
-	}
 	m_Faction = currentChar->characterRecord->faction;
 	for (const auto &ch : m_usedCharacters)
 	{
@@ -1574,6 +1591,7 @@ void globalEopAiConfig::characterTurnStart(character* currentChar, bool turnStar
 		return;
 	bool used = false;
 	const auto moveData = currentChar->createMoveData(static_cast<int>(searchType::avoidZoc), 1);
+	extentsGuard guard;
 	bool movedDamaged = false;
 	for (const auto& nearSett : moveData->settlements)
 	{
@@ -1665,9 +1683,9 @@ void globalEopAiConfig::characterTurnStart(character* currentChar, bool turnStar
 						gameHelpers::logStringGame("Character: " + string(gen->characterRecord->fullName) + " leading another army!");
 					m_usedCharacters.push_back(gen);
 					m_usedArmies.push_back(nearArmy.army);
+					auxGenerals.pop_back();
+					break;
 				}
-				auxGenerals.pop_back();
-				break;
 			}
 		}
 		if (turnStart && nearArmy.moveCost > 75.f)
@@ -1794,6 +1812,8 @@ const auto threatSort2 = [](const std::shared_ptr<armyResource>& a, const std::s
 };
 */
 
+static constexpr int MIN_ORDER_PRIORITY = 100;
+
 void globalEopAiConfig::assignOrders(factionStruct* fac)
 {
 	const auto campaignData = campaignHelpers::getCampaignData();
@@ -1811,13 +1831,14 @@ void globalEopAiConfig::assignOrders(factionStruct* fac)
 		}
 		m_Orders.emplace_back(make_shared<defendSettlementOrder>(settRes));
 		m_Orders.back()->priority = priority;
+		float moveCost = 0.f;
 		for (const auto& nearArmy : settRes->nearResources)
 		{
 			if (!nearArmy || !nearArmy->resource->own || nearArmy->resource->used || !nearArmy->resource->army || nearArmy->resource->army->siege)
 				continue;
 			nearArmy->resource->targets++;
 			m_Orders.back()->assignedArmies.emplace_back(nearArmy);
-			m_Orders.back()->priority -= nearArmy->moveCost * (moveCostFactor * (1 + (nearArmy->turns * 0.2f)));
+			moveCost += nearArmy->moveCost * (moveCostFactor * (1 + (nearArmy->turns * 0.2f)));
 #ifdef PRIORITY_DEBUG
 			std::string genName = "No general";
 			if (nearArmy->resource->army->gen)
@@ -1829,10 +1850,16 @@ void globalEopAiConfig::assignOrders(factionStruct* fac)
 			LOG_PRIORITY("new Priority: " + to_string(m_Orders.back()->priority));
 #endif
 		}
-		LOG_PRIORITY("new Priority total: " + to_string(m_Orders.back()->priority));
-		if (m_Orders.back()->priority < 0)
+		if (m_Orders.back()->assignedArmies.empty())
 		{
-			for (const auto& assignedArmy :settRes->nearResources)
+			m_Orders.erase(m_Orders.end() - 1);
+			continue;
+		}
+		m_Orders.back()->priority -= moveCost / m_Orders.back()->assignedArmies.size();
+		LOG_PRIORITY("new Priority total: " + to_string(m_Orders.back()->priority));
+		if (m_Orders.back()->priority < MIN_ORDER_PRIORITY)
+		{
+			for (const auto& assignedArmy : m_Orders.back()->assignedArmies)
 				assignedArmy->resource->targets--;
 			m_Orders.erase(m_Orders.end() - 1);
 		}
@@ -1851,13 +1878,14 @@ void globalEopAiConfig::assignOrders(factionStruct* fac)
 		}
 		m_Orders.emplace_back(make_shared<defendArmyOrder>(armyRes));
 		m_Orders.back()->priority = priority;
+		float moveCost = 0.f;
 		for (const auto& nearArmy : armyRes->nearResources)
 		{
 			if (!nearArmy->resource->own || nearArmy->resource->used || !nearArmy->resource->army || nearArmy->resource->army->siege || nearArmy->resource->army == armyRes->army)
 				continue;
 			nearArmy->resource->targets++;
 			m_Orders.back()->assignedArmies.emplace_back(nearArmy);
-			m_Orders.back()->priority -= nearArmy->moveCost * (moveCostFactor * (1 + (nearArmy->turns * 0.2f)));
+			moveCost += nearArmy->moveCost * (moveCostFactor * (1 + (nearArmy->turns * 0.2f)));
 #ifdef PRIORITY_DEBUG
 			std::string genName = "No general";
 			if (army->resource->army->gen)
@@ -1869,10 +1897,16 @@ void globalEopAiConfig::assignOrders(factionStruct* fac)
 			LOG_PRIORITY("new Priority: " + to_string(m_Orders.back()->priority));
 #endif
 		}
-		LOG_PRIORITY("new Priority total: " + to_string(m_Orders.back()->priority));
-		if (m_Orders.back()->priority < 0)
+		if (m_Orders.back()->assignedArmies.empty())
 		{
-			for (const auto& assignedArmy :armyRes->nearResources)
+			m_Orders.erase(m_Orders.end() - 1);
+			continue;
+		}
+		m_Orders.back()->priority -= moveCost / m_Orders.back()->assignedArmies.size();
+		LOG_PRIORITY("new Priority total: " + to_string(m_Orders.back()->priority));
+		if (m_Orders.back()->priority < MIN_ORDER_PRIORITY)
+		{
+			for (const auto& assignedArmy :m_Orders.back()->assignedArmies)
 				assignedArmy->resource->targets--;
 			m_Orders.erase(m_Orders.end() - 1);
 		}
@@ -1895,6 +1929,7 @@ void globalEopAiConfig::assignOrders(factionStruct* fac)
 		}
 		m_Orders.emplace_back(make_shared<attackSettlementOrder>(targetSett));
 		m_Orders.back()->priority = priority;
+		float moveCost = 0.f;
 		for (const auto& nearArmy : targetSett->nearResources)
 		{
 			if (!nearArmy->resource->own || nearArmy->resource->used || !nearArmy->resource->army)
@@ -1906,7 +1941,7 @@ void globalEopAiConfig::assignOrders(factionStruct* fac)
 			}
 			nearArmy->resource->targets++;
 			m_Orders.back()->assignedArmies.emplace_back(nearArmy);
-			m_Orders.back()->priority -= nearArmy->moveCost * (moveCostFactor * (1 + (nearArmy->turns * 0.2f)));
+			moveCost += nearArmy->moveCost * (moveCostFactor * (1 + (nearArmy->turns * 0.2f)));
 #ifdef PRIORITY_DEBUG
 			std::string genName = "No general";
 			if (army->resource->army->gen)
@@ -1918,10 +1953,16 @@ void globalEopAiConfig::assignOrders(factionStruct* fac)
 			LOG_PRIORITY("new Priority: " + to_string(m_Orders.back()->priority));
 #endif
 		}
-		LOG_PRIORITY("new Priority total: " + to_string(m_Orders.back()->priority));
-		if (m_Orders.back()->priority < 0)
+		if (m_Orders.back()->assignedArmies.empty())
 		{
-			for (const auto& assignedArmy :targetSett->nearResources)
+			m_Orders.erase(m_Orders.end() - 1);
+			continue;
+		}
+		m_Orders.back()->priority -= moveCost / m_Orders.back()->assignedArmies.size();
+		LOG_PRIORITY("new Priority total: " + to_string(m_Orders.back()->priority));
+		if (m_Orders.back()->priority < MIN_ORDER_PRIORITY)
+		{
+			for (const auto& assignedArmy :m_Orders.back()->assignedArmies)
 				assignedArmy->resource->targets--;
 			m_Orders.erase(m_Orders.end() - 1);
 		}
@@ -1940,13 +1981,14 @@ void globalEopAiConfig::assignOrders(factionStruct* fac)
 		}
 		m_Orders.emplace_back(make_shared<attackArmyOrder>(targetArmy));
 		m_Orders.back()->priority = priority;
+		float moveCost = 0.f;
 		for (const auto& nearArmy : targetArmy->nearResources)
 		{
 			if (!nearArmy->resource->own || nearArmy->resource->used || !nearArmy->resource->army || nearArmy->resource->army->siege)
 				continue;
 			nearArmy->resource->targets++;
 			m_Orders.back()->assignedArmies.emplace_back(nearArmy);
-			m_Orders.back()->priority -= nearArmy->moveCost * (moveCostFactor * (1 + (nearArmy->turns * 0.2f)));
+			moveCost += nearArmy->moveCost * (moveCostFactor * (1 + (nearArmy->turns * 0.2f)));
 #ifdef PRIORITY_DEBUG
 			std::string genName = "No general";
 			if (army->resource->army->gen)
@@ -1958,10 +2000,16 @@ void globalEopAiConfig::assignOrders(factionStruct* fac)
 			LOG_PRIORITY("new Priority: " + to_string(m_Orders.back()->priority));
 #endif
 		}
-		LOG_PRIORITY("new Priority total: " + to_string(m_Orders.back()->priority));
-		if (m_Orders.back()->priority < 0)
+		if (m_Orders.back()->assignedArmies.empty())
 		{
-			for (const auto& assignedArmy :targetArmy->nearResources)
+			m_Orders.erase(m_Orders.end() - 1);
+			continue;
+		}
+		m_Orders.back()->priority -= moveCost / m_Orders.back()->assignedArmies.size();
+		LOG_PRIORITY("new Priority total: " + to_string(m_Orders.back()->priority));
+		if (m_Orders.back()->priority < MIN_ORDER_PRIORITY)
+		{
+			for (const auto& assignedArmy :m_Orders.back()->assignedArmies)
 				assignedArmy->resource->targets--;
 			m_Orders.erase(m_Orders.end() - 1);
 		}
@@ -1980,13 +2028,14 @@ void globalEopAiConfig::assignOrders(factionStruct* fac)
 		}
 		m_Orders.emplace_back(make_shared<defendSettlementOrder>(settRes));
 		m_Orders.back()->priority = priority;
+		float moveCost = 0.f;
 		for (const auto& nearArmy : settRes->nearResources)
 		{
 			if (!nearArmy->resource->own || nearArmy->resource->used || !nearArmy->resource->army || nearArmy->resource->army->siege)
 				continue;
 			nearArmy->resource->targets++;
 			m_Orders.back()->assignedArmies.emplace_back(nearArmy);
-			m_Orders.back()->priority -= nearArmy->moveCost * (moveCostFactor * (1 + (nearArmy->turns * 0.2f)));
+			moveCost += nearArmy->moveCost * (moveCostFactor * (1 + (nearArmy->turns * 0.2f)));
 #ifdef PRIORITY_DEBUG
 			std::string genName = "No general";
 			if (army->resource->army->gen)
@@ -1998,10 +2047,16 @@ void globalEopAiConfig::assignOrders(factionStruct* fac)
 			LOG_PRIORITY("new Priority: " + to_string(m_Orders.back()->priority));
 #endif
 		}
-		LOG_PRIORITY("new Priority total: " + to_string(m_Orders.back()->priority));
-		if (m_Orders.back()->priority < 0)
+		if (m_Orders.back()->assignedArmies.empty())
 		{
-			for (const auto& assignedArmy :settRes->nearResources)
+			m_Orders.erase(m_Orders.end() - 1);
+			continue;
+		}
+		m_Orders.back()->priority -= moveCost / m_Orders.back()->assignedArmies.size();
+		LOG_PRIORITY("new Priority total: " + to_string(m_Orders.back()->priority));
+		if (m_Orders.back()->priority < MIN_ORDER_PRIORITY)
+		{
+			for (const auto& assignedArmy :m_Orders.back()->assignedArmies)
 				assignedArmy->resource->targets--;
 			m_Orders.erase(m_Orders.end() - 1);
 		}
@@ -2020,13 +2075,14 @@ void globalEopAiConfig::assignOrders(factionStruct* fac)
 		}
 		m_Orders.emplace_back(make_shared<defendArmyOrder>(armyRes));
 		m_Orders.back()->priority = priority;
+		float moveCost = 0.f;
 		for (const auto& nearArmy : armyRes->nearResources)
 		{
 			if (!nearArmy->resource->own || nearArmy->resource->used || !nearArmy->resource->army || nearArmy->resource->army->siege)
 				continue;
 			nearArmy->resource->targets++;
 			m_Orders.back()->assignedArmies.emplace_back(nearArmy);
-			m_Orders.back()->priority -= nearArmy->moveCost * (moveCostFactor * (1 + (nearArmy->turns * 0.2f)));
+			moveCost += nearArmy->moveCost * (moveCostFactor * (1 + (nearArmy->turns * 0.2f)));
 #ifdef PRIORITY_DEBUG
 			std::string genName = "No general";
 			if (army->resource->army->gen)
@@ -2038,10 +2094,16 @@ void globalEopAiConfig::assignOrders(factionStruct* fac)
 			LOG_PRIORITY("new Priority: " + to_string(m_Orders.back()->priority));
 #endif
 		}
-		LOG_PRIORITY("new Priority total: " + to_string(m_Orders.back()->priority));
-		if (m_Orders.back()->priority < 0)
+		if (m_Orders.back()->assignedArmies.empty())
 		{
-			for (const auto& assignedArmy :armyRes->nearResources)
+			m_Orders.erase(m_Orders.end() - 1);
+			continue;
+		}
+		m_Orders.back()->priority -= moveCost / m_Orders.back()->assignedArmies.size();
+		LOG_PRIORITY("new Priority total: " + to_string(m_Orders.back()->priority));
+		if (m_Orders.back()->priority < MIN_ORDER_PRIORITY)
+		{
+			for (const auto& assignedArmy :m_Orders.back()->assignedArmies)
 				assignedArmy->resource->targets--;
 			m_Orders.erase(m_Orders.end() - 1);
 		}
@@ -2050,7 +2112,7 @@ void globalEopAiConfig::assignOrders(factionStruct* fac)
 	std::stable_sort(m_Orders.begin(), m_Orders.end(), C_ORDER_SORT);
 	for (const auto& order : m_Orders)
 	{
-		if (order->executed || order->priority < 100)
+		if (order->executed || order->priority < MIN_ORDER_PRIORITY)
 			continue;
 #ifdef PRIORITY_DEBUG
 		gameHelpers::logStringGame("++++++++++++++++++++++++ ORDER +++++++++++++++++++++++++");
@@ -2142,7 +2204,7 @@ void aiFactionData::setAidReligionFactor(const int religion, float factor)
 	aidReligionFactors.insert_or_assign(religion, factor);
 }
 
-void eopProductionHelper::unitProducer(const factionStruct* faction)
+void eopProductionHelper::unitProducer(const factionStruct* faction) const
 {
 	const auto campaign = campaignHelpers::getCampaignData();
 	if (!faction || faction->isPlayerControlled == 1 )
@@ -2155,15 +2217,8 @@ void eopProductionHelper::unitProducer(const factionStruct* faction)
 	if (money < minMoney)
 		return;
 
-	struct settRecruitInfo
-	{
-		int freeSlots;
-		std::vector<eduEntry*> recruitedEntries;
-		std::vector<eduEntry*> retrainedEntries;
-	};
 	const auto settNum = faction->settlementsNum;
 	bool recruited = true;
-	std::unordered_map<std::string, settRecruitInfo> settOptionsCache{};
 	while (true)
 	{
 		if (!recruited)
@@ -2176,32 +2231,16 @@ void eopProductionHelper::unitProducer(const factionStruct* faction)
 			if (!settlement)
 				continue;
 
-			auto it = settOptionsCache.find(settlement->name);
-			settRecruitInfo* settInfo = nullptr;
-
-			if (it == settOptionsCache.end())
-			{
-				settOptionsCache[settlement->name] = {
-					settlement->getFreeRecruitmentSlots(),
-					std::vector<eduEntry*>{}
-				};
-				settInfo = &settOptionsCache[settlement->name];
-			}
-			else
-			{
-				settInfo = &it->second;
-			}
-
-			const auto recruitOptions = settlementHelpers::getAvailableUnits(settlement);
+			auto recruitOptions = settlementHelpers::getAvailableUnits(settlement);
 			
-			if (settInfo->freeSlots <= 0 || !recruitOptions)
+			if (settlement->getFreeRecruitmentSlots() <= 0 || !recruitOptions)
 				continue;
 
 			unitRQ* bestUnit = nullptr;
 			float bestUnitValue = 0.f;
 			int bestRecruitCost = 0;
 			
-			const int optionNum = recruitOptions->size();
+			int optionNum = recruitOptions->size();
 			for (int r = 0; r < optionNum; ++r)
 			{
 				const auto option = &(*recruitOptions)[r];
@@ -2210,19 +2249,6 @@ void eopProductionHelper::unitProducer(const factionStruct* faction)
 					continue;
 
 				const auto eduEntry = option->getUnitEntry();
-				
-				bool alreadyRecruited = false;
-				for (const auto& recruitedEntry : settInfo->recruitedEntries)
-				{
-					if (recruitedEntry == eduEntry)
-					{
-						alreadyRecruited = true;
-						break;
-					}
-				}
-
-				if (alreadyRecruited)
-					continue;
 
 				if (option->recruitType == 0
 					&& static_cast<float>(option->cost) * costMultiplier < static_cast<float>(money)
@@ -2236,24 +2262,25 @@ void eopProductionHelper::unitProducer(const factionStruct* faction)
 					bestUnitValue = eduEntry->aiUnitValue;
 					bestRecruitCost = option->cost;
 				}
+			}
 
-				if (bestUnit)
+			if (bestUnit)
+			{
+				if (settlementHelpers::addUnitToQueue(bestUnit))
 				{
-					if (settlementHelpers::addUnitToQueue(bestUnit))
-					{
-						if (logProduction)
-							gameHelpers::logStringGame("unitProducer - " + string(bestUnit->getUnitEntry()->eduType) + " recruited in " + string(settlement->name));
-						money -= bestRecruitCost;
-						money -= bestUnit->getUnitEntry()->upkeepCost * (upkeepTurns / 2);
-						settInfo->freeSlots--;
-						recruited = true;
-						settInfo->recruitedEntries.emplace_back(bestUnit->getUnitEntry());
-					}
+					if (logProduction)
+						gameHelpers::logStringGame("unitProducer - " + string(bestUnit->getUnitEntry()->eduType) + " recruited in " + string(settlement->name));
+					money -= bestRecruitCost;
+					money -= bestUnit->getUnitEntry()->upkeepCost * (upkeepTurns / 2);
+					recruited = true;
 				}
 			}
 				
+			bestUnit = nullptr;
 			bestUnitValue = 0.f;
 			bestRecruitCost = 0;
+			recruitOptions = settlementHelpers::getAvailableRetrainingUnits(settlement);
+			optionNum = recruitOptions->size();
 			
 			for (int r = 0; r < optionNum; ++r)
 			{
@@ -2263,19 +2290,6 @@ void eopProductionHelper::unitProducer(const factionStruct* faction)
 					continue;
 
 				const auto eduEntry = option->getUnitEntry();
-				
-				bool alreadyRetrained = false;
-				for (const auto& recruitedEntry : settInfo->retrainedEntries)
-				{
-					if (recruitedEntry == eduEntry)
-					{
-						alreadyRetrained = true;
-						break;
-					}
-				}
-
-				if (alreadyRetrained)
-					continue;
 
 				if (option->recruitType == 3
 					&& static_cast<float>(option->cost) * costMultiplier < static_cast<float>(money)
@@ -2286,18 +2300,16 @@ void eopProductionHelper::unitProducer(const factionStruct* faction)
 					bestUnitValue = eduEntry->aiUnitValue;
 					bestRecruitCost = option->cost;
 				}
-
-				if (bestUnit)
+			}
+			
+			if (bestUnit)
+			{
+				if (settlementHelpers::addUnitToQueue(bestUnit))
 				{
-					if (settlementHelpers::addUnitToQueue(bestUnit))
-					{
-						if (logProduction)
-							gameHelpers::logStringGame("unitProducer - " + string(bestUnit->getUnitEntry()->eduType) + " recruited in " + string(settlement->name));
-						money -= bestRecruitCost;
-						settInfo->freeSlots--;
-						recruited = true;
-						settInfo->retrainedEntries.emplace_back(bestUnit->getUnitEntry());
-					}
+					if (logProduction)
+						gameHelpers::logStringGame("unitProducer - " + string(bestUnit->getUnitEntry()->eduType) + " retrained in " + string(settlement->name));
+					money -= bestRecruitCost;
+					recruited = true;
 				}
 			}
 		}
@@ -2327,6 +2339,11 @@ void globalEopAiConfig::turnStartMove(factionStruct* fac, const bool isEnd)
 {
 	if (!enabled || fac->isPlayerControlled > 0 || fac->factionRecord->slave || fac->isHorde)
 		return;
+	if (!isEnd)
+	{
+		m_usedCharacters.clear();
+		m_usedArmies.clear();
+	}
 	const auto campaignData = campaignHelpers::getCampaignData();
 	campaignData->speedUp = true;
 	m_Faction = fac;
@@ -2369,7 +2386,7 @@ void globalEopAiConfig::turnStartMove(factionStruct* fac, const bool isEnd)
 				string charName;
 				if (armyRes->army->gen->characterRecord->shortName)
 					charName = armyRes->army->gen->characterRecord->shortName;
-				if (armyRes->army->moveTactical(xCoord, yCoord, true))
+				if (armyRes->army->moveTactical(xCoord, yCoord, false))
 					gameHelpers::logStringGame("Character: " + charName + " merged armies!");
 				armyRes->used = true;
 				nearRes->resource->used = true;
@@ -2385,8 +2402,12 @@ void globalEopAiConfig::turnStartMove(factionStruct* fac, const bool isEnd)
 				string charName;
 				if (armyRes->army->gen->characterRecord->shortName)
 					charName = armyRes->army->gen->characterRecord->shortName;
-				if (armyRes->army->moveTactical(armyRes->nearSetts.front()->resource->settlement->xCoord, armyRes->nearSetts.front()->resource->settlement->yCoord, true))
-					gameHelpers::logStringGame("Character: " + charName + " moved to safety!");
+				const auto targetSett = armyRes->nearSetts.front()->resource->settlement;
+				if (targetSett->army->canReceiveMerge(armyRes->army))
+				{
+					if (armyRes->army->moveTactical(targetSett->xCoord, targetSett->yCoord, false))
+						gameHelpers::logStringGame("Character: " + charName + " moved to safety!");
+				}
 			}
 		}
 	}
@@ -2500,6 +2521,7 @@ void globalEopAiConfig::getData(const factionStruct* fac)
 		const auto noActionTurns = max(currentChar->numTurnsIdle, m_CurrentFacData->noActionTurns);
 		const auto searchTurns = min(noActionTurns, maxTurnSearchCount * 2);
 		const auto moveData = currentChar->createMoveData(static_cast<int>(searchType::avoidZoc), 1 + (isEndTurn ? 0 : searchTurns));
+		extentsGuard guard;
 		for (auto& nearSettlement : moveData->settlements)
 		{
 			if (auto settRes = findSettResource(nearSettlement.settlement); settRes)
@@ -2516,7 +2538,7 @@ void globalEopAiConfig::getData(const factionStruct* fac)
 					const auto threatGiving = res->army->totalStrength - settRes->positionPower;
 					if (threatGiving > 0)
 						res->totalThreatGiving += threatGiving / nearSettlement.turns;
-					settRes->totalThreatReceiving += res->army->totalStrength;
+					settRes->totalThreatReceiving += res->army->totalStrength / nearSettlement.turns;
 				}
 				else
 				{
@@ -2545,7 +2567,7 @@ void globalEopAiConfig::getData(const factionStruct* fac)
 					const auto threatGiving = res->army->totalStrength - armyRes->positionPower;
 					if (threatGiving > 0)
 						res->totalThreatGiving += threatGiving / nearArmy.turns;
-					armyRes->totalThreatReceiving += res->army->totalStrength;
+					armyRes->totalThreatReceiving += res->army->totalStrength / nearArmy.turns;
 				}
 				else
 				{
@@ -3021,7 +3043,7 @@ void aiMilitaryDirector::checkDefensiveCampaigns(const aiGlobalStrategyDirector*
 		for (int j = 0; j < director->ownRegionsCount; j++)
 		{
 			if (const auto ownRegion = &director->ownRegions[j];
-				defCampaign->regionData->targetsSameSettlement(ownRegion))
+				defCampaign->targetsSameSettlement(ownRegion))
 			{
 				defCampaign->regionData = ownRegion;
 				found = true;
@@ -3050,6 +3072,7 @@ void aiMilitaryDirector::checkDefensiveCampaigns(const aiGlobalStrategyDirector*
 		if (!found)
 		{
 			const auto newController = createCampaignController(ownRegion);
+			newController->settlementIndex = ownRegion->settlementIndex;
 			addCampaign(&defensiveCampaigns, newController);
 		}
 	}
@@ -3067,7 +3090,7 @@ void aiMilitaryDirector::checkOffensiveCampaigns(const aiGlobalStrategyDirector*
 		for (int j = 0; j < director->targetRegionsCount; j++)
 		{
 			if (const auto targetRegion = &director->targetRegions[j];
-				offCampaign->regionData->targetsSameSettlement(targetRegion))
+				offCampaign->targetsSameSettlement(targetRegion))
 			{
 				offCampaign->regionData = targetRegion;
 				found = true;
@@ -3096,6 +3119,7 @@ void aiMilitaryDirector::checkOffensiveCampaigns(const aiGlobalStrategyDirector*
 		if (!found)
 		{
 			const auto newController = createCampaignController(targetRegion);
+			newController->settlementIndex = targetRegion->settlementIndex;
 			addCampaign(&offensiveCampaigns, newController);
 		}
 	}
@@ -3115,7 +3139,7 @@ void aiMilitaryDirector::checkAidingCampaigns(const aiGlobalStrategyDirector* di
 			for (int j = 0; j < director->allNeighbourRegionsCount; j++)
 			{
 				if (const auto targetRegion = &director->allNeighbourRegions[j];
-					aidCampaign->regionData->targetsSameSettlement(targetRegion))
+					aidCampaign->targetsSameSettlement(targetRegion))
 				{
 					aidCampaign->regionData = targetRegion;
 					found = true;
@@ -3149,6 +3173,7 @@ void aiMilitaryDirector::checkAidingCampaigns(const aiGlobalStrategyDirector* di
 			const auto newController = createCampaignController(targetRegion);
 			newController->setStrategy(aiCampaignStrategy::attackAid);
 			newController->strengthRequiredType = static_cast<int>(aiCampaignStrength::medium);
+			newController->settlementIndex = targetRegion->settlementIndex;
 			addCampaign(&aidingCampaigns, newController);
 		}
 	}
@@ -3502,7 +3527,7 @@ void aiCampaignController::updateAllocation()
 		regionData->calculateRegionStrengths();
 		totalStrengthRequired = regionData->strength.enemyStrength - regionData->strength.ownStrength / 2;
 		totalStrengthRequired += regionData->neighboursStrength.enemyStrength / 4 - regionData->neighboursStrength.ownStrength / 8;
-		if (const auto targetSett = regionData->getSettlement(); targetSett && targetSett->army)
+		if (const auto targetSett = regionData->getSettlement(); targetSett && targetSett->army && targetSett->isEnemyToFaction(faction))
 		{
 			totalStrengthRequired = max(totalStrengthRequired, static_cast<int>(targetSett->army->totalStrength * 1.5f));
 		}
@@ -3516,6 +3541,11 @@ void aiCampaignController::setStrategy(aiCampaignStrategy strategy)
 	if (strategyType == aiCampaignStrategy::dormant)
 		strategyType = static_cast<int>(aiCampaignStrategy::gathering);
 	nextStrategyType = static_cast<int>(strategy);
+}
+
+bool aiCampaignController::targetsSameSettlement(const aiRegionData* other) const
+{
+	return this->targetRegionID == other->regionID && this->settlementIndex == other->settlementIndex;
 }
 #pragma endregion aiCampaignController methods
 
@@ -3642,6 +3672,7 @@ void aiLongTermGoalDirector::update()
 	checkConsiderNavalInvasion();
 	if (this->consideringNavalInvasion)
 		setNavalTarget();
+	callClassFunc<aiLongTermGoalDirector*, void>(this, doAllianceStuff);
 }
 
 void aiLongTermGoalDirector::reset()
@@ -3655,8 +3686,9 @@ void aiLongTermGoalDirector::clampInvadePriority()
 	const auto config = campaignAi::getLtgdConfig();
 	for (int i = 0; i < campaign->factionCount; i++)
 	{
-		const auto invadePriority = this->longTermGoalValues[faction->factionID].invadePriority;
-		this->longTermGoalValues[faction->factionID].invadePriority = clamp(invadePriority, config->minInvadePriority, config->maxInvadePriority);
+		const auto fac = campaign->getFactionByOrder(i);
+		const auto invadePriority = this->longTermGoalValues[fac->factionID].invadePriority;
+		this->longTermGoalValues[fac->factionID].invadePriority = clamp(invadePriority, config->minInvadePriority, config->maxInvadePriority);
 	}
 }
 
@@ -3764,7 +3796,7 @@ int aiLongTermGoalDirector::getNavalTargetScore(const seaConnectedRegion* seaReg
 		return -1;
 	}
 	const auto mapSize = sMap->mapWidth * sMap->mapHeight;
-	const auto mapSizeModifier = mapSize / baseMapSize;
+	const float mapSizeModifier = static_cast<float>(mapSize) / baseMapSize;
 	int score = static_cast<int>(seaRegion->moveCostBestLandTile - (baseMinFloat * mapSizeModifier));
 	if (score > 0)
 	{
@@ -3871,7 +3903,7 @@ settlementTroopPolicy aiPersonalityValues::decideSettlementTroopPolicy(const set
 	const auto region = stratMapHelpers::getRegion(settlement->regionID);
 	const int neighbourNum = region->neighbourRegionsNum;
 	int enemyNum = region->getEnemySettsToFaction(settlement->factionID);
-	int neutralNum = region->getEnemySettsToFaction(settlement->factionID);
+	int neutralNum = region->getNeutralSettsToFaction(settlement->factionID);
 	for (int i = 0; i < neighbourNum; i++)
 	{
 		const auto nRegion = region->neighbourRegions[i];
@@ -3919,14 +3951,15 @@ settlementTroopPolicy aiPersonalityValues::decideSettlementTroopPolicy(const set
 			}
 			garrisonInfantryNum++;
 		}
-		garrisonArtilleryRatio = garrisonArtilleryNum / static_cast<float>(settlement->army->numOfUnits);
-		garrisonCavalryRatio = garrisonCavalryNum / static_cast<float>(settlement->army->numOfUnits);
-		garrisonInfantryRatio = garrisonInfantryNum / static_cast<float>(settlement->army->numOfUnits);
-		garrisonMissileRatio = garrisonMissileNum / static_cast<float>(settlement->army->numOfUnits);
-		garrisonSpearmenRatio = garrisonSpearmenNum / static_cast<float>(settlement->army->numOfUnits);
+		const float numUnits = settlement->army->numOfUnits == 0 ? 1.f : static_cast<float>(settlement->army->numOfUnits);
+		garrisonArtilleryRatio = static_cast<float>(garrisonArtilleryNum) / numUnits;
+		garrisonCavalryRatio = static_cast<float>(garrisonCavalryNum) / numUnits;
+		garrisonInfantryRatio = static_cast<float>(garrisonInfantryNum)/ numUnits;
+		garrisonMissileRatio = static_cast<float>(garrisonMissileNum) / numUnits;
+		garrisonSpearmenRatio = static_cast<float>(garrisonSpearmenNum) / numUnits;
 	}
-	const float infantryPref = (getRecruitmentValueEnum(unitCategoryClass::heavyInfantry) + getRecruitmentValueEnum(unitCategoryClass::lightInfantry) / 2.f) * (isUnderRisk ? 1.5f : 0.5f);
-	const float cavalryPref = (getRecruitmentValueEnum(unitCategoryClass::heavyCavalry) + getRecruitmentValueEnum(unitCategoryClass::lightCavalry) + getRecruitmentValueEnum(unitCategoryClass::missileCavalry) / 3.f) * (safeRegion ? 2.f : 1.f);
+	const float infantryPref = ((getRecruitmentValueEnum(unitCategoryClass::heavyInfantry) + getRecruitmentValueEnum(unitCategoryClass::lightInfantry)) / 2.f) * (isUnderRisk ? 1.5f : 0.5f);
+	const float cavalryPref = ((getRecruitmentValueEnum(unitCategoryClass::heavyCavalry) + getRecruitmentValueEnum(unitCategoryClass::lightCavalry) + getRecruitmentValueEnum(unitCategoryClass::missileCavalry)) / 3.f) * (safeRegion ? 2.f : 1.f);
 	const float missilePref = getRecruitmentValueEnum(unitCategoryClass::missileInfantry) * (isUnderRisk ? 2.f : 1.f);
 	const float spearmenPref = getRecruitmentValueEnum(unitCategoryClass::spearmenInfantry) * (isUnderRisk ? 2.f : 1.f);
 	const float artilleryPref = getRecruitmentValueEnum(unitCategoryClass::siegeWeapon) * (safeRegion ? 1.f : 0.5f);
@@ -4004,7 +4037,7 @@ void aiPersonalityValues::initValues()
 {
 	clearBuildingBias();
 	clearRecruitmentBias();
-	constexpr int policyLevels[4] = { 32, 16, 8, 0 };
+	constexpr int policyLevels[5] = { 32, 16, 8, 4, 0 };
 	constexpr int troopStatus[4] = { 128, 64, 32, 16 };
 	int boost = policyLevels[this->aiFaction->ltgd->longTermPolicy];
 	const int troopBoost = troopStatus[this->aiFaction->ltgd->longTermTroopStatus];
@@ -4026,7 +4059,7 @@ void aiPersonalityValues::initValues()
 	{
 		for (int i = 1; i < 8; i++)
 		{
-			incConstructionUnitValue(i, boost);
+			incConstructionUnitValue(i, troopBoost);
 			incRecruitmentValue(i, troopBoost);
 		}
 	}
@@ -4238,7 +4271,7 @@ void aiGlobalStrategyDirector::initialize2()
 		{
 			const auto fac = campaign->getFactionByOrder(i);
 			const auto facDip = campaign->getFactionDiplomacy(faction->factionID, fac->factionID);
-			if (faction->isNeighbourFaction(fac) && facDip->state == dipStance::war)
+			if (faction->isNeighbourFaction(fac) && facDip->state == dipStance::war && !aiFaction->ltgd->longTermGoalValues[fac->factionID].wantPeace)
 			{
 				stratFacData[fac->factionID].atWar = true;
 				stratFacData[fac->factionID].activeWar = true;
@@ -4260,7 +4293,7 @@ void aiGlobalStrategyDirector::initialize2()
 	for (int i = 0; i < campaign->factionCount; i++)
 	{
 		const auto fac = campaign->factionsSortedByTurnOrder[i];
-		const auto facId = faction->factionID;
+		const auto facId = fac->factionID;
 		if (facId == campaign->slaveFactionID || fac->deadStatus > 0)
 			continue;
 		const auto stratData = stratFacData[facId];
@@ -4460,7 +4493,7 @@ void aiGlobalStrategyDirector::initTargetRegions()
 	{
 		const auto targetFaction = allNeighbourRegions[i].getTargetFaction();
 		const int targetId = targetFaction->factionID;
-		if ((stratFacData[targetId].activeWar && !aiFaction->ltgd->longTermGoalValues[targetId].wantPeace)
+		if ((stratFacData[targetId].plannedWar && !aiFaction->ltgd->longTermGoalValues[targetId].wantPeace)
 			|| targetId == campaign->slaveFactionID)
 		{
 			const auto regionData = &allNeighbourRegions[i];

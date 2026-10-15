@@ -475,6 +475,8 @@ public:
 	static void setDisplayEnemyStats(const bool value) { displayEnemyStats = value; }
 	static bool getEnableAiBattles() { return enableAiBattles; }
 	static void setEnableAiBattles(const bool value) { enableAiBattles = value; }
+	static bool getRandomizeHealing() { return randomizeHealing; }
+	static void setRandomizeHealing(const bool value) { randomizeHealing = value; }
 	static int getAiBattleFrequency() { return aiBattleFrequency; }
 	static void setAiBattleFrequency(const int value) { aiBattleFrequency = value; }
 	static DWORD getColor() { return (static_cast<uint32_t>(0xFF) << 24) | (khakiTextRed << 16) | (khakiTextGreen << 8) | khakiTextBlue; }
@@ -513,6 +515,7 @@ public:
 	static bool isSetKhaki;
 	static bool isOpenGateOnStratMap;
 	static bool enableAiBattles;
+	static bool randomizeHealing;
 };
 
 struct boostLightMutex
@@ -601,6 +604,7 @@ namespace gameHelpers
 	std::string getModPath();
 	std::string getLuaPath();
 	std::string getModFolderName();
+	int getRandomInt(int min, int max);
 	void copyFileLua(const std::string& file, const std::string& to);
 	void setExpandedString(const std::string& key, const std::string& value);
 	std::string getExpandedString(const std::string& key);

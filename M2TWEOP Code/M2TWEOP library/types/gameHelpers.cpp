@@ -49,6 +49,7 @@ bool m2tweopOptions::noAiMissileLooseFormation = true;
 bool m2tweopOptions::displayEnemyStats = true;
 int m2tweopOptions::aiBattleFrequency = 2;
 bool m2tweopOptions::enableAiBattles = false;
+bool m2tweopOptions::randomizeHealing = true;
 
 scriptCommand::scriptCommand(const char* name) : className(name)
 {
@@ -748,6 +749,16 @@ namespace gameHelpers
 			globals::dataS.modFolderName = path.substr(pos + 1, path.length() - pos);
 		}
 		return globals::dataS.modFolderName;
+	}
+
+	int getRandomInt(const int min, const int max)
+	{
+		if (min > max)
+			return min;
+		static std::random_device rd;
+		static std::mt19937 gen(rd());
+		std::uniform_int_distribution<> dis(min, max);
+		return dis(gen);
 	}
 
 	void copyFileLua(const std::string& file, const std::string& to)

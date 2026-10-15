@@ -4154,8 +4154,10 @@ onInitGsd::onInitGsd(MemWork* mem, LPVOID addr, int ver)
 void onInitGsd::SetNewCode()
 {
 	const auto a = new Assembler();
+	a->pushad();
 	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
 	a->call(eax);
+	a->popad();
 	a->ret();
 	m_cheatBytes = static_cast<unsigned char*>(a->make());
 	delete a;
@@ -4174,8 +4176,10 @@ onInitGsd2::onInitGsd2(MemWork* mem, LPVOID addr, int ver)
 void onInitGsd2::SetNewCode()
 {
 	const auto a = new Assembler();
+	a->pushad();
 	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
 	a->call(eax);
+	a->popad();
 	a->ret();
 	m_cheatBytes = static_cast<unsigned char*>(a->make());
 	delete a;
@@ -6952,6 +6956,38 @@ void onChooseCaptainUnit::SetNewCode()
 	a->call(eax);
 	a->mov(ecx, jumpAddr);
 	a->jmp(ecx);
+	a->ret();
+	m_cheatBytes = static_cast<unsigned char*>(a->make());
+	delete a;
+}
+
+onHealCasualties::onHealCasualties(MemWork* mem, LPVOID addr, int ver)
+	:AATemplate(mem), funcAddress(addr)
+{
+	if (ver == 2)//steam
+		m_adress = 0x617998;
+
+	else if (ver == 1)//kingdoms
+		m_adress = 0x6175F8;
+}
+
+void onHealCasualties::SetNewCode()
+{
+	const auto a = new Assembler();
+	const auto label = a->newLabel();
+	const auto jumpAddr = m_adress + 0x171;
+	a->pushad();
+	a->mov(ecx, ebx);
+	a->sub(ecx, 0x5C);
+	a->mov(eax, reinterpret_cast<DWORD>(funcAddress));
+	a->call(eax);
+	a->mov(dword_ptr(esp, 0x1C), eax);
+	a->popad();
+	a->test(eax, eax);
+	a->jnz(label);
+	a->mov(eax, jumpAddr);
+	a->jmp(eax);
+	a->bind(label);
 	a->ret();
 	m_cheatBytes = static_cast<unsigned char*>(a->make());
 	delete a;

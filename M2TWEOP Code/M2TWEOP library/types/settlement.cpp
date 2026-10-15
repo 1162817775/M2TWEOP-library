@@ -61,7 +61,7 @@ void aiProductionController::setBuildPoliciesAndTaxLevel(const int policy, const
 	if (this == nullptr)  // NOLINT(clang-diagnostic-tautological-undefined-compare)
 		return;
 	if (this->autoManagePolicy != settlementPolicy::none)
-		--*(&this->aiFaction->aiProductionControllers->balancedPolicyNum + policy);
+		--*(&this->aiFaction->aiProductionControllers->balancedPolicyNum + this->autoManagePolicy);
 	this->autoManagePolicy = policy;
 	this->secondaryPolicy = recruitPolicy;
 	this->aiFaction->aiProductionControllers->updatePolicies(this->settlement, policy);

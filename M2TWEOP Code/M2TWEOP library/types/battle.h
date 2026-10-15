@@ -1,5 +1,6 @@
 ﻿
 #pragma once
+#include "characterRecord.h"
 #include "realGameTypes.h"
 #include "lua/sol.hpp"
 
@@ -1007,6 +1008,8 @@ public:
 	{
 		return &units[index];
 	}
+	battleUnit* findBattleUnit(const unit* un);
+	int takenPrisonerSum();
 };//Size: 0x00BC
 
 struct battlePos
@@ -1047,6 +1050,16 @@ struct deployData {
 	int8_t byte_0x1D[3];
 };
 
+struct lostSoldier
+{
+	int reason;
+	soldierInBattle* soldier;
+	struct soldierData* data;
+	trackedUnit trackedUnit;
+	int captureFacId;
+	characterRecord* character;
+};
+
 struct battleSideArmy {
 	int trackedArmyVtbl;
 	struct armyStruct* stack;//0x0004
@@ -1066,7 +1079,7 @@ struct battleSideArmy {
 	bool hasReformPoint;
 	int8_t byte_0x31[3];
 	gameList<deployData> deploymentAreas;
-	void* lostSoldiers;
+	lostSoldier* lostSoldiers;
 	int lostSoldiersSize;
 	int lostSoldiersCount;
 	void* fledSoldiers;
@@ -1694,6 +1707,7 @@ namespace battleHelpers
 	float getBattleMapHeight(float xCoord, float yCoord);
 	bool inBattle();
 	void autoResolve();
+	battleArmy* findBattleArmyWithSide(battleSide* side, const armyStruct* army);
 	bool autoWin(const char* winnerSide);
     void addToLua(sol::state& luaState);
 	int addDebugLine(vector3* start, vector3* end, uint32_t color, float time);

@@ -107,7 +107,7 @@ struct character
 	bool unusedMovePoints;
 	bool infiniteMovePoints;
 	int8_t multiTurnMoveThisTurn;
-	int8_t padc7;
+	bool hasEopOrders;
 	float movePointsCharacter;
     float totalMpCost;
 	uchar isStopCharacterNeeded; /* set to 1 if character moving now and he stops */
@@ -129,8 +129,8 @@ struct character
 	struct armyStruct* visitingArmy; /* army, if not leader */
 	character *surrenderToCharacter;
 	character *surrenderTile;
-	factionStruct *captor;
-	bool hasEopOrders;
+	factionStruct* captor;
+	bool hostage;
 	int8_t turnExecuting;
 	int16_t additionalRot;
 	int timer;

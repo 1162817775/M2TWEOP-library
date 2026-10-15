@@ -1677,6 +1677,66 @@ int patchesForGame::chooseCaptainUnit(armyStruct* army)
 	return 0;
 }
 
+character* __fastcall patchesForGame::onHealCasualties(battleSideArmy* sideArmy)
+{
+	const auto army = sideArmy->stack;
+	const auto namedChar = army->gen->characterRecord;
+	if (!m2tweopOptions::getRandomizeHealing())
+	{
+		return army->gen;
+	}
+	const int surgery = std::clamp(namedChar->battleSurgery, 0, 10);
+	const auto lostSoldierCount = sideArmy->lostSoldiersCount;
+	const auto battleData = battleHelpers::getBattleData();
+	battleArmy* bArmy = nullptr;
+	for (int s = 0; s < battleData->sidesNum; ++s)
+	{
+		const auto side = &battleData->sides[s];
+		if (bArmy = battleHelpers::findBattleArmyWithSide(side, army); bArmy != nullptr)
+			break;
+	}
+	if (!bArmy)
+		return army->gen;
+	auto soldiersToHeal = lostSoldierCount - bArmy->takenPrisonerSum();
+	const float surgeryRatio = (0.15f + (0.03f * static_cast<float>(surgery)));
+	soldiersToHeal = static_cast<int>(ceil(static_cast<float>(soldiersToHeal) * surgeryRatio));
+	std::vector<lostSoldier*> candidates;
+	for (int i = 0; i < lostSoldierCount; ++i)
+	{
+		auto* lostSoldier = &sideArmy->lostSoldiers[i];
+		if (!lostSoldier->trackedUnit.unit || !lostSoldier->soldier)
+		{
+			continue;
+		}
+		auto* soldier = lostSoldier->soldier;
+		if (!soldier->isRecoverable || soldier->isOfficer || soldier->isOfficerCommanding || soldier->isGeneral) 
+		{
+			continue;
+		}
+		if (soldier->captor) 
+		{ 
+			soldier->thisUnit->recoverSoldier(soldier); 
+			soldier->captor = nullptr; 
+			continue; 
+		}
+		candidates.push_back(lostSoldier);
+	}
+	const int n = min<int>(soldiersToHeal, static_cast<int>(candidates.size()));
+	for (int k = 0; k < n; ++k)
+	{
+		std::swap(candidates[k], candidates[gameHelpers::getRandomInt(k, static_cast<int>(candidates.size()) - 1)]);
+		auto* soldier = candidates[k]->soldier;
+		if (auto* bUnit = bArmy->findBattleUnit(soldier->thisUnit))
+		{
+			soldier->thisUnit->recoverSoldier(soldier);
+			bUnit->soldiersHealed++; 
+			bUnit->soldiersEnd++;
+		}
+	}
+	return nullptr;
+}
+
+
 int patchesForGame::onGetTrueBuildingCapabilities(const int counter, const stackCapabilities* cap)
 {
 	if (counter < 32)
@@ -3420,6 +3480,7 @@ minHookFunctions::t_onAerialMapUpdate                      minHookFunctions::o_o
 minHookFunctions::t_onAerialMapSetPosition                 minHookFunctions::o_onAerialMapSetPosition = nullptr;
 minHookFunctions::t_onMoveStratCameraSlow                  minHookFunctions::o_onMoveStratCameraSlow = nullptr;
 minHookFunctions::t_onZoomStratCamera                      minHookFunctions::o_onZoomStratCamera = nullptr;
+minHookFunctions::t_onCalcPathFindWidth                    minHookFunctions::o_onCalcPathFindWidth = nullptr;
 
 DWORD minHookFunctions::lastSoundClass = NULL;
 bool minHookFunctions::isUnlockWeaponLimit = false;
@@ -3510,6 +3571,19 @@ void minHookFunctions::init()
 	MIN_HOOK(a_onAerialMapSetPosition,                 onAerialMapSetPosition,                 o_onAerialMapSetPosition);
 	MIN_HOOK(moveStratCameraSlowFunc,                  onMoveStratCameraSlow,                  o_onMoveStratCameraSlow);
 	MIN_HOOK(zoomStratCameraFunc,                      onZoomStratCamera,                      o_onZoomStratCamera);
+	MIN_HOOK(onCalcPathFindWidth,                      onCalcPathFindWidth,                    o_onCalcPathFindWidth);
+}
+
+/* prevents infinite loop in pathfinding code, game bug with invalid float argument */
+bool __thiscall minHookFunctions::onCalcPathFindWidth(void* _this, vector2* start, vector2* end, float maxWidth, float* outWidth, int swim, int maxSlope, int validZone)
+{
+	if (!(maxWidth >= 0.f && maxWidth <= 256.f))                                                                                                                                                                                    
+	{                                                                                                                                                                                                                               
+		gameHelpers::logStringGame("onCalcPathFindWidth: maxWidth out of range or NaN, resetting to 256.f");                                                                                                                           
+		maxWidth = 256.f;                                                                                                                                                                                                       
+	}  
+	
+	return o_onCalcPathFindWidth(_this, start, end, maxWidth, outWidth, swim, maxSlope, validZone);
 }
 
 int __thiscall minHookFunctions::debugLineAdd(void* _this, vector3* start, vector3* end, color8888 color, float time, bool zbuffered)
