@@ -464,7 +464,7 @@ struct aiCampaignController : aiMilitaryController
     bool attacking;
     bool canRequestMore;
     bool canAttack;
-    bool fieldx3F;
+    uint8_t settlementIndex;
     int strategyType;
     int lastStrategyType;
     int nextStrategyType;
@@ -484,6 +484,7 @@ struct aiCampaignController : aiMilitaryController
     void logData();
     void updateAllocation();
     void setStrategy(aiCampaignStrategy strategy);
+    bool targetsSameSettlement(const aiRegionData* other) const;
 	aiCampaignStrategy getCurrentStrategy() { return static_cast<aiCampaignStrategy>(strategyType);}
 	aiCampaignStrategy getNextStrategy() { return static_cast<aiCampaignStrategy>(nextStrategyType);}
 };
@@ -710,7 +711,7 @@ public:
 	}
 	void incConstructionUnitValue(int type, int value)
 	{
-		unitBuildingValues[type] = value;
+		unitBuildingValues[type] += value;
 	}
 	void setRecruitmentValue(int type, int value)
 	{
@@ -750,7 +751,7 @@ public:
 	}
 	int getRecruitmentValueEnum(unitCategoryClass type)
 	{
-		return unitBuildingValues[static_cast<int>(type)];
+		return unitRecruitmentValues[static_cast<int>(type)];
 	}
 	int getAgentValue(int type)
 	{
@@ -1062,7 +1063,7 @@ public:
 	float costMultiplier = 2;
 	bool enabled = true;
 	bool logProduction = true;
-	void unitProducer(const factionStruct* faction);
+	void unitProducer(const factionStruct* faction) const;
 };
 
 class globalEopAiConfig
@@ -1135,6 +1136,21 @@ protected:
 	void getData(const factionStruct* fac);
 	void clearData()
 	{
+		for (const auto* list : { &m_Armies, &m_AllyArmies, &m_TargetArmies })
+		{
+			for (auto& res : *list)
+			{
+				res->nearResources.clear();
+				res->nearSetts.clear();
+			}
+		}
+		for (const auto* list : { &m_Settlements, &m_AllySettlements, &m_TargetSettlements })
+		{
+			for (auto& res : *list)
+			{
+				res->nearResources.clear();
+			}
+		}
 		m_Armies.clear();
 		m_AllyArmies.clear();
 		m_TargetArmies.clear();

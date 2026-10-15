@@ -2504,6 +2504,18 @@ private:
 	LPVOID funcAddress;
 };
 
+class onHealCasualties
+	:public AATemplate
+{
+public:
+	onHealCasualties(MemWork* mem, LPVOID addr, int ver);
+	~onHealCasualties() = default;
+	
+	void SetNewCode();
+private:
+	LPVOID funcAddress;
+};
+
 
 class onExchangeWithCharacter
 	:public AATemplate

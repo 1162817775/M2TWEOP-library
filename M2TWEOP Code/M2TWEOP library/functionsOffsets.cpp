@@ -452,6 +452,8 @@ void codes::initCodes(int gameVer)
 		offsets.setupBattleTime = 0x45C460;
 		offsets.transitionToBattle = 0x44EA70;
 		offsets.autoResolveHandler = 0x628D60;
+		offsets.recoverSoldier = 0x743930;
+		offsets.onCalcPathFindWidth = 0xE05F80;
 	}
 
 
@@ -907,5 +909,7 @@ void codes::initCodes(int gameVer)
 		offsets.setupBattleTime = 0x45C7E0;
 		offsets.transitionToBattle = 0x44EDB0;
 		offsets.autoResolveHandler = 0x629110;
+		offsets.recoverSoldier = 0x7440B0;
+		offsets.onCalcPathFindWidth = 0xE005B0;
 	}
 }

@@ -145,6 +145,7 @@ public:
 	static int __cdecl onCalcArrowKillChance(unitStats* stats, soldierInBattle* defender, int16_t angle, int* dir, float heightDiff, int bonus);
 	static int __fastcall onCalculateCommand(const characterRecord* general);
 	static int __fastcall chooseCaptainUnit(armyStruct* army);
+	static character* __fastcall onHealCasualties(battleSideArmy* army);
 	static void __fastcall onRemoveFromUnitQueue(const unitRQ* queue, int index);
 	static void __fastcall onLoadModelRigid(model_Rigid* model);
 	static void __fastcall onUnloadModels();
@@ -1179,6 +1180,10 @@ public:
 	using t_onZoomStratCamera = void(__cdecl*)(float target);
 	static t_onZoomStratCamera o_onZoomStratCamera;
 	static void __cdecl onZoomStratCamera(float target);
+
+	using t_onCalcPathFindWidth = bool(__thiscall*)(void* _this, vector2* start, vector2* end, float maxWidth, float *outWidth, int swim, int maxSlope, int validZone);
+	static t_onCalcPathFindWidth o_onCalcPathFindWidth;
+	static bool __thiscall onCalcPathFindWidth(void* _this, vector2* start, vector2* end, float maxWidth, float *outWidth, int swim, int maxSlope, int validZone);
 
 	static void stratCameraMouseWheel();
 	static void enableEopCamera(bool set, float speedRotate, float speedMove, float speedZoom, bool toBattle);
